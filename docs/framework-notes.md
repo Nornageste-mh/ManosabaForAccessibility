@@ -1,4 +1,4 @@
-﻿# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
+# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
 
 > 给 Lead 与后续逐作开发用。**只留可执行事实**，不抄 Framework 文档原文。
 > 仓库：`D:\DSHWorkSpace\Framework`（只读，未做任何修改）。
@@ -370,3 +370,51 @@ Framework 仓库未改动：`git status --porcelain` 为空。
 
 **仍未做（诚实记录）：** 魔女手册朗读/页签、存读档界面、关键选项「重要选项」提示、
 快进经过的行能否重读 —— 都还没实机复测。
+
+## 14. 第七轮：未命名控件（魔女手册）+ 审判实机 + 配音报名字默认关（0.0.0.4）
+
+**用户反馈的三件事**（m03529）：「有很多未命名控件，用 REA 继续研究」「魔女审判暂时还没有测试」
+「有配音文字朗读角色名需要默认关闭」。
+
+### 14.1 未命名控件的根因不是"没取名字"，是"取不到激活文字"
+
+- 取证：用户自己那轮日志里 44 条 `[UiNav] 未命名控件`，全部集中在魔女手册：
+  `Tab_Maps` 17、`Tab_Notes` 10、`WitchBookButtonUI/Wrapper/Button` 9、
+  `Page_Clues/.../PresentEvidenceButton/Button` 5、`Tab_Rules` 3。
+- 平台 `ResolveLabel` 的第一顺位是 `OwnTextOf`（只看**激活**的 `TMP_Text`）。而本作页签标签
+  挂在 `WitchTrialsTabToggle._defaultLabel/_highlightedLabel`（`CanvasGroup`）下，
+  未选中的页签文字是未激活子物体 —— 于是平台层拿到空串，落到类型名。
+- 改法（逐作层内，未动平台）：`GameLabelOf` 再降一级 `InactiveTextOf(transform, 3)`，
+  用 `GetComponentsInChildren<TMP_Text>(true)` 取第一段 ≤24 字、非噪声的文字；
+  **Slider/Dropdown 必须跳过**，否则会把「100%」「简体中文」这种当前值当名字。
+- 交叉验证：`UiProbe` 给每个 `UIPROBE item` 打 `resolved='…'`，run60 显示
+  `Tab_Clues→线索`、`Focus(Page_Maps/F1_1/Infirmary)→医务室`、`ButtonNext→下一页`。
+
+### 14.2 组名要"先看组根自己"，否则十个页签组全叫「魔女手册」
+
+第一版 `GameGroupName` 从组根向上找 `GroupAlias`，结果 10 个页签组都命中祖先 `WitchBookUI`。
+改成：先看组根自己（`GroupAlias`，或以 `Tab_` 开头则 `NameAlias + "页签"`），再向上。
+run61 播报：`导航模式。第 1 / 10 组：记录页签，1 项。全部 10 组：【记录页签 1 项】；规定页签 1 项；…`。
+
+### 14.3 审判（魔女审判）实机结论
+
+- 辩论文本走 `DebateTextPrinterPanel.AddText(string)`，**没有 `PrintedMessage`**，所以辩论行
+  没有行 id → 配音闸门不生效（辩论台词本来也几乎都有配音，实际影响小）。
+- 辩论不报说话人：界面没有可靠名字来源，宁可只读正文，不张冠李戴。
+- 审判倒计时与 HP 条不是 `Selectable`，导航扫不到 —— 目前**不主动播报**（属于"可感知性缺口"，
+  不是 bug；要做得另挂 `WitchTrialsNaninovelManager.OnRemainingTimeChangedAsObservable`，
+  但它是 `IObservable` 的 IL2CPP 转换，成本高且容易引入噪声，本轮未做）。
+- 「跳过辩论」按钮有名字：`DebateUI/Wrapper/SkipButton/Button → 跳过辩论`（run59 UIPROBE）。
+
+### 14.4 方向键逐项移动仍然没能在自动化下复测
+
+`keybd_event` 合成方向键/PageDown/HOME 这类扩展键需要 `KEYEVENTF_EXTENDEDKEY(0x0001)`，
+即使加了标志，6 FPS 下 420ms 按住仍常常落在两帧之间；KEYDIAG 232 行里只稳定看到
+`alt=True shift=True`，`up/down` 恒 False。结论：**这条路只能玩家自己试**，
+代码路径与已实测的标题菜单完全一致（`KeyEdge.Pressed` → `GetAsyncKeyState`）。
+
+### 14.5 "有配音时也报说话人"改默认关
+
+用户要求「有配音文字朗读角色名需要默认关闭」——默认值改 `false`（`CfgAnnounceOnVoiced`）。
+注意 BepInEx 的 `ConfigEntry` **不会迁移老配置**：玩家已有的 cfg 里仍是 `true`，
+文档必须写「升级后自己确认这一行」。

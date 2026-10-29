@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.3`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.4`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -18,6 +18,50 @@
 - 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
+
+### v0.0.0.4（魔女手册命名 + 审判实机验证 + 配音报名字改默认关）
+
+**已实机验证（2026-10-29，Unity 6000.0.48f1 / IL2CPP / BepInEx 6.0.0-be.788）**
+
+- 修：**魔女手册里一串「未命名开关/未命名按钮」**（玩家实机反馈「有很多未命名控件」）。
+  - 取证：玩家日志里 44 条 `[UiNav] 未命名控件`，按路径分组 = 页签 `Tab_Maps`(17)、`Tab_Notes`(10)、
+    `Tab_Rules`(3)、打开手册的 `WitchBookButtonUI/Wrapper/Button`(9)、`PresentEvidenceButton`(5)。
+  - 根因：这些页签只有 `CanvasGroup`+`RebuildableLabel`，**TMP 文字挂在未激活的子物体上**，
+    平台层的 `OwnTextOf` 只认激活文字 → 一个字都取不到；按钮本身对象名又太泛（`Button`/`Wrapper`）。
+  - 改法（都在逐作层 `UiNav.Game.cs`，平台层未动）：
+    1) `NameAlias` 补页签（线索/人物/地图/规定/记录）、出示证据、魔女手册、分页箭头（上一页/下一页）、
+       `LoupeButton`（放大查看）；
+    2) `PathAlias` 补**地图全部 29 个地点**（医务室/审判庭/图书室/…，中文名取自游戏自己的
+       `CustomUI.txt` 的 `WitchBook.Map.*`，不是我们编的）与楼层容器（F1_1/F2_1/F2_2/B1_1）；
+    3) `GameLabelOf` 增加「NameAlias 祖先」与 `InactiveTextOf`（读子树里**未激活**的 TMP 文字，
+       长度 ≤24、过噪声过滤；滑条/下拉框跳过，否则会把「100%」当名字）；
+    4) `GameGroupName` 改成**先看组根自己**：魔女手册的 5 个页签各自成组，之前一路往上找到
+       `WitchBookUI` 会让 10 个组全念「魔女手册」。
+  - 实测（run60/run61 UIPROBE `resolved=` 栏）：`Tab_Clues→线索`、`Tab_Profiles→人物`、
+    `Focus(…/Page_Maps/F1_1/Infirmary)→医务室`、`Focus(…/B1_1/Incinerator)→焚烧炉`、
+    `ButtonNext→下一页`、`WitchBookButtonUI/Wrapper/Button→魔女手册`、`DebateUI/…/SkipButton→跳过辩论`。
+  - 实测（run61 导航播报原文）：`导航模式。第 1 / 10 组：记录页签，1 项。全部 10 组：【记录页签 1 项】；
+    规定页签 1 项；地图页签 1 项；人物页签 1 项；魔女手册 14 项；线索页签 1 项。…记录，开关，关。1 / 1`。
+- 改：**「有配音时也报说话人」改为默认关闭**（按要求）。现在有配音的行**完全安静**：
+  不念正文、也不念名字；玩家要文本时按 `Backspace` 用 TTS 重读（这一条 v0.0.0.3 已实机验证）。
+  旧配置文件不会自动迁移，装好后请确认 `BepInEx\config\manosaba.a11y.reader.cfg` 里
+  `有配音时也报说话人 = false`。
+- 验证：**魔女审判（审判/辩论）实机跑通**（run59，JUMP 到 `Act01_Chapter01/Act01_Chapter01_Trial01`，
+  300 秒真实点击推进）：`say=16 voiced=3 debate=34`。
+  - 辩论台词（`@printDebate`）逐句朗读，实测原文
+    `Reader.say[debate:add] raw=我找到的证据……<br>那就是<br>死亡讯息！ => 我找到的证据……那就是，死亡讯息！`；
+    带 `<link>`（异议触发词）的行只读文字、不读 id：`在这些地方都有用血画下的蝴蝶绘画！`。
+  - 审判画面的 HUD：跳过按钮 ` DebateUI/Wrapper/SkipButton/Button → 跳过辩论`；
+    倒计时与 HP 条**不是可交互控件**（是 Image/文字），导航读不到 —— 见「未验证/未实现」。
+- 诊断留档：`MANOSABA_A11Y_PROBE_UI=1` 的 UIPROBE 转储改成「12 秒后开始、最多 12 次、每次 40 秒」，
+  这样魔女手册、审判这些要走真实操作才能到达的画面也能被截到（run59 一次转储 1069 行）。
+- 未验证 / 未实现（诚实记录）：
+  - 「方向键逐项移动」在魔女手册里**没有在自动化下复测成功**：扩展键（方向键/PageDown）由脚本
+    `keybd_event` 合成时命中率不稳定（标题菜单那次成功过，书里这次没有），**建议玩家自己按方向键确认**；
+    代码路径与标题菜单完全相同（`KeyEdge.Pressed` → 全局 `GetAsyncKeyState`）。
+  - 审判倒计时、HP 数值、关键选项提示（`CriticalChoiceHint`）**不会主动播报**：前者是 Image+文字、
+    没有可交互控件可挂；后两者需要额外的主动播报机制，目前没做。
+  - 证据出示（`ChoiceEvidence`）只加了剧透闸门约束、**未实机走到该分支**。
 
 ### v0.0.0.3（退格重读 + 配音闸门 + 隐藏控制台）
 

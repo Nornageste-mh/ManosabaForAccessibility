@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyName>ManosabaA11y</AssemblyName>
     <RootNamespace>ManosabaA11y</RootNamespace>
-    <Version>0.0.0.3</Version>
+    <Version>0.0.0.4</Version>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -133,6 +133,11 @@
     这两个是插件的**编译期引用**，运行时由游戏自身加载，绝不随包分发。
   -->
   <ItemGroup>
+    <!-- 魔女手册页签/按钮的标签在 RebuildableLabel 里（screenshot 2026-10-29 的 44 条未命名控件） -->
+    <Reference Include="GigaCreation.Essentials.UI">
+      <HintPath>$(InteropDir)\GigaCreation.Essentials.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Elringus.Naninovel.Runtime">
       <HintPath>$(InteropDir)\Elringus.Naninovel.Runtime.dll</HintPath>
       <Private>false</Private>

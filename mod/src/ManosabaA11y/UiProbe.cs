@@ -32,7 +32,7 @@ namespace ManosabaA11y
                 catch { _enabled = false; }
                 if (!_enabled) { _done = true; return; }
                 _due = Time.realtimeSinceStartup + 12f;
-                A11yHost.Diag("UIPROBE 已排程：12 秒 / 30 秒各转储一次（标题画面出现得比较晚）");
+                A11yHost.Diag("UIPROBE 已排程：12 秒后开始，之后每 40 秒转储一次（最多 12 次；标题/魔女手册/审判画面前后各覆盖到）");
             }
             if (!_enabled) return;
             if (Time.realtimeSinceStartup < _due) return;
@@ -40,8 +40,10 @@ namespace ManosabaA11y
             _round++;
             Dump();
 
-            if (_round >= 2) { _done = true; return; }
-            _due = Time.realtimeSinceStartup + 18f;
+            // 早期每 18 秒一次（引擎初始化 → 标题），之后每 40 秒一次：
+            // 魔女手册、审判/辩论这些画面都要靠真实操作走进去，转储太早会漏掉。
+            if (_round >= 12) { _done = true; return; }
+            _due = Time.realtimeSinceStartup + (_round < 3 ? 18f : 40f);
         }
 
         private static string PathOf(Transform t)
@@ -134,20 +136,93 @@ namespace ManosabaA11y
                     catch { }
 
                     string label = txt.ToString();
+                    string resolved = "";
+                    try { resolved = UiNav.GameLabelOf(s); } catch { }
                     string key = type + "§" + path + "§" + label;
                     if (!seen.Add(key)) continue;
                     bool vis = false;
                     try { vis = UiVis.Visible(s); } catch { }
 
                     A11yHost.Diag("UIPROBE item type=" + type + " name='" + go + "' path='" + path
-                                 + "' label='" + label + "' active=" + active
+                                 + "' label='" + label + "' resolved='" + resolved + "' active=" + active
                                  + " interactable=" + interactable + " visible=" + vis);
                     if (++shown >= 120) { A11yHost.Diag("UIPROBE …（超过 120 条，截断）"); break; }
                 }
+
+                DumpLabels();
             }
             catch (Exception e)
             {
                 A11yHost.Diag("UIPROBE 失败: " + e.GetType().Name + ": " + e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 单独转储两类「美术字标签」组件：魔女手册的页签/按钮文字都挂在这上面，
+        /// 而它们的 GameObject 往往是**未激活**的（切页时才激活），平台层读不到。
+        /// 这一节是别名表与 InactiveTextOf 兜底的取证依据。
+        /// </summary>
+        private static void DumpLabels()
+        {
+            try
+            {
+                var rl = Resources.FindObjectsOfTypeAll<GigaCreation.Essentials.Ui.RebuildableLabel>();
+                if (rl != null && rl.Length > 0)
+                {
+                    A11yHost.Diag("UIPROBE rebuildableLabels=" + rl.Length);
+                    int n = 0;
+                    foreach (var l in rl)
+                    {
+                        if (l == null) continue;
+                        string path = "";
+                        string text = "";
+                        string id = "";
+                        bool active = false;
+                        try
+                        {
+                            path = PathOf(l.transform);
+                            active = l.gameObject.activeInHierarchy;
+                            id = l.LabelId == null ? "" : l.LabelId;
+                            if (l._uiLabel != null && l._uiLabel.text != null)
+                                text = l._uiLabel.text.Replace("\n", " ").Trim();
+                        }
+                        catch { }
+                        A11yHost.Diag("UIPROBE label path='" + path + "' id='" + id + "' text='" + text
+                                     + "' active=" + active);
+                        if (++n >= 80) { A11yHost.Diag("UIPROBE …（标签超过 80 条，截断）"); break; }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                A11yHost.Diag("UIPROBE 标签转储失败: " + e.GetType().Name + ": " + e.Message);
+            }
+
+            try
+            {
+                var ml = Resources.FindObjectsOfTypeAll<WitchTrials.Views.MapAreaLabel>();
+                if (ml != null && ml.Length > 0)
+                {
+                    A11yHost.Diag("UIPROBE mapAreaLabels=" + ml.Length);
+                    foreach (var m in ml)
+                    {
+                        if (m == null) continue;
+                        string path = "";
+                        string text = "";
+                        try
+                        {
+                            path = PathOf(m.transform);
+                            if (m._label != null && m._label.text != null)
+                                text = m._label.text.Replace("\n", " ").Trim();
+                        }
+                        catch { }
+                        A11yHost.Diag("UIPROBE mapLabel path='" + path + "' text='" + text + "'");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                A11yHost.Diag("UIPROBE 地图标签转储失败: " + e.GetType().Name + ": " + e.Message);
             }
         }
     }

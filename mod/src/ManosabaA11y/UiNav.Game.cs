@@ -60,6 +60,33 @@ namespace ManosabaA11y
             // ---- 引擎初始化进度条（run47 实测：EngineInitializationUI(Clone)/Wrapper/Progress）----
             // 启动阶段唯一可导航的控件，不给名字就会被念成「未命名滑条」。
             { "Progress",       "加载进度" },
+
+            // ---- 魔女手册（图鉴）页签与按钮 ----
+            // 依据：玩家 2026-10-29 11:20 那轮日志里的 44 条
+            //   [UiNav] 未命名控件：类型=开关 原始名=Tab_Maps 路径=…/WitchBookUI/Wrapper/Tabs/Tab_Maps
+            //   [UiNav] 未命名控件：类型=按钮 原始名=PresentEvidenceButton 路径=…/Page_Clues/LeftArea/PresentEvidenceButton/Button
+            //   [UiNav] 未命名控件：类型=按钮 原始名=Wrapper 路径=…/WitchBookButtonUI/Wrapper/Button
+            // 页签本身只有 CanvasGroup（_defaultLabel/_highlightedLabel），TMP 文字在子物体里且常处于
+            // 未激活状态，平台层默认只认激活文字 → 这里按对象名兜底，同时 NearbyText() 会再试一次
+            // 「子树（含未激活）里的 TMP 文字」。
+            { "Tab_Clues",  "线索" },
+            { "Tab_Rules",  "规定" },
+            { "Tab_Maps",   "地图" },
+            { "Tab_Notes",  "记录" },
+            // run59 实测多出来的第五个页签（run31 的转储里没有它，因为当时还没通关到人物页）
+            { "Tab_Profiles", "人物" },
+            { "PresentEvidenceButton", "出示证据" },
+            { "WitchBookButtonUI",     "魔女手册" },
+            { "WitchBookUI",           "魔女手册" },
+
+            // ---- 分页箭头：魔女手册 / 存读档 / 鉴赏三处共用同一套对象名（run59 实测） ----
+            //   WitchBookUI (Clone)/Wrapper/ItemList/Pagination/MovingArrows/ButtonNext
+            //   UI/SaveLoadUI/Wrapper/Pagination/MovingArrows/ButtonNext
+            //   GalleryUI/Wrapper/StillPanel/Pagination/MovingArrows/ButtonNext
+            { "ButtonNext", "下一页" },
+            { "ButtonPrev", "上一页" },
+            // WitchBookUI (Clone)/Wrapper/Pages/Page_Profiles/LeftArea/LoupeButton
+            { "LoupeButton", "放大查看" },
         };
 
         /// <summary>
@@ -97,6 +124,49 @@ namespace ManosabaA11y
             { "PostProcessingToggle",    "后期处理" },
             { "ScreenModeToggle",        "显示模式" },
             { "CriticalChoiceHint",      "关键选项提示" },
+
+            // ---- 魔女手册·地图：地点（run59 实测）----
+            // 地图上每个地点是一个名叫 Focus 的按钮，父物体是英文地点 id：
+            //   WitchBookUI (Clone)/Wrapper/Pages/Page_Maps/F1_1/Infirmary/Focus
+            // 中文名来自游戏自己的本地化表（textassets/ui/zh-Hans/CustomUI.txt 的
+            //   WitchBook.Map.Infirmary: 医务室 …），不是我们编的。
+            // 注意 UnknownArea 原文是「<cspace=-0.2em><space=4>？？？」（富文本），这里取纯文字。
+            { "Infirmary",           "医务室" },
+            { "Courtroom",           "审判庭" },
+            { "CourtroomHallway",    "审判庭入口过道" },
+            { "Courtyard",           "中庭" },
+            { "EntranceHall",        "玄关大厅" },
+            { "FrontGuesthouse",     "招待所" },
+            { "FlowerFields",        "往花田方向" },
+            { "Lake",                "往湖方向" },
+            { "Incinerator",         "焚烧炉" },
+            { "Kitchen",             "厨房" },
+            { "Library",             "图书室" },
+            { "Lounge",              "会客厅" },
+            { "MessHall",            "食堂" },
+            { "NoahStudio",          "诺亚的画室" },
+            { "Parlor",              "接客室" },
+            { "PrisonEntrance",      "监牢入口" },
+            { "RecreationRoom",      "娱乐室" },
+            { "Restroom",            "女厕" },
+            { "SecondFloorHallway",  "2F大厅" },
+            { "Showers",             "淋浴房" },
+            { "SolitaryConfinement", "惩罚室" },
+            { "StorageRoom",         "杂物处" },
+            { "Sunroom",             "日光房" },
+            { "Wall",                "围墙" },
+            { "Warehouse",           "仓库" },
+            { "BasementHallway",     "牢房" },
+            { "ChamberGnome",        "地精之室" },
+            { "ChamberSalamander",   "火精之室" },
+            { "ChamberUndine",       "水精之室" },
+            { "UnknownArea",         "未知区域" },
+
+            // ---- 魔女手册·地图：楼层容器（同上实测路径里的 F1_1 / F2_1 / F2_2 / B1_1）----
+            { "F1_1", "1F" },
+            { "F2_1", "2F" },
+            { "F2_2", "2F" },
+            { "B1_1", "地下1F" },
         };
 
         /// <summary>
@@ -123,6 +193,60 @@ namespace ManosabaA11y
                         return value.Length > 0 ? hit + "，" + value : hit;
                     }
                     t = t.parent;
+                }
+
+                // 对象名别名（含祖先）：魔女手册的页签/按钮子树里一个字都没有，
+                // 只能靠这条。平台层第 3 步也会查同一张表，这里提前返回是为了让
+                // 「别名 + 当前值」能拼在一起（开关类），并且不再被同行兄弟文字抢走。
+                Transform a = s.transform;
+                for (int depth = 0; a != null && depth < 4; depth++)
+                {
+                    string n = a.name;
+                    string alias;
+                    if (!string.IsNullOrEmpty(n) && NameAlias.TryGetValue(n, out alias))
+                    {
+                        string value = "";
+                        try { value = CurrentValueOf(s); } catch { }
+                        return value.Length > 0 ? alias + "，" + value : alias;
+                    }
+                    a = a.parent;
+                }
+
+                // 名字太泛（Button / Wrapper / Frame / Toggle …）时，读子树里**未激活**的
+                // TMP 文字：魔女手册页签的标签挂在 CanvasGroup 下面，平台层只认激活文字，
+                // 所以一行都取不到（玩家实测就是「未命名开关」。这里主动补一次。
+                // 滑条/下拉框排除：它们子树里的文字是**当前值**（100% / 1280×720），
+                // 当标签念会变成「100%，滑条」。
+                if (s.TryCast<Slider>() == null && s.TryCast<Dropdown>() == null)
+                {
+                    string near = InactiveTextOf(s.transform, 3);
+                    if (near.Length > 0) return near;
+                }
+            }
+            catch { }
+            return "";
+        }
+
+        /// <summary>
+        /// 读控件子树里（含未激活对象）第一段像人话的文字。
+        /// 只用于「平台层什么都没读到」的兜底，且长度限制很严：太长多半是整段正文，不是控件名。
+        /// </summary>
+        private static string InactiveTextOf(Transform root, int maxDepth)
+        {
+            if (root == null) return "";
+            try
+            {
+                TMP_Text[] tmps = root.GetComponentsInChildren<TMP_Text>(true);
+                if (tmps != null)
+                {
+                    foreach (TMP_Text t in tmps)
+                    {
+                        if (t == null || t.text == null) continue;
+                        string v = t.text.Replace("\n", " ").Trim();
+                        if (v.Length == 0 || v.Length > 24) continue;
+                        if (GameTextIsNoise(v)) continue;
+                        return v;
+                    }
                 }
             }
             catch { }
@@ -221,6 +345,15 @@ namespace ManosabaA11y
             { "LogUI",       "对话记录" },
             { "SoundTestUI", "音乐鉴赏" },
             { "WitchBook",   "魔女手册" },
+            // 魔女手册真实对象名是 WitchBookUI（run59 转储：…/UI/WitchBookUI (Clone)/Wrapper/...）
+            { "WitchBookUI", "魔女手册" },
+            { "Page_Maps",     "地图页" },
+            { "Page_Clues",    "线索页" },
+            { "Page_Profiles", "人物页" },
+            { "Page_Notes",    "记录页" },
+            { "Page_Rules",    "规定页" },
+            // 开发者调试面板：正式流程里不激活，但转储里能看到，给个名字免得读成乱码
+            { "DebugCanvas", "调试面板" },
             { "ControlPanel","手机菜单" },
             { "SmartPhone",  "手机菜单" },
             { "DebateUI",    "辩论" },
@@ -233,7 +366,19 @@ namespace ManosabaA11y
             if (root == null) return "";
             try
             {
-                Transform t = root;
+                // 先看组根自己叫什么：魔女手册的 5 个页签各自成一个组（组根就是 Tab_Clues 这些），
+                // 如果一路往上找到 WitchBookUI，10 个组会全叫「魔女手册」，那组播报等于没说
+                // （run60 实测就是「全部 10 组：【魔女手册 1 项】×6…」）。
+                string self = root.name;
+                if (!string.IsNullOrEmpty(self))
+                {
+                    string selfHit;
+                    if (GroupAlias.TryGetValue(self, out selfHit)) return selfHit;
+                    if (self.StartsWith("Tab_", StringComparison.Ordinal) && NameAlias.TryGetValue(self, out selfHit))
+                        return selfHit + "页签";
+                }
+
+                Transform t = root.parent;
                 for (int up = 0; up < 8 && t != null; up++)
                 {
                     string n = t.name;
@@ -241,6 +386,9 @@ namespace ManosabaA11y
                     {
                         string hit;
                         if (GroupAlias.TryGetValue(n, out hit)) return hit;
+                        // 组根是 Wrapper 这类泛名时，上一级的 Tab_* 就是最好的组名
+                        if (n.StartsWith("Tab_", StringComparison.Ordinal) && NameAlias.TryGetValue(n, out hit))
+                            return hit + "页签";
                     }
                     t = t.parent;
                 }

@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.3";
+        public const string Version = "0.0.0.4";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -378,9 +378,9 @@ namespace ManosabaA11y
         {
             CfgReadUnvoiced = Config.Bind("朗读", "朗读无配音剧情", true,
                 "有语音的台词由游戏自己播，再念一遍会重叠；没配音的行必须念。");
-            CfgAnnounceOnVoiced = Config.Bind("朗读", "有配音时也报说话人", true,
-                "有配音的行不念正文（游戏语音在念），但仍然念出说话人名字。\n" +
-                "关掉 = 有配音的行完全安静，只留游戏语音。");
+            CfgAnnounceOnVoiced = Config.Bind("朗读", "有配音时也报说话人", false,
+                "默认关闭：有配音的行完全安静，只留游戏语音（玩家要文本按 Backspace 重读）。\n" +
+                "打开 = 有配音的行仍念一遍说话人名字。");
             CfgSpeakWhenUnknown = Config.Bind("朗读", "无法判定时也朗读", true,
                 "拿不到「这行有没有配音」的判断时，宁可多念一遍也不要漏。");
             CfgSpeakName = Config.Bind("朗读", "朗读时带上说话人", true,
