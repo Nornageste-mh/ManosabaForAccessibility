@@ -29,8 +29,11 @@ namespace ManosabaA11y
         /// 纯数字，四段。**不要在版本号里加字母** —— BepInPlugin 的版本参数是
         /// System.Version，`0.1.0a` 这种会直接抛异常导致插件加载失败。
         /// 必须与 csproj 的 &lt;Version&gt; 一致（build.ps1 第三道守卫会查）。
+        ///
+        /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
+        /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.1.0.0";
+        public const string Version = "0.0.0.1";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -50,6 +53,7 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgReadPhone;
         internal static ConfigEntry<bool> CfgReadPhoneSticker;
         internal static ConfigEntry<bool> CfgAnnounceOnSkipStop;
+        internal static ConfigEntry<bool> CfgAnnounceLoading;
 
         // ==================== 界面导航 ====================
         internal static ConfigEntry<bool> CfgMenuNav;
@@ -91,6 +95,10 @@ namespace ManosabaA11y
             A11yHost.BlockGameAdvance = () => UiNav.BlockGameAdvance;
             A11yHost.ShouldMuteUnitySubmit = () => UiNav.ShouldMuteUnitySubmit;
 
+            // 逐作标签钩子：本作大量控件子树里一个字都没有（run31 转储 label=''），
+            // 靠对象名/路径名补中文（依据见 UiNav.Game.cs 顶部注释）。
+            A11yHost.GameLabelOf = UiNav.GameLabelOf;
+
             // 每帧一次：界面导航 + 选项面板。
             // 逐作逻辑一律 try/catch 隔离，一个子系统的异常不能让整帧瘫痪。
             A11yHost.TickUiNav = () =>
@@ -102,9 +110,16 @@ namespace ManosabaA11y
                 try { Choices.Update(); } catch (Exception e) { A11yHost.Diag("Choices: " + e.Message); }
             };
 
-            // 焦点相关的兜底开关：本作是否也拿不到键盘焦点**尚未实机确认**，
-            // 因此保持 false（= 不变更平台层行为）。实机验证窗口 exstyle 后再开。
-            A11yHost.UseGlobalKeys = false;
+            // 键盘读取兜底 —— 本作**必须开**，理由（实机取证 probe\logs\run31-ui-probe.txt）：
+            //   UIPROBE legacyInput=FAIL
+            //   System.InvalidOperationException: You are trying to read Input using the
+            //   UnityEngine.Input class, but you have switched active Input handling to
+            //   Input System package in Player Settings.
+            // Player Settings 只启用了新 Input System，旧 UnityEngine.Input 整体不可用；
+            // 平台层的 Tab 导航 / 方向键 / 回车 / 数字键都经 KeyEdge，KeyEdge 在旧 API
+            // 抛异常时退回 GlobalKeys（Win32 GetAsyncKeyState）—— 前提是这里打开开关。
+            // 不开的表现：所有键盘热键静默失效（每次读取都被当作「没按」）。
+            A11yHost.UseGlobalKeys = true;
 
             A11yHost.Validate();
 
@@ -150,6 +165,8 @@ namespace ManosabaA11y
                 // 辩论面板的 SetText/AddText 用 AccessTools 手工挂（逐个 try/catch，
                 // 单条失败不让整个补丁链失效）。依据见 Patches.ApplyManual 注释。
                 if (!skipDebate) Patches.ApplyManual(_harmony);
+                // 加载界面可见性（Giga LoadingUiExtended）——事件驱动，补轮询查不到的短板。
+                Patches.ApplyLoadingUi(_harmony);
 
                 // 把已挂补丁数打进日志：漏挂是静默故障，必须能一眼看出来。
                 int patched = 0;
@@ -202,6 +219,9 @@ namespace ManosabaA11y
                 "表情/贴纸的描述文字。逐作 P3 接上后生效。");
             CfgAnnounceOnSkipStop = Config.Bind("朗读", "快进停止时补念当前句", true,
                 "快进时台词被跳过，停下时补念当前这一句。");
+            CfgAnnounceLoading = Config.Bind("朗读", "播报加载中", true,
+                "加载时念一句「正在加载。」——读屏玩家在加载期没有任何线索，容易以为卡死。\n" +
+                "本作实测有明显的黑屏加载段（点新游戏后），所以默认开。");
 
             CfgMenuNav = Config.Bind("界面导航", "菜单键盘导航", true,
                 "Tab 键在可交互控件间移动并朗读，方向键/回车等按平台层规则工作。");
@@ -293,6 +313,14 @@ namespace ManosabaA11y
             try { Reader.Tick(); }
             catch (Exception e) { A11yHost.Diag("Reader.Tick: " + e.Message); }
 
+            // 加载播报（本作点「新游戏」后有明显的黑屏加载段）
+            try { LoadingWatch.Update(); }
+            catch (Exception e) { A11yHost.Diag("LoadingWatch: " + e.Message); }
+
+            // 界面取证探针（仅 MANOSABA_A11Y_PROBE_UI=1）：转储控件对象名，供别名表取证
+            try { UiProbe.Update(); }
+            catch (Exception e) { A11yHost.Diag("UiProbe: " + e.Message); }
+
             // 实机测试驱动器（仅 MANOSABA_A11Y_TEST=1）：点开始按钮 + 开自动播放
             if (Plugin.TestMode)
             {
@@ -313,6 +341,7 @@ namespace ManosabaA11y
         private static bool _jumpPathRead;
         private static bool _jumped;
         private static float _jumpAt = -1f;
+        private static bool _storySeen;
 
         private void JumpTick()
         {
@@ -326,7 +355,27 @@ namespace ManosabaA11y
             if (string.IsNullOrEmpty(_jumpPath) || _jumped) return;
             if (!Naninovel.Engine.Initialized) return;
 
-            if (_jumpAt < 0f) { _jumpAt = Time.unscaledTime + 8f; return; }
+            // 只有**真的进了正片**之后再跳。理由（run16 实机）：在标题画面直接 LoadAndPlay
+            // 只推进了脚本状态机，UI 还停在标题 —— 那种状态下什么补丁点都验证不到。
+            if (!_storySeen)
+            {
+                try
+                {
+                    Naninovel.IScriptPlayer sp0 = Naninovel.Engine.GetService<Naninovel.IScriptPlayer>();
+                    string p0 = "";
+                    try { p0 = sp0 == null || sp0.PlayedScript == null ? "" : sp0.PlayedScript.Path; } catch { }
+                    if (sp0 != null && sp0.Playing && p0 != null && p0.StartsWith("Act"))
+                    {
+                        _storySeen = true;
+                        _jumpAt = Time.unscaledTime + 4f;
+                        Plugin.L.LogInfo("[a11y] JUMP 已进正片（path=" + p0 + "），4 秒后跳转到 " + _jumpPath);
+                    }
+                }
+                catch { }
+                return;
+            }
+
+            if (_jumpAt < 0f) { _jumpAt = Time.unscaledTime + 4f; return; }
             if (Time.unscaledTime < _jumpAt) return;
 
             _jumped = true;

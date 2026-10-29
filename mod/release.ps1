@@ -12,7 +12,7 @@
     ★ 绝不使用 Compress-Archive 打这个包：Windows PowerShell 5.1 的它会给条目名
       写反斜杠（BepInEx\core\x.dll），Linux/macOS 与 Python 的 unzip 会解出一坨
       带反斜杠的文件名。必须走 tools\makezip.ps1（手工建条目，正斜杠）。
-    ★ 版本号纯数字四段；发布 tag 写 v<版本>（如 v0.1.0.0）。
+    ★ 版本号纯数字四段；发布 tag 写 v<版本>（如 v0.0.0.1）。
     ★ 发布包不进版本库（见 .gitignore）：每次发版都会往历史里塞一个几十 MB
       的二进制，git 对 zip 没法做增量。
 #>

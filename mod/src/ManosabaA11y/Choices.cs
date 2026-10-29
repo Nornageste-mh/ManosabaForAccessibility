@@ -31,6 +31,8 @@ namespace ManosabaA11y
         private static readonly List<string> _labels = new List<string>();
         private static readonly List<Button> _buttons = new List<Button>();
         private static string _announcedKey = "";
+        private static float _announcedAt = -999f;
+        private static float _notLiveAt = 0f;
         private static int _lastChildCount = -1;
 
         /// <summary>由 Harmony 在 AddChoiceButton 之后调用：只记下面板，不做朗读。</summary>
@@ -171,9 +173,19 @@ namespace ManosabaA11y
 
             if (!live)
             {
-                if (_labels.Count > 0) { _labels.Clear(); _buttons.Clear(); _announcedKey = ""; }
+                // 本作选项面板是淡入淡出的：UiVis 判可见会在动画帧里闪一下 false 再 true。
+                // 若收到 false 立刻清空缓冲，下一帧重扫就会把同一组选项再念一遍
+                // （run32 实测念了两遍）。所以给 1.5 秒宽限期，超时才真的清空；
+                // _announcedKey 不清 —— 同一组文字的选项只念一次。
+                if (_notLiveAt <= 0f) _notLiveAt = Time.unscaledTime;
+                if (Time.unscaledTime - _notLiveAt > 1.5f && _labels.Count > 0)
+                {
+                    _labels.Clear();
+                    _buttons.Clear();
+                }
                 return;
             }
+            _notLiveAt = 0f;
 
             bool wantRead = Plugin.CfgReadChoices == null || Plugin.CfgReadChoices.Value;
             bool hotkeys = Plugin.CfgChoiceHotkeys == null || Plugin.CfgChoiceHotkeys.Value;
@@ -188,6 +200,7 @@ namespace ManosabaA11y
             if (key.Length > 0 && key != _announcedKey && _labels.Count > 0)
             {
                 _announcedKey = key;
+                _announcedAt = Time.unscaledTime;
                 if (wantRead)
                 {
                     // 整组选项拼成一段念出去（而不是逐条），理由：
@@ -213,7 +226,10 @@ namespace ManosabaA11y
             {
                 for (int i = 1; i <= 9; i++)
                 {
-                    if (Input.GetKeyDown(KeyCode.Alpha0 + i) || Input.GetKeyDown(KeyCode.Keypad0 + i))
+                    // 走 KeyEdge 而不是裸 Input：本作只启用了新 Input System，
+                    // UnityEngine.Input 读取会抛 InvalidOperationException（实机 run31 取证），
+                    // KeyEdge 会在旧 API 不可用时退回 Win32 全局读取（A11yHost.UseGlobalKeys）。
+                    if (KeyEdge.Pressed(KeyCode.Alpha0 + i) || KeyEdge.Pressed(KeyCode.Keypad0 + i))
                     {
                         pick = i;
                         break;
@@ -222,6 +238,7 @@ namespace ManosabaA11y
             }
             catch { return; }
             if (pick == 0) return;
+            A11yHost.Diag("CHOICE 数字键按下 " + pick);
 
             if (pick > _buttons.Count)
             {
@@ -252,6 +269,8 @@ namespace ManosabaA11y
             _labels.Clear();
             _buttons.Clear();
             _announcedKey = "";
+            _announcedAt = -999f;
+            _notLiveAt = 0f;
             _lastChildCount = -1;
         }
     }

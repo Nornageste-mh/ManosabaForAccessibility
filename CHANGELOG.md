@@ -6,17 +6,20 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：`0.1.0.0`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.1`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
+- **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
+  纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
+  不要为了「看起来有进展」跳版本。
 - `Plugin.cs` 的 `public const string Version` 必须与 `ManosabaA11y.csproj` 的
   `<Version>` 完全一致；`mod\build.ps1` 的第三道守卫会校验，不一致就中断。
-- 语义：`0.x` = 仍在补完逐作层；`1.0` = 全流程（对话 / 选项 / 审判辩论 / 魔女手册 /
-  系统菜单）都经过实机验收。
-- 发布 tag 写 `v<版本>`，例如 `v0.1.0.0`。
+- 语义：`0.0.x` = 仍在补完逐作层；`0.x` = 主线流程（对话 / 选项 / 审判辩论 / 魔女手册 /
+  系统菜单）都经过实机验收；`1.0` = 可面向普通玩家发布。
+- 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
 
-### v0.1.0.0（首个可安装版本）
+### v0.0.0.1（首个可安装版本；版本号按项目要求从 0.0.0.1 起算）
 
 **已实机验证（2026-10-29，Unity 6000.0.48f1 / IL2CPP / BepInEx 6.0.0-be.788 / NVDA）**
 
@@ -24,7 +27,7 @@
   不是 MonoBehaviour，没有 `Update`，每帧逻辑必须挂在自建 MonoBehaviour 上）。
 - 新增：**对话朗读**。挂点 `Naninovel.UI.RevealableText.set_Text`（Postfix）。
   实测日志：`Reader.say[reveal] raw=——这里是囚牢。 => ——这里是囚牢`，
-  连续 23~31 句文本链稳定、无异常。
+  单轮连续 82 句文本链稳定、无 `MethodAccessException`。
 - 新增：**说话人朗读**。`WitchTrialsTextPrinterPanel.SetMessageAuthor(MessageAuthor)`
   与 `RevealableTextPrinterPanel.SetAuthorNameText(string)` 两个 Postfix 互补：
   前者实测 `id/label` 恒为空（本作不走 Naninovel 的 actor 元数据），
@@ -33,9 +36,32 @@
   `<br>` 25693 次、`<link>` 1192 次、`<color>` 130 次、`<b>` 72 次、`<ruby>` 50 次。
   规则：剥 `|#行号|` → 剥 `作者:` 前缀 → `<br>` 转停顿 → ruby「正文（旁注）」→
   link 只留文字 → 其余标签删除 → 方块字符读「方块」→ 空白/标点归一。
-- 新增：界面导航 / 选项 / 审判辩论的补丁位（`ChoiceHandlerPanel.AddChoiceButton`、
-  `DebateTextPrinterPanel.AddMessage` / `SetMessages`），已编译、已确认挂载成功，
-  **但尚未在实机上读到选项与辩论文本**（见下「未验证」）。
+- 新增：**选项朗读 + 数字键选择**（实机跑到第 1 章第 5 幕的选项）。
+  实测日志：`选项容器 Content childCount=2` → `CHOICE 播报 2 项: 挡在蕾雅的身前|选择了旁观`
+  → `CHOICE 数字键 1 -> 挡在蕾雅的身前` → 脚本按所选分支继续。
+  整组读成「共 2 个选项。选项 1：……。选项 2：……。按数字键选择。」
+- 新增：**加载播报**（照《不存在》的 `LoadingWatch` 做法）。本作点「新游戏」后有
+  黑屏 + 右下角进度条的一段，读屏玩家此时完全没有线索。挂
+  `GigaCreation.NaninovelExtender.Ui.LoadingUiExtended.HandleVisibilityChanged(bool)`
+  的 Postfix（事件驱动；轮询查 `Naninovel.UI.LoadingPanel` 与按对象名找 `LoadingUI`
+  都不可靠），可见时念「正在加载。」并**打断**当前朗读（时效性就是它的全部价值）。
+  实测日志：`patched LoadingUiExtended.HandleVisibilityChanged` → `加载播报（LoadingUiExtended）`。
+- 新增：**菜单/设置界面的中文名与当前值**。用一次性取证探针
+  （`MANOSABA_A11Y_PROBE_UI=1`，实机转储 79 个 `Selectable` 的对象名与路径）建立
+  `NameAlias`（`Button_Save` 保存 / `Button_Load` 读取存档 / `Button_Log` 对话记录 /
+  `Button_Options` 系统设置 / `Button_Title` 返回标题 / `CloseButton` 关闭 /
+  `OpenButton` 打开菜单 / `AutoToggle` 自动播放 / `PlayVoiceButton` 重播语音 / 页签 …）
+  与 `PathAlias`（`MasterVolume` 主音量、`BgmVolume` 音乐音量、`MessageSpeed` 文字显示速度、
+  `Language` 语言、`ResolutionDropDown` 分辨率 …）；滑块读百分比、下拉框读当前选项文字。
+- 修：**旧输入 API 在本作整体不可用**。实机探针抓到原文异常：
+  `You are trying to read Input using the UnityEngine.Input class, but you have switched
+  active Input handling to Input System package in Player Settings.`
+  → 平台层热键/导航若走裸 `Input` 会全部静默失效。改开 `A11yHost.UseGlobalKeys = true`
+  （窗口无焦点时用 Win32 `GetAsyncKeyState` 兜底），选项数字键改走平台层 `KeyEdge`。
+- 修：**选项重复播报**。面板淡入淡出时 `UiVis.Visible` 会抖一帧 false，旧代码在
+  `!live` 分支把去重键清零 → 同一组选项要念两遍（run32）。改法：`!live` 只清按钮列表、
+  不清 `_announcedKey`，并加 1.5 秒宽限；`Reset()` 才彻底清空。
+  实测 run34 起「一次选项只播报一次」。
 
 **修掉的两个事故（都是实机打出来的，不是编译期能发现的）**
 
@@ -58,19 +84,19 @@
 
 **未验证 / 已知缺口（想帮忙的话优先测这些）**
 
-- 选项朗读与数字键选择：补丁已挂 `ChoiceHandlerPanel.AddChoiceButton`，代码走
-  「每帧扫容器、内容变化才播报」，**尚未跑到有选项的剧情位置实测**（尚未实机复测）。
 - 审判辩论（`@printDebate`，全作 2003 条）：`DebateTextPrinterPanel.SetText(string)`
   **挂不上**（Harmony `IL Compile Error (unknown location)`，两个独立探针都复现），
   改挂 `AddMessage(PrintedMessage)` / `SetMessages(IReadOnlyList<PrintedMessage>)`；
-  **尚未跑到辩论章节实测**（尚未复测）。
-- 魔女手册 / 系统菜单 / 标题菜单的键盘导航：`UiNav.Game.cs` 目前是通用规则，
-  **未按本作对象名做别名表**；标题菜单按钮不是 `UnityEngine.UI.Button`（本作自定义 UI），
-  逐控件名字来源需用场景树实查后再补（尚未实机复测）。
+  **尚未跑到辩论章节实测**（尚未实机复测）。
+- 魔女手册（WitchBook）：页面用 `Present/Dismiss` 而非 `SetActive`，页签是
+  `WitchTrialsTabToggle : SlideToggle`；朗读与导航**尚未实机复测**。
 - 游戏内文本语言：本作标题画面默认日文（`StreamingAssets\config.json` 里
   `available_text_lang` = `ja` / `zh-Hans`）。补丁新增配置「文本语言」，
   用 `ILocalizationManager.SelectLocale` 切到 zh-Hans；**默认「跟随游戏」**，
-  日文环境下的玩家需要自己切成「简体中文」（尚未实机复测切换效果）。
-- 有配音时是否跳过朗读：本作语音 26083 条、覆盖率对白 98.2%，但
-  **暂未做「有配音就只放语音」**（读屏玩家需要中文文本，日配中文不同步）。
+  日文环境下的玩家需要自己切成「简体中文」（切换效果尚未实机复测）。
+- 有配音时是否跳过朗读：本作语音 26083 条、对白覆盖率 98.2%，但
+  **暂未做「有配音就只放语音」**（读屏玩家需要中文文本，日配中文不同步；
+  且 `Naninovel.AudioManager` 没有「当前配音 clip」的公开入口，拿不到「这句有没有配音」）。
   配置项保留但行为是全部朗读。
+- 焦点/全屏下的自动测试路径不可靠：本作只有约 6 FPS，Win32 点击常被吞，
+  自动化只能当辅助；最终验收一律以「真人点击 + 日志」为准（见 `docs\framework-notes.md` §9）。

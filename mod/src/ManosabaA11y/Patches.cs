@@ -178,6 +178,46 @@ namespace ManosabaA11y
             }
         }
 
+        // ==================== 加载：界面级可见性（事件驱动，比轮询稳）====================
+
+        /// <summary>
+        /// GigaCreation.NaninovelExtender.Ui.LoadingUiExtended.HandleVisibilityChanged(bool visible)：
+        /// 本作「点新游戏后黑屏 + 右下进度条」用的就是 Giga 的加载界面（实机 UIPROBE 对象名
+        /// `LoadingUI/Wrapper/ProgressBar`；类型签名见 re\decompiled\signatures\giga-ui\LoadingUiExtended.txt）。
+        /// 轮询查不到它（对象可能不在默认层级/未激活），改成挂可见性回调：void + bool，detour 安全。
+        /// </summary>
+        internal static void ApplyLoadingUi(Harmony harmony)
+        {
+            Type t = null;
+            try { t = Type.GetType("GigaCreation.NaninovelExtender.Ui.LoadingUiExtended, GigaCreation.NaninovelExtender.UI"); }
+            catch (Exception e) { A11yHost.Diag("Patches.loading type: " + e.Message); }
+            if (t == null)
+            {
+                Plugin.L.LogWarning("[a11y] LoadingUiExtended 未找到，加载播报降级为轮询");
+                return;
+            }
+            try
+            {
+                MethodInfo m = AccessTools.Method(t, "HandleVisibilityChanged", new Type[] { typeof(bool) });
+                if (m == null) { Plugin.L.LogWarning("[a11y] 未找到 LoadingUiExtended.HandleVisibilityChanged"); return; }
+                harmony.Patch(m, postfix: new HarmonyMethod(
+                    typeof(Patches).GetMethod(nameof(LoadingVisibilityPostfix),
+                        BindingFlags.Static | BindingFlags.NonPublic)));
+                Plugin.L.LogInfo("[a11y] patched LoadingUiExtended.HandleVisibilityChanged");
+            }
+            catch (Exception e) { Plugin.L.LogWarning("[a11y] patch LoadingUiExtended failed: " + e.Message); }
+        }
+
+        private static void LoadingVisibilityPostfix([HarmonyArgument(0)] bool visible)
+        {
+            try
+            {
+                A11yHost.Diag("HOOK loadingUi visible=" + visible);
+                if (visible) LoadingWatch.Announce("LoadingUiExtended");
+            }
+            catch (Exception e) { A11yHost.Diag("Patches.LoadingVisibilityPostfix: " + e.Message); }
+        }
+
         // ==================== 辩论：面板文本入口（手工挂，失败不致命）====================
 
         /// <summary>

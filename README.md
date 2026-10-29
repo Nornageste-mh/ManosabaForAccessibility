@@ -39,17 +39,19 @@
 本作是 Naninovel，`Ctrl` 快进、`Enter`/`Space`/鼠标左键推进、`Esc` 菜单。
 补丁只在**界面导航模式**（`Tab` 开启）和**选项编号键**上接管输入，其余按键原样交给游戏。
 
-## 当前进度（v0.1.0.0）
+## 当前进度（v0.0.0.1）
 
 | 功能 | 状态 |
 |---|---|
 | 插件加载 / 启动播报 / 语音后端选择（NVDA→ZDSR→SAPI） | ✅ 实机验证 |
-| 对话朗读（含旁白与对白） | ✅ 实机验证（连续 31 句无异常） |
+| 对话朗读（含旁白与对白） | ✅ 实机验证（单轮连续 82 句无异常） |
 | 说话人朗读（`樱羽艾玛：……`） | ✅ 实机验证（旁白不报名字） |
 | 文本清洗（`<br>`/`<ruby>`/`<link>`/`<color>` 等） | ✅ 实机验证 |
-| 选项朗读 / 数字键选择 | ⚠️ 补丁已挂，**尚未跑到选项位置实测** |
+| 选项朗读 / 数字键选择 | ✅ 实机验证（第 1 章第 5 幕，2 个选项，数字键选中后走对应分支） |
+| 加载播报（点「新游戏」后的黑屏加载段） | ✅ 实机验证（`LoadingUiExtended` 可见性钩子） |
+| 菜单 / 设置界面中文名与当前值 | ✅ 别名表按实机取证建立（探针转储 79 个 `Selectable`） |
 | 审判辩论（`@printDebate`）朗读 | ⚠️ 补丁已挂，**尚未跑到辩论章节实测** |
-| 菜单 / 魔女手册键盘导航 | ⚠️ 通用规则可跑，**未按本作对象名做别名表** |
+| 魔女手册键盘导航 | ⚠️ 通用规则可跑，**未实机复测** |
 | 游戏文本语言切换（日文→简体中文） | ⚠️ 已实现，**未实机复测** |
 
 详细依据见 [`CHANGELOG.md`](CHANGELOG.md) 与 [`无障碍可行性验证.md`](无障碍可行性验证.md)。
@@ -65,10 +67,16 @@
 - 对象名 / 方法名**不许猜**，一律以 probe 场景树与反编译实查为准（陷阱 I3）。
 - 若 `BepInEx\interop\` 里出现 **0 字节** dll，说明 interop 生成失败：删掉整个
   interop 目录再启动一次游戏，然后看 `BepInEx\LogOutput.log`。
-- 窗口焦点：本作实测可以抢到前台（`focused=True`），因此 `A11yHost.UseGlobalKeys`
-  保持 `false`；但**自动点击推进剧情在本作上不可靠**，本项目所有验收都是真人点击 + 日志核对。
-- 标题菜单、魔女手册等自定义 UI 的按钮不是标准 `UnityEngine.UI.Button`，
-  导航扫描要靠 `TryCast<Button>()` 判空后跳过，**不要假设一切都能键盘走**。
+- 窗口焦点：本作实测可以抢到前台（`focused=True`），但**旧输入 API `UnityEngine.Input`
+  在本作整体不可用**（Player Settings 只启用 Input System，实机探针原文异常：
+  `You are trying to read Input using the UnityEngine.Input class...`）。
+  因此 `A11yHost.UseGlobalKeys = true` —— 热键走 Win32 `GetAsyncKeyState` 兜底，
+  不依赖 Unity 的输入后端。**自动点击推进剧情在本作上不可靠**（约 6 FPS，点击常被吞），
+  本项目所有验收都是真人点击 + 日志核对。
+- 本作 UI 有两类按钮：`WitchTrials.Views.TitleUi._newGameButton` 是标准
+  `UnityEngine.UI.Button`；而 `WitchTrialsButton : RebuildableButton : MonoBehaviour`
+  内部包着一个 `public unsafe Button _uiButton`。导航扫描遇到后者要
+  `TryCast<Button>(btn._uiButton)`，不能假设所有可点对象都是 `Selectable`。
 - `BepInEx` 会**递归扫描 `BepInEx\plugins` 的子目录**：把插件挪进 `plugins\_stash\`
   并不会禁用它，必须挪到游戏目录之外。做「无补丁对照组」时踩过这个坑。
 

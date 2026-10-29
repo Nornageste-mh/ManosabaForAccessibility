@@ -567,15 +567,30 @@ namespace ManosabaA11y
                 A11yHost.Diag("TESTDRIVER[" + tag + "] buttons=" + (buttons == null ? 0 : buttons.Length));
                 if (buttons != null)
                 {
+                    // 只打「有名字/有文字/激活」的那些，且按 (名字, 文字) 去重 ——
+                    // 本作有 220 个存档槽按钮，不去重会把日志淹掉、看不到标题菜单。
+                    var seen = new System.Collections.Generic.HashSet<string>();
                     int shown = 0;
                     foreach (Button b in buttons)
                     {
                         if (b == null) continue;
                         string label = LabelOf(b);
                         bool active = false;
-                        try { active = b.gameObject.activeInHierarchy; } catch { }
-                        A11yHost.Diag("TESTDRIVER[" + tag + "] button '" + label + "' active=" + active);
-                        if (++shown >= 40) break;
+                        string goName = "";
+                        string parent = "";
+                        try
+                        {
+                            active = b.gameObject.activeInHierarchy;
+                            goName = b.gameObject.name;
+                            Transform pt = b.transform.parent;
+                            parent = pt == null ? "<root>" : pt.name;
+                        }
+                        catch { }
+                        string key = goName + "§" + label;
+                        if (!seen.Add(key)) continue;
+                        A11yHost.Diag("TESTDRIVER[" + tag + "] button name='" + goName + "' parent='" + parent
+                                     + "' label='" + label + "' active=" + active);
+                        if (++shown >= 60) break;
                     }
                 }
             }
@@ -772,6 +787,19 @@ namespace ManosabaA11y
         private static void TryPlayStory(Naninovel.IScriptPlayer sp)
         {
             var names = new System.Collections.Generic.List<string>();
+
+            // 诊断用：MANOSABA_A11Y_JUMP=<Naninovel 脚本路径> 时优先跳这个脚本，
+            // 用来把「选项 / 辩论」这类后面章节的补丁点拉到前面验证。
+            try
+            {
+                string jump = Environment.GetEnvironmentVariable("MANOSABA_A11Y_JUMP");
+                if (!string.IsNullOrEmpty(jump))
+                {
+                    names.Add(jump);
+                    A11yHost.Diag("TESTDRIVER 使用 MANOSABA_A11Y_JUMP='" + jump + "'");
+                }
+            }
+            catch { }
 
             try
             {

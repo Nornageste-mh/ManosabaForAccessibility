@@ -1,4 +1,4 @@
-# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
+﻿# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
 
 > 给 Lead 与后续逐作开发用。**只留可执行事实**，不抄 Framework 文档原文。
 > 仓库：`D:\DSHWorkSpace\Framework`（只读，未做任何修改）。
@@ -45,7 +45,7 @@ AnyNewOtherKeyHeld/ResetPressed` → 新生成骨架必然 CS0103。
 ManosabaGameDir  (Condition 为空 → 默认 D:\Steam\steamapps\common\manosaba_game)   ← build.ps1 -p: 覆盖
 BepInExCoreDir = $(ManosabaGameDir)\BepInEx\core
 InteropDir     = $(ManosabaGameDir)\BepInEx\interop
-AssemblyName/RootNamespace = ManosabaA11y ; Version = 0.1.0.0
+AssemblyName/RootNamespace = ManosabaA11y ; Version = 0.0.0.1
 TargetFramework = net6.0 ; AllowUnsafeBlocks = true ; CodePage = 65001
 LangVersion = 9.0 ; Nullable disable ; ImplicitUsings disable
 AppendTargetFrameworkToOutputPath = false ; GenerateDocumentationFile = false
@@ -163,12 +163,12 @@ pwsh -NoProfile -File .\build.ps1
 # ③ 发布（校验 + 打 zip）
 pwsh -NoProfile -File .\release.ps1
 # 必需文件 12 项齐全 / 说明文档 2 份 / 未混入 interop|unity-libs|config|probe
-# zip: mod\dist\ManosabaA11y-0.1.0.0.zip  34.17 MB  265 条目  无反斜杠   exit 0
+# zip: mod\dist\ManosabaA11y-0.0.0.1.zip  34.17 MB  265 条目  无反斜杠   exit 0
 ```
 
 产物：`mod\src\ManosabaA11y\bin\Release\ManosabaA11y.dll`（69120 字节，sha256 `1FA40C0C…`）、
 `<GameDir>\BepInEx\plugins\manosaba_a11y\{ManosabaA11y.dll, nvdaControllerClient.dll}`（已核对与源同步）、
-`mod\package\`、`mod\dist\ManosabaA11y-0.1.0.0.zip`。
+`mod\package\`、`mod\dist\ManosabaA11y-0.0.0.1.zip`。
 
 **L1/L2 逐字节机械校验**（python 比较原始字节，只把两边的 namespace 归一到同一 token）：
 10 个文件（Hotkey/KeyEdge/Nvda/Repeat/Sapi/Speech/UiNav/Zdsr/GlobalKeys/A11yHost）
@@ -202,7 +202,7 @@ Framework 仓库未改动：`git status --porcelain` 为空。
   可用 `-Il2CppInteropDll` 覆盖；找不到不同内容时回退基础包并打印提示。
 - **A3** `A11yHost.UseGlobalKeys = false`：本作窗口是否也拿不到键盘焦点**未实测**，先保守。
   若实机焦点异常，改一行即可（Plugin.Load 里）。
-- **A4** 版本号 `0.1.0.0`；`CfgQuitNames` 默认 `"TODO"`、`CfgExcludeNames` 默认空 ——
+- **A4** 版本号 `0.0.0.1`；`CfgQuitNames` 默认 `"TODO"`、`CfgExcludeNames` 默认空 ——
   退出按钮名与开发者工具面板名**必须 P3 实查后填**，不许猜。
 - **A5** 生成器临时目录 `D:\DSHWorkSpace\manosaba_a11y\.skelgen\` 为合并用中间产物，交付前应删除；
   Framework 仓库未改动。
