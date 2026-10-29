@@ -245,3 +245,48 @@ Framework 仓库未改动：`git status --porcelain` 为空。
 
 - 对话/旁白朗读 + 说话人：**实机通过**（31 句连续、无异常）。
 - 选项 / 辩论 / 系统菜单导航：补丁已挂，**尚未跑到对应剧情位置实测**，见 `CHANGELOG.md`。
+
+## 10. 第二轮回填（0.0.0.1，参考《不存在》仓库后的补充）
+
+### 10.1 输入后端：Unity 6 + 只启用 Input System 的作
+
+- 实机探针原文：`You are trying to read Input using the UnityEngine.Input class, but you have
+  switched active Input handling to Input System package in Player Settings.`
+  → 平台层所有裸 `Input.GetKey*`（热键、导航、选项数字键）在本作会**整体抛异常或静默失效**，
+  必须 `A11yHost.UseGlobalKeys = true`（`GlobalKeys` 用 Win32 `GetAsyncKeyState` 兜底），
+  逐作层按键也走平台层 `KeyEdge`。**新作接入第一步就应该探这个**（`MANOSABA_A11Y_PROBE_UI=1`
+  里试一次 `Input.GetKey` 即可）。
+- 本作实测约 6 FPS（`Time.deltaTime≈0.165`），按键必须**按住 ≥0.4s** 才能被逐帧采样命中；
+  90ms 的模拟按键会整个落在两帧之间。
+- 自动点击进正片成功率不稳（`InputSystem.QueueStateEvent<MouseState>` 可注入，但标题就绪时机难卡），
+  验收仍以真人点击 + 日志为准。
+
+### 10.2 加载播报：轮询查不到就挂可见性回调
+
+- 本作加载界面是 **Giga 扩展**：`GigaCreation.NaninovelExtender.Ui.LoadingUiExtended : CustomUI`，
+  实机对象名 `LoadingUI`，方法 `HandleVisibilityChanged(bool)`。挂它的 Postfix 最稳；
+  `Naninovel.UI.LoadingPanel` 轮询与 `Resources.FindObjectsOfTypeAll<Transform>()` 按名扫描
+  在本作都拿不到（对象不在默认层级/未激活）。
+- 参考作用 3 秒去抖；本作一次「新游戏」会连续显隐 4 轮，3 秒窗内全播了 → 放宽到 8 秒，
+  并保留「必须打断」的语义（`Repeat.Say("正在加载。", true)`）。
+
+### 10.3 选项链与去重
+
+- `ChoiceHandlerPanel.AddChoiceButton` 只登记面板；**文字必须等按钮 TMP 写完再读**
+  （每帧扫容器、内容变化才播报），且容器第 0 个子物体不一定是第一个选项。
+- 面板淡入淡出会抖出一帧 `Visible=false`：旧实现在 `!live` 分支把去重键清零 → 同一组选项念两遍。
+  正确做法：`!live` 只清按钮列表、不清 `_announcedKey`，再加 1.5 秒宽限。
+- 数字键选择走 `KeyEdge.Pressed`（同样受 10.1 影响）。
+
+### 10.4 版本策略（本项目）
+
+- 当前 **0.0.0.1**；只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段，
+  纯文档/纯打包/纯内部重构不动版本号。
+
+### 10.5 交付状态（第二轮）
+
+- 对话/旁白 + 说话人：**实机通过**（单轮 82 句、0 异常）。
+- 选项播报 + 数字键选择：**实机通过**（第 1 章第 5 幕，2 个选项，选中后走对应分支）。
+- 加载播报：**实机通过**（`LoadingUiExtended` 钩子）。
+- 菜单/设置中文名与当前值：别名表按探针取证建立（79 个 `Selectable`），**尚未逐项实机复测**。
+- 审判辩论 / 魔女手册 / 文本语言切换：**尚未实机复测**。
