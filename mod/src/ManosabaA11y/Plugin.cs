@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.4";
+        public const string Version = "0.0.0.5";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -125,6 +125,7 @@ namespace ManosabaA11y
             string spec = CfgNavKey == null ? "" : (CfgNavKey.Value ?? "");
             bool chord = false;
             try { chord = Hotkey.Down(spec); } catch { chord = false; }
+            if (!chord) chord = SpecDown(spec);
             if (chord)
             {
                 A11yHost.Diag("导航开关键按下: " + spec);
@@ -133,13 +134,38 @@ namespace ManosabaA11y
 
             if (CfgNavKeyAllowTab != null && CfgNavKeyAllowTab.Value)
             {
-                if (KeyEdge.Pressed(KeyCode.Tab))
+                if (KeyEdge.Pressed(KeyCode.Tab) || InputSysKeys.Pressed(KeyCode.Tab))
                 {
                     A11yHost.Diag("导航开关键按下: Tab");
                     return true;
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// 配置里的按键是否在这一帧刚被按下：平台层 <see cref="Hotkey"/>（旧 Input + Win32 兜底）
+        /// 或新 Input System（<see cref="InputSysKeys"/>）任一路命中即可。
+        ///
+        /// 0.0.0.5 实测：自动化用 keybd_event 注入的键**进不了** GetAsyncKeyState
+        /// （同进程自测 sawKey=False），而真实玩家在新 Input System 里的按键一定能读到。
+        /// 两路并集既不影响真实玩家，也让「退格重读」这类功能键在两种环境都能验证。
+        /// </summary>
+        internal static bool SpecDown(string spec)
+        {
+            if (Hotkey.Down(spec)) return true;
+
+            try
+            {
+                Hotkey.Spec s;
+                string why;
+                if (!Hotkey.Parse(spec, out s, out why)) return false;
+                return InputSysKeys.Down(s.Key, s.Alt, s.Ctrl, s.Shift);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public override void Load()
@@ -189,6 +215,22 @@ namespace ManosabaA11y
             // 抛异常时退回 GlobalKeys（Win32 GetAsyncKeyState）—— 前提是这里打开开关。
             // 不开的表现：所有键盘热键静默失效（每次读取都被当作「没按」）。
             A11yHost.UseGlobalKeys = true;
+
+            // 强制触发平台层的懒同步（GlobalKeys.SyncWithHostSwitch），否则
+            // Hotkey.GlobalHeld 为 null → Hotkey.Down 的「全局读取」整段被跳过，
+            // 功能键（Backspace / 0 / Alt+Shift+F1）在旧 Input API 不可用的本作里
+            // 会静默失效。0.0.0.5 实测：不预热时 run64 全程 `重读=0`。
+            try
+            {
+                bool globalReading = GlobalKeys.Reading;
+                L.LogInfo("[a11y] 全局键: reading=" + globalReading
+                          + " available=" + GlobalKeys.Available
+                          + " backspaceHeld=" + GlobalKeys.Held(KeyCode.Backspace));
+            }
+            catch (Exception e)
+            {
+                L.LogWarning("[a11y] 全局键预热失败: " + e.Message);
+            }
             // 导航验收：合成 Tab（仅 MANOSABA_A11Y_TEST_NAV=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_NAV") == "1")
             {
@@ -527,10 +569,15 @@ namespace ManosabaA11y
 
             // 重读 / 沉默（默认 Backspace / 0）。
             // ★ 为什么必须自己读键：本作只启用新 Input System，裸 UnityEngine.Input 恒抛
-            //   InvalidOperationException，所以走 Hotkey.Down（内部用 GlobalKeys 的
-            //   GetAsyncKeyState 兜底）。平台层只提供 Repeat 缓冲，不会自己去读这两个键。
+            //   InvalidOperationException，所以走 SpecDown（Hotkey 的 Win32 兜底 + 新 Input System）。
+            //   平台层只提供 Repeat 缓冲，不会自己去读这两个键。
             try { HotkeyTick(); }
             catch (Exception e) { A11yHost.Diag("Hotkey: " + e.Message); }
+
+            // 测试专用：注入一次键盘（仅 MANOSABA_A11Y_TEST_KEYS=1）。
+            // 目的：验证「新 Input System 读取功能键」这条链路（真实玩家按键一定在这里）。
+            try { TestKeyInjectTick(); }
+            catch (Exception e) { A11yHost.Diag("TestKeyInject: " + e.Message); }
 
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }
@@ -572,7 +619,7 @@ namespace ManosabaA11y
         private static void HotkeyTick()
         {
             string repeatSpec = Plugin.CfgRepeatKey == null ? "" : (Plugin.CfgRepeatKey.Value ?? "");
-            if (repeatSpec.Length > 0 && Hotkey.Down(repeatSpec))
+            if (repeatSpec.Length > 0 && SpecDownBeh(repeatSpec))
             {
                 string last = Reader.LastLine;
                 if (string.IsNullOrEmpty(last))
@@ -587,10 +634,53 @@ namespace ManosabaA11y
             }
 
             string silenceSpec = Plugin.CfgSilenceKey == null ? "" : (Plugin.CfgSilenceKey.Value ?? "");
-            if (silenceSpec.Length > 0 && Hotkey.Down(silenceSpec))
+            if (silenceSpec.Length > 0 && SpecDownBeh(silenceSpec))
             {
                 try { Speech.Stop(); } catch (Exception e) { A11yHost.Diag("沉默: " + e.Message); }
             }
+        }
+
+        /// <summary>
+        /// 功能键读取：平台层 <see cref="Hotkey"/> 与「新 Input System」两路并集。
+        /// 具体实现见 <see cref="Plugin.SpecDown"/>（放在 Plugin 类里，导航开关键也要用）。
+        /// </summary>
+        private static bool SpecDownBeh(string spec)
+        {
+            return Plugin.SpecDown(spec);
+        }
+
+        // ==================== 测试专用：注入 Backspace ====================
+        // 只在 MANOSABA_A11Y_TEST_KEYS=1 时启用；发布版不会走到。
+        // 为什么要这个：自动化环境里 keybd_event 注入的键进不了 GetAsyncKeyState
+        // （0.0.0.5 实测 sawKey=False），而「新 Input System」能读到游戏自己队列里的按键状态。
+        // 这条路径可以端到端验证「读键 → Reader.LastLine → Repeat.Say」。
+        private static bool _keyInjectRead;
+        private static bool _keyInjectOn;
+        private static float _nextKeyInjectAt = -1f;
+        private static int _keyInjects;
+
+        private static void TestKeyInjectTick()
+        {
+            if (!_keyInjectRead)
+            {
+                _keyInjectRead = true;
+                _keyInjectOn = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_KEYS") == "1";
+                if (_keyInjectOn)
+                {
+                    Plugin.L.LogInfo("[a11y] TEST KEYS MODE: 每 20s 注入一次 Backspace（验证新 Input System 读键链路）");
+                    _nextKeyInjectAt = Time.realtimeSinceStartup + 30f;
+                }
+            }
+            if (!_keyInjectOn) return;
+
+            InputInject.Tick(); // 到点抬起（不 Tick 的话键会一直处于按下状态）
+
+            float now = Time.realtimeSinceStartup;
+            if (now < _nextKeyInjectAt) return;
+            _nextKeyInjectAt = now + 20f;
+            _keyInjects++;
+            Plugin.L.LogInfo("[a11y] TEST KEYS: 注入 Backspace #" + _keyInjects + " t=" + now.ToString("F1") + " last=" + (Reader.LastLine == null ? "<null>" : "len" + Reader.LastLine.Length));
+            InputInject.PressKey(UnityEngine.InputSystem.Key.Backspace, 0.35f);
         }
 
         // ==================== 键盘链路诊断 ====================
@@ -629,7 +719,9 @@ namespace ManosabaA11y
                     + " back=" + GlobalKeys.Held(KeyCode.Backspace)
                     + " backspaceVk=" + (GlobalKeys.Reading ? "on" : "off")
                     + " repeat=" + (Plugin.CfgRepeatKey == null ? "<null>" : "[" + Plugin.CfgRepeatKey.Value + "]")
-                    + " last=" + (Reader.LastLine == null ? "<null>" : "len" + Reader.LastLine.Length));
+                    + " last=" + (Reader.LastLine == null ? "<null>" : "len" + Reader.LastLine.Length)
+                    + " isys=" + InputSysKeys.Available
+                    + " isysBack=" + InputSysKeys.Held(KeyCode.Backspace));
             }
             catch (Exception e) { Plugin.L.LogInfo("KEYDIAG 异常: " + e.Message); }
         }

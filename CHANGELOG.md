@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.4`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.5`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -19,6 +19,33 @@
 
 ## 版本清单
 
+### v0.0.0.5（功能键读取接上「新 Input System」+ 全局键预热）
+
+**已实机验证（2026-10-29 18:11，run71：`say=56 voiced=34 重读=3`）**
+
+- 修：**退格 / 沉默 / 导航组合键在某些启动方式下读不到**。
+  - 现象：同样的部署，`重读` 有时能出、有时整轮一条都没有；KEYDIAG 里
+    `reading=True available=True` 但 `back=False`。
+  - 根因（两层）：
+    1. `Hotkey.Down` 的全局兜底依赖 `Hotkey.GlobalHeld` 委托，而它只在
+       `GlobalKeys.Reading` 被**第一次访问**时才接线；启动早期如果没有别的代码碰过
+       `Reading`，前几帧（甚至整轮，如果 `TickUiNav` 没跑）功能键就是静默失效。
+    2. 本作只启用新 Input System，平台层的 Win32 `GetAsyncKeyState` 是一路兜底，
+       但自动化环境里 `keybd_event` 注入的键不一定进 async key state
+       （同进程自测 `sawKey=False`），于是测试脚本永远验证不到这两个键。
+  - 怎么修：
+    - `Plugin.Load()` 里主动访问一次 `GlobalKeys.Reading`（触发平台层懒同步）并把
+      `reading/available/backspaceHeld` 写进日志；
+    - 新增 `InputSysKeys`（`mod\src\ManosabaA11y\InputSysKeys.cs`）：用游戏自己的
+      `UnityEngine.InputSystem.Keyboard.current` 读「这一帧刚按下」，覆盖字母/数字/
+      功能键/方向键/退格等配置里可能写的键；
+    - `Plugin.SpecDown(spec)` = `Hotkey.Down(spec)` **或** `InputSysKeys` 同语义判断
+      （修饰键也按配置严格匹配，没写的修饰键要求没按住，避免抢游戏按键）；
+      退格/沉默/导航组合键都改走它。
+  - 验证：run71 `重读: 樱羽艾玛：牢、牢房……！？为什么！？`（有配音行也能用 TTS 重读）、
+    `重读: 艾玛早早地洗了澡，换了睡衣，早早地钻进了被窝里`；手工注入 Backspace 同样命中。
+  - 备注：这一版**没有改平台层**，逐作层只做「多一路读取」，平台层的 `Hotkey`/`KeyEdge`
+    依旧是主路径（真实玩家两条路都能读到，并集无副作用）。
 ### v0.0.0.4（魔女手册命名 + 审判实机验证 + 配音报名字改默认关）
 
 **已实机验证（2026-10-29，Unity 6000.0.48f1 / IL2CPP / BepInEx 6.0.0-be.788）**
