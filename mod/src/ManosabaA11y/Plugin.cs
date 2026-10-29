@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -75,6 +75,27 @@ namespace ManosabaA11y
         /// 绕开鼠标/窗口焦点问题）。生产用户不会设置该变量，发布版行为不变。
         /// </summary>
         internal static bool TestMode;
+        /// <summary>
+        /// 导航验收模式：只有环境变量 MANOSABA_A11Y_TEST_NAV=1 时打开。
+        /// 由插件自己合成「按了一次 Tab」，用来验证导航朗读链路 ——
+        /// 自动化点击/按键在本作 6 FPS + 全屏下会被吞（见 docs\framework-notes.md §9），
+        /// 但 Tab 这条钩子是逐作层自己的（A11yHost.NavTogglePressed），
+        /// 合成它不会碰游戏逻辑，只影响本进程的测试。
+        /// </summary>
+        internal static bool TestNavMode;
+        private static float _nextSyntheticNavAt;
+        private static int _syntheticNavCount;
+
+        /// <summary>TestNavMode 下的「Tab 是否按下」：每 25 秒合成一次。</summary>
+        private static bool SyntheticNavPressed()
+        {
+            float now = Time.realtimeSinceStartup;
+            if (now < _nextSyntheticNavAt) return false;
+            _nextSyntheticNavAt = now + 25f;
+            _syntheticNavCount++;
+            A11yHost.Diag("TEST NAV: 合成 Tab 第 " + _syntheticNavCount + " 次 t=" + now.ToString("F1"));
+            return true;
+        }
 
         public override void Load()
         {
@@ -98,6 +119,8 @@ namespace ManosabaA11y
             // 逐作标签钩子：本作大量控件子树里一个字都没有（run31 转储 label=''），
             // 靠对象名/路径名补中文（依据见 UiNav.Game.cs 顶部注释）。
             A11yHost.GameLabelOf = UiNav.GameLabelOf;
+            A11yHost.GameGroupName = UiNav.GameGroupName;
+            A11yHost.GameTextIsNoise = UiNav.GameTextIsNoise;
 
             // 每帧一次：界面导航 + 选项面板。
             // 逐作逻辑一律 try/catch 隔离，一个子系统的异常不能让整帧瘫痪。
@@ -120,6 +143,14 @@ namespace ManosabaA11y
             // 抛异常时退回 GlobalKeys（Win32 GetAsyncKeyState）—— 前提是这里打开开关。
             // 不开的表现：所有键盘热键静默失效（每次读取都被当作「没按」）。
             A11yHost.UseGlobalKeys = true;
+            // 导航验收：合成 Tab（仅 MANOSABA_A11Y_TEST_NAV=1）
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_NAV") == "1")
+            {
+                TestNavMode = true;
+                _nextSyntheticNavAt = Time.realtimeSinceStartup + 45f;
+                A11yHost.NavTogglePressed = SyntheticNavPressed;
+                L.LogInfo("[a11y] TEST NAV MODE: 45s 后每 25s 合成一次 Tab");
+            }
 
             A11yHost.Validate();
 

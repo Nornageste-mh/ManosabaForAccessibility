@@ -290,3 +290,17 @@ Framework 仓库未改动：`git status --porcelain` 为空。
 - 加载播报：**实机通过**（`LoadingUiExtended` 钩子）。
 - 菜单/设置中文名与当前值：别名表按探针取证建立（79 个 `Selectable`），**尚未逐项实机复测**。
 - 审判辩论：**实机通过**（Trial01，8 句连续，`Reader.say[debate:add]`）。\n- 魔女手册 / 文本语言切换：**尚未实机复测**。
+
+## 11. 第三轮：标题菜单导航的可重复验证
+
+- 物理按键在自动化里**不可重复**：同样的 `Send-Key 0x09`（按住 420ms）在 run41 能进入导航、
+  在 run42/run43/run45 一次都没进去（同一条标题截图、同一份日志只有 36 行）。
+  结论与 §9 一致：自动化只能当辅助，不能当验收依据。
+- 想稳定验证「导航朗读」这类纯 UI 链路，用**逐作钩子合成输入**，而不是抢焦点发键：
+  `MANOSABA_A11Y_TEST_NAV=1` → `A11yHost.NavTogglePressed = SyntheticNavPressed`
+  （45s 后每 25s 返回一次 true）。这条路只改本进程的 UI 状态，不碰游戏逻辑，
+  run44 稳定复现「进入 → 播报 → 退出 → 播报」。
+- 顺带打掉的两个标签坑（都是逐作钩子能修、平台层不该修的）：
+  - `GameTextIsNoise`：`TitleUI/Wrapper/VersionNumberLabel` 的 `Ver. 1.1.2` 会被
+    「同行文字」退路拿去当按钮标签，整排按钮全念版本号。
+  - `GameGroupName`：组根叫 `Wrapper`，不映射就只能兜底「面板」。

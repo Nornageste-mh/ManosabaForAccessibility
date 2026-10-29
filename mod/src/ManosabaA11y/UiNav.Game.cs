@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // 《魔法少女ノ魔女裁判》逐作区（UiNav 的 partial class 补充）
 //
 // 这个文件是 A11yFramework 模板 UiNav.Game.cs 的逐作实现，平台层保持不动。
@@ -37,6 +37,14 @@ namespace ManosabaA11y
             { "Button_Log",     "对话记录" },
             { "Button_Options", "系统设置" },
             { "Button_Title",   "返回标题" },
+
+            // ---- 标题画面（run41 实测路径，5 个按钮：ModalUI/TitleUI/Wrapper/Buttons/*）----
+            // 这几个按钮子树里没有 TMP 标签，只有一张图 + 一个用「Ver. 1.1.2」这种
+            // 版本号冒充行文字的坑（见 GameTextIsNoise），所以必须靠名字表。
+            { "Button_NewGame",  "新游戏" },
+            { "Button_LoadGame", "读取存档" },
+            { "Button_Gallery",  "鉴赏模式" },
+            { "Button_Exit",     "退出游戏" },
 
             // ---- 通用按钮（多个面板复用同一个名字，语义一致）----
             { "CloseButton",    "关闭" },
@@ -190,6 +198,68 @@ namespace ManosabaA11y
             if (o == null) return null;
             try { return ((Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)o).TryCast<T>(); }
             catch { return null; }
+        }
+
+        /// <summary>
+        /// 面板组的中文名（逐作钩子 <see cref="A11yHost.GameGroupName"/>）。
+        ///
+        /// 依据 run41 实机：标题菜单的组根叫 Wrapper，平台层只能兜底成「面板」；
+        /// 而读屏用户最需要知道的是「现在是标题画面还是设置页」，所以从组根往上
+        /// 找第一个认识的容器名。都被找不到就返回空串，让平台走中性兜底。
+        /// </summary>
+        private static readonly Dictionary<string, string> GroupAlias =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "TitleUI",     "标题画面" },
+            { "SaveLoadUI",  "存读档" },
+            { "OptionsUI",   "系统设置" },
+            { "GalleryUI",   "鉴赏模式" },
+            { "LogUI",       "对话记录" },
+            { "SoundTestUI", "音乐鉴赏" },
+            { "WitchBook",   "魔女手册" },
+            { "ControlPanel","手机菜单" },
+            { "SmartPhone",  "手机菜单" },
+            { "DebateUI",    "辩论" },
+            { "LoadingUI",   "加载" },
+        };
+
+        internal static string GameGroupName(Transform root)
+        {
+            if (root == null) return "";
+            try
+            {
+                Transform t = root;
+                for (int up = 0; up < 8 && t != null; up++)
+                {
+                    string n = t.name;
+                    if (!string.IsNullOrEmpty(n))
+                    {
+                        string hit;
+                        if (GroupAlias.TryGetValue(n, out hit)) return hit;
+                    }
+                    t = t.parent;
+                }
+            }
+            catch { }
+            return "";
+        }
+
+        /// <summary>
+        /// 逐作噪声钩子：这些文字是版本号 / 版权行，不是控件标签。
+        ///
+        /// run41 实测的坑：标题菜单 5 个按钮的「同行文字」都取到了
+        /// TitleUI/Wrapper/VersionNumberLabel 的 Ver. 1.1.2，于是整排按钮全念
+        /// 「Ver. 1.1.2」。平台层不给逐作以外的改法，唯一正确的口子就是这里 ——
+        /// Noise 过滤同时作用于「自己子树」和「同行兄弟」两条取文路径。
+        /// </summary>
+        internal static bool GameTextIsNoise(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return false;
+            string t = s.Trim();
+            if (t.StartsWith("Ver.", StringComparison.OrdinalIgnoreCase)) return true;
+            if (t.StartsWith("ver ", StringComparison.OrdinalIgnoreCase)) return true;
+            if (t.StartsWith("Copyright", StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
         }
     }
 }

@@ -62,6 +62,15 @@
   active Input handling to Input System package in Player Settings.`
   → 平台层热键/导航若走裸 `Input` 会全部静默失效。改开 `A11yHost.UseGlobalKeys = true`
   （窗口无焦点时用 Win32 `GetAsyncKeyState` 兜底），选项数字键改走平台层 `KeyEdge`。
+- 修：**标题菜单整排按钮念「Ver. 1.1.2」**。`TitleUI/Wrapper/Buttons/*` 这 5 个按钮
+  子树里没有标签文字，平台层的「同行文字」退路取到了旁边的版本号
+  （`TitleUI/Wrapper/VersionNumberLabel` = `Ver. 1.1.2`），于是整排都念版本号。
+  修法用逐作钩子：`GameTextIsNoise` 把 `Ver.` 开头的文本判成噪声，
+  `NameAlias` 补 `Button_NewGame` 新游戏 / `Button_LoadGame` 读取存档 /
+  `Button_Gallery` 鉴赏模式 / `Button_Exit` 退出游戏，`GameGroupName` 把组名
+  从兜底的「面板」改成「标题画面」。实测读出
+  `导航模式，标题画面，共 5 项。退出游戏，按钮。1 / 5`。
+
 - 新增：**文本语言（简体中文 / 日文）切换**。本作默认日文
   （`StreamingAssets\config.json` 的 `available_text_lang` = `ja` / `zh-Hans`），
   补丁用 `ILocalizationManager.SelectLocale(locale).Forget()` 切换，**已实机双向验证**：
