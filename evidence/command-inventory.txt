@@ -1,0 +1,58 @@
+scripts=440 distinct_types=47 total_records=52159
+
+== namespaces ==
+  GigaCreation.NaninovelExtender.ExtendedActors 27139
+  Naninovel.Commands                       20539
+  GigaCreation.NaninovelExtender.Common    3465
+  GigaCreation.NaninovelExtender.ExtendedSpawn 998
+  GigaCreation.NaninovelExtender.Effects   10
+  GigaCreation.NaninovelExtender.Localization 8
+
+== command types (all scripts) ==
+  ModifyCharacterExtended         22889  (debug 86)
+  Wait                             3980  (debug 130)
+  ModifyBackgroundExtended         3322  (debug 80)
+  GotoModified                     3159  (debug 510)
+  Gosub                            3145  (debug 96)
+  HideAllCharacters                2310  (debug 16)
+  AddChoice                        2028  (debug 506)
+  ResetText                        1206  (debug 9)
+  PlayBgm                           996  (debug 60)
+  SetCustomVariable                 917  (debug 513)
+  AnimateActorExtended              762  (debug 2)
+  StopVoice                         762  (debug 3)
+  HideActors                        761  (debug 4)
+  Return                            754  (debug 53)
+  StopBgm                           711  (debug 62)
+  Skip                              619  (debug 4)
+  SpawnExtended                     555  (debug 118)
+  BeginIf                           501  (debug 2)
+  DestroySpawnedExtended            443  (debug 73)
+  HidePrinter                       343  (debug 12)
+  ShowUI                            329  (debug 7)
+  HideUI                            323  (debug 2)
+  WaitForNextFrame                  247  (debug 1)
+  SpawnBlur                         197  (debug 3)
+  ChangeActorMaskability            162  (debug 3)
+  ShowToastUI                       128  (debug 1)
+  ModifyCamera                      118  (debug 0)
+  ModifyTextPrinter                  89  (debug 5)
+  PlayVoice                          75  (debug 15)
+  Stop                               64  (debug 36)
+  SetCustomVariableAsFlag            58  (debug 0)
+  WaitForInput                       58  (debug 58)
+  ProcessInput                       55  (debug 7)
+  SpawnShake                         24  (debug 0)
+  StopSfx                            18  (debug 0)
+  ShowActors                          8  (debug 0)
+  BeginIfCurrentLanguage              8  (debug 2)
+  Else                                7  (debug 2)
+  ShowMattes                          5  (debug 5)
+  HideMattes                          5  (debug 5)
+  ChangeActorPivot                    4  (debug 1)
+  ClearBacklog                        4  (debug 2)
+  PlayMovie                           3  (debug 1)
+  HideAllActors                       2  (debug 0)
+  ClearChoiceHandler                  2  (debug 1)
+  ShowPrinter                         2  (debug 0)
+  Quit                                1  (debug 0)

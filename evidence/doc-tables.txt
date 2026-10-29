@@ -1,0 +1,261 @@
+records: 34836
+roles: {'narration': 7058, 'dialogue': 24492, 'print': 21, 'toast': 78, 'choice': 1184, 'printDebate': 2003}
+
+### ASCII letters after stripping tags
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv05.txt:271 id=0101Adv05_Leia014 role=dialogue text='在手机里面，有一个叫【魔女图鉴】的APP。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv06.txt:32 id=0101Adv06_Narrative006 role=narration text='她打开手机里的聊天APP后，弹出一条典狱长（头像是它自己的抽象画）传来的信息。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv06.txt:133 id=0101Adv06_Narrative018 role=narration text='和蕾雅刚才说的一样，手机里面安装了一个叫【魔女图鉴】的APP。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv06.txt:138 id=0101Adv06_Narrative019 role=narration text='艾玛启动了APP，确认里面的内容。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv12.txt:33 id=0101Adv12_Narrative006 role=narration text='她正在银幕上播放着8mm胶片里的黑白电影。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv12.txt:148 id=0101Adv12_Sherry006 role=dialogue text='欸～这个APP居然还可以直播耶！'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv26.txt:150 id=0101Adv26_Sherry007 role=dialogue text='说来，我们在聊天APP上还没有添加好友耶。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv26.txt:156 id=0101Adv26_Sherry008 role=dialogue text='在APP上添加了好友后，不仅可以传文字信息，还可以通话，也可以传图片哦。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Trial01.txt:408 id=0101Trial01_Ema027 role=dialogue text='【魔女图鉴】……是手机里面的那个APP吗？'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Trial04.txt:385 id=0101Trial04_Sherry006 role=dialogue text='嗯！英文名叫crossbow，所以又叫十字弓……不提这个了。'
+  textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Adv15.txt:192 id=0102Adv15_Miria013 role=dialogue text='而她被小团体出卖了，自己拍的那些不雅照被传到了SNS上。'
+  textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Adv28.txt:51 id=0102Adv28_Narrative009 role=narration text='纸上在离监牢稍远的湖泊附近，画了一个“x”形标记。'
+
+### ASCII digits after stripping tags
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv04.txt:72 id=0101Adv04_Narrative013 role=narration text='宽阔的会客厅内，共有13位少女聚集在此。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv05.txt:470 id=0101Adv05_Narrative039 role=narration text='留在会客厅内的，就只剩艾玛、雪莉、汉娜和梅露露4个人。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv06.txt:13 id=0101Adv06_Ema001 role=dialogue text='（我的囚犯编号是658号……）'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv06.txt:121 id=0101Adv06_Narrative017 role=narration text='身处昏暗不见天日的地下，容易失去对时间的判断。看手机上的时钟显示，现在是15时刚过一点点的时间。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv08.txt:386 id=0101Adv08_Narrative031 role=narration text='……大概有10厘米左右。她的脚已经离开地面，像气球一样飘着。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv08.txt:440 id=0101Adv08_Hanna018 role=dialogue text='说拥有魔法的人可能会变成魔女，所以要在15岁的时候送到监牢里。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv12.txt:33 id=0101Adv12_Narrative006 role=narration text='她正在银幕上播放着8mm胶片里的黑白电影。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv12.txt:164 id=0101Adv12_Coco002 role=dialogue text='哦，在线观众3个！看来开了个好头？请多多转发推介哦！'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv12.txt:170 id=0101Adv12_Sherry007 role=dialogue text='可最多也只能同时在线11个人耶。'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv14.txt:267 id=0101Adv14_Warden005 role=dialogue text='这座监牢呢，已经有500年的历史了。'
+
+### print / toast samples (quoted-param form)
+  print    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv04.txt:1241 ann='; > @print |#0101Adv04_Narrative111| speed:0.05 waitInput! wait!' text='——做得好。'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv05.txt:3 ann='; > @toast |#Toast_101|' text='第１章'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv07.txt:178 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv08.txt:242 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv09.txt:99 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv10.txt:143 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv14.txt:328 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv23.txt:203 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv26.txt:213 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv27.txt:243 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv29.txt:107 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv30.txt:247 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv32.txt:83 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  print    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv36.txt:234 ann='; > @print |#0101Adv36_Narrative045| speed:0.05 waitInput! wait!' text='——做得好。'
+  print    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Bad03.txt:217 ann='; > @print |#0101Bad03_Narrative032| speed:0.05 waitInput! wait!' text='<color=#ff0000>【现在正看到这行字的你也去死吧】</color>'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Trial05.txt:230 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Adv01.txt:3 ann='; > @toast |#Toast_102|' text='第２章'
+  print    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Adv27.txt:1066 ann='; > @print |#0102Adv27_Narrative089| speed:0.05 waitInput! wait!' text='——做得好。'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Adv28.txt:32 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Trial01.txt:857 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Trial02.txt:590 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Trial03.txt:665 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter02/Act01_Chapter02_Trial13.txt:1086 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter03/Act01_Chapter03_Adv01.txt:3 ann='; > @toast |#Toast_103|' text='第３章'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter03/Act01_Chapter03_Trial03.txt:831 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter03/Act01_Chapter03_Trial04.txt:565 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter03/Act01_Chapter03_Trial07.txt:785 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter04/Act01_Chapter04_Adv01.txt:3 ann='; > @toast |#Toast_104|' text='第４章'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter04/Act01_Chapter04_Trial03.txt:732 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter04/Act01_Chapter04_Trial06.txt:969 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter05/Act01_Chapter05_Adv01.txt:3 ann='; > @toast |#Toast_105|' text='第５章'
+  toast    textassets/scripts/zh-Hans/Act01_Chapter05/Act01_Chapter05_Trial02.txt:820 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Adv06.txt:3 ann='; > @toast "|#Toast_106|"' text='第２部\u3000第１章'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Adv17.txt:209 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial00.txt:127 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial02.txt:242 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial02.txt:258 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial05.txt:307 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial05.txt:317 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial06.txt:1082 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial07.txt:373 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial07.txt:384 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter01/Act02_Chapter01_Trial12.txt:628 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Adv01.txt:3 ann='; > @toast "|#Toast_107|"' text='第２部\u3000第２章'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial00.txt:127 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial03.txt:211 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial03.txt:221 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial08.txt:935 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial09.txt:739 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter02/Act02_Chapter02_Trial11.txt:591 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter03/Act02_Chapter03_Adv01.txt:3 ann='; > @toast "|#Toast_108|"' text='第２部\u3000第３章'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter03/Act02_Chapter03_Trial00.txt:226 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter03/Act02_Chapter03_Trial01.txt:584 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter03/Act02_Chapter03_Trial03.txt:454 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter03/Act02_Chapter03_Trial04.txt:623 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter04/Act02_Chapter04_Adv01.txt:3 ann='; > @toast "|#Toast_109|"' text='第２部\u3000第４章'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter04/Act02_Chapter04_Trial00.txt:182 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter04/Act02_Chapter04_Trial01.txt:359 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter04/Act02_Chapter04_Trial04.txt:1163 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv02.txt:3 ann='; > @toast "|#Toast_110|"' text='第２部\u3000第５章'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv05.txt:3 ann='; > @toast |#Toast_111|' text=''
+  print    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv08.txt:376 ann='; > @print |#0205Adv08_Ema027| !waitInput !wait' text='希罗，我们还能再见面的吧？'
+  print    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv08.txt:381 ann='; > @print |#0205Adv08_Hiro016| !waitInput !wait' text='因为你都哭得稀里哗啦的了。<br>没办法，就待在你身边吧。'
+  print    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv08.txt:387 ann='; > @print |#0205Adv08_Ema028| !waitInput !wait' text='明明希罗自己也在哭，还说我。'
+  print    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv08.txt:392 ann='; > @print |#0205Adv08_Hiro017| !waitInput !wait' text='……你好烦。'
+  print    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Adv08.txt:397 ann='; > @print |#0205Adv08_Ema029| !waitInput !wait' text='我想跟希罗一直聊下去，聊好多好多呢。<br>毕竟，属于我们两个人的时间，现在才刚刚开始。'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial02.txt:574 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial05.txt:642 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial07.txt:446 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial09.txt:1048 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial12.txt:662 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial13.txt:409 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial14.txt:312 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial14.txt:352 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial16.txt:447 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial16.txt:452 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial17.txt:371 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial18.txt:225 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial18.txt:230 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial19.txt:425 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial20.txt:377 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial21.txt:170 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial21.txt:175 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial22.txt:124 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter05/Act02_Chapter05_Trial25.txt:595 ann='; > @toast "|#Toast_001|"' text='魔女图鉴 更新…'
+  toast    textassets/scripts/zh-Hans/Act02_Chapter06/Act02_Chapter06_Trial03.txt:259 ann='; > @toast |#Toast_002|' text='讨论前进…'
+  print    textassets/scripts/zh-Hans/Debug/Debug_Trial.txt:63 ann='; > @print "|#~c651365d|{map}|#~66fea5a2|{timelineIdx}|#~fc2a4de5|{message}" !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Trial.txt:68 ann='; > @print "|#~ec6915dc|{map}" !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:11 ann='; > @print |#~73174a9| !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:16 ann='; > @print |#~d42ae7d6| !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:21 ann='; > @print |#~3563838| !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:26 ann='; > @print "|#~916e99d2|" author:Hanna !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:31 ann='; > @print "|#~9fd5abf2|" author:Sherry !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:36 ann='; > @print |#~e0c9abb4| author:Hanna !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:41 ann='; > @print "|#~5b121a55|" author:Sherry !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:46 ann='; > @print |#~854aba99| author:Hanna !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:51 ann='; > @print "|#~3cff067f|" author:Ema !waitInput' text=''
+  print    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:56 ann='; > @print |#~3510ea53| !waitInput' text=''
+  toast    textassets/scripts/zh-Hans/Debug/Debug_Ui.txt:81 ann='; > @toast "|#Toast_001|"' text=''
+
+### per-act table
+| act | files | lines | chars | dialogue | narration | choice | toast | print | printDebate |
+|---|---|---|---|---|---|---|---|---|---|
+| Act01_Chapter01 | 61 | 4689 | 115752 | 3174 | 1209 | 127 | 13 | 3 | 163 |
+| Act01_Chapter02 | 48 | 3973 | 92326 | 2870 | 724 | 120 | 6 | 1 | 252 |
+| Act01_Chapter03 | 46 | 3117 | 76350 | 2283 | 541 | 122 | 4 | 0 | 167 |
+| Act01_Chapter04 | 28 | 1853 | 46493 | 1339 | 326 | 71 | 3 | 0 | 114 |
+| Act01_Chapter05 | 25 | 2490 | 62063 | 1836 | 439 | 93 | 2 | 0 | 120 |
+| Act02_Chapter01 | 44 | 4123 | 95924 | 2952 | 918 | 89 | 11 | 0 | 153 |
+| Act02_Chapter02 | 38 | 3100 | 65464 | 2211 | 591 | 85 | 7 | 0 | 206 |
+| Act02_Chapter03 | 32 | 2820 | 64112 | 2033 | 502 | 82 | 5 | 0 | 198 |
+| Act02_Chapter04 | 33 | 2902 | 64818 | 1868 | 797 | 80 | 4 | 0 | 153 |
+| Act02_Chapter05 | 40 | 3585 | 73034 | 2700 | 408 | 147 | 21 | 5 | 304 |
+| Act02_Chapter06 | 12 | 1238 | 26664 | 1014 | 0 | 54 | 1 | 0 | 169 |
+| Common | 13 | 476 | 10598 | 191 | 285 | 0 | 0 | 0 | 0 |
+| Debug | 16 | 468 | 0 | 21 | 318 | 112 | 1 | 12 | 4 |
+| System | 4 | 2 | 10 | 0 | 0 | 2 | 0 | 0 | 0 |
+| **total** | 440 | 34836 | 793608 | 24492 | 7058 | 1184 | 78 | 21 | 2003 |
+
+### voice bundles table
+| bundle | clips | bytes |
+|---|---|---|
+| `general-voice-act01_chapter01_advbad_assets_all.bundle` | 1509 | 266,212,474 |
+| `general-voice-act01_chapter01_trial_assets_all.bundle` | 1753 | 331,094,545 |
+| `general-voice-act01_chapter02_advbad_assets_all.bundle` | 1151 | 216,014,580 |
+| `general-voice-act01_chapter02_trial_assets_all.bundle` | 1891 | 323,739,387 |
+| `general-voice-act01_chapter03_advbad_assets_all.bundle` | 885 | 160,311,502 |
+| `general-voice-act01_chapter03_trial_assets_all.bundle` | 1552 | 287,764,475 |
+| `general-voice-act01_chapter04_advbad_assets_all.bundle` | 411 | 79,367,057 |
+| `general-voice-act01_chapter04_trial_assets_all.bundle` | 1031 | 188,989,897 |
+| `general-voice-act01_chapter05_advbad_assets_all.bundle` | 703 | 161,787,347 |
+| `general-voice-act01_chapter05_trial_assets_all.bundle` | 1241 | 245,297,977 |
+| `general-voice-act02_chapter01_advbad_assets_all.bundle` | 1126 | 205,744,177 |
+| `general-voice-act02_chapter01_trial_assets_all.bundle` | 1918 | 326,042,983 |
+| `general-voice-act02_chapter02_advbad_assets_all.bundle` | 776 | 131,608,861 |
+| `general-voice-act02_chapter02_trial_assets_all.bundle` | 1576 | 240,506,706 |
+| `general-voice-act02_chapter03_advbad_assets_all.bundle` | 549 | 97,492,339 |
+| `general-voice-act02_chapter03_trial_assets_all.bundle` | 1647 | 259,333,875 |
+| `general-voice-act02_chapter04_advbad_assets_all.bundle` | 740 | 135,069,019 |
+| `general-voice-act02_chapter04_trial_assets_all.bundle` | 1258 | 207,848,239 |
+| `general-voice-act02_chapter05_advbad_assets_all.bundle` | 460 | 84,603,704 |
+| `general-voice-act02_chapter05_trial_assets_all.bundle` | 2512 | 385,879,035 |
+| `general-voice-act02_chapter06_trial_assets_all.bundle` | 1167 | 215,171,427 |
+| `general-voice-commonbad01_assets_all.bundle` | 19 | 4,857,489 |
+| `general-voice-commonbad02_assets_all.bundle` | 10 | 1,778,540 |
+| `general-voice-commonbad03_assets_all.bundle` | 12 | 1,873,213 |
+| `general-voice-commonbad04_assets_all.bundle` | 26 | 7,178,475 |
+| `general-voice-commonbad05_assets_all.bundle` | 39 | 9,866,625 |
+| `general-voice-commonbad06_assets_all.bundle` | 13 | 3,078,099 |
+| `general-voice-commonbad07_assets_all.bundle` | 11 | 2,175,105 |
+| `general-voice-commonbad08_assets_all.bundle` | 14 | 2,924,444 |
+| `general-voice-commonbad09_assets_all.bundle` | 11 | 2,535,342 |
+| `general-voice-commonbad10_assets_all.bundle` | 7 | 1,091,522 |
+| `general-voice-commonbad11_assets_all.bundle` | 4 | 542,006 |
+| `general-voice-commonbad12_assets_all.bundle` | 3 | 453,712 |
+| `general-voice-commonbad13_assets_all.bundle` | 8 | 1,662,009 |
+| `general-voice-commontrial_assets_all.bundle` | 50 | 3,184,344 |
+| **total (35)** | 26083 | 4,593,080,531 |
+
+### speakers table (top 20)
+| speaker id | zh display name | lines |
+|---|---|---|
+| `Ema` | 樱羽艾玛 | 5992 |
+| `Hiro` | 二阶堂希罗 | 5918 |
+| `Sherry` | 橘雪莉 | 1678 |
+| `Margo` | 宝生玛格 | 1409 |
+| `Leia` | 莲见蕾雅 | 1210 |
+| `Coco` | 泽渡可可 | 1128 |
+| `Alisa` | 紫藤亚里沙 | 1020 |
+| `Hanna` | 远野汉娜 | 1018 |
+| `Meruru` | 冰上梅露露 | 1012 |
+| `Nanoka` | 黑部奈叶香 | 969 |
+| `Miria` | 佐伯米莉亚 | 799 |
+| `AnAn` | 夏目安安 | 644 |
+| `Noah` | 城崎诺亚 | 607 |
+| `Warden` | 典狱长 | 473 |
+| `Yuki` | 月代雪 | 469 |
+| `Unknown` | ? ? ? | 69 |
+| `StrayNarehate` | 流浪的残骸 | 32 |
+| `Jailer` | 看守 | 17 |
+| `Girl` | 少女 | 11 |
+| `BigWitch` | 小岛的大魔女 | 9 |
+
+### punctuation table
+| char | count |
+|---|---|
+| `…` | 37987 |
+| `，` | 20605 |
+| `。` | 19254 |
+| `！` | 9656 |
+| `？` | 6066 |
+| `（` | 5053 |
+| `）` | 5051 |
+| `—` | 3745 |
+| `、` | 1906 |
+| `——` | 1872 |
+| `～` | 708 |
+| `♡` | 91 |
+| `■` | 27 |
+| `：` | 23 |
+| `♪` | 16 |
+| `☆` | 8 |
+| `・` | 6 |
+| `×` | 4 |
+| `；` | 3 |
+| `←` | 1 |
+| `」` | 1 |
+
+### ascii table
+| char | count |
+|---|---|
+| `_` | 2384 |
+| `"` | 1242 |
+| `/` | 723 |
+| `=` | 687 |
+| `#` | 65 |
+| `%` | 2 |
+| `,` | 1 |
+| `)` | 1 |
+
+### misc: {'fullwidth_space_u3000': 3346, 'tab': 0, 'nbsp': 0, 'zwsp': 0, 'cr': 0, 'line_break_literal': 0, 'leading_space': 1, 'trailing_space': 0}
+### len: {'min': 1, 'max': 193, 'p50': 22, 'p90': 40, 'p99': 68, 'gt120': 67, 'gt200': 0, 'gt400': 0, 'overall': 793608}
+### id_shape: {'A: <actch4><Script>_<Who><NNN>': 33669, 'HASH: ~hex (auto id)': 446, 'B: <Named>_<Who><NNN>': 481, 'C: other': 15}
+### empty_by_role: {'toast': 2, 'narration': 318, 'dialogue': 21, 'choice': 112, 'print': 12, 'printDebate': 4} empty: 469
+### voice_hit: 26034 uniq: 26033 missing: 8578
+### voice_by_role: {'dialogue': 24033, 'print': 8, 'printDebate': 1989, 'narration': 4} no_voice_by_role: {'narration': 7054, 'dialogue': 459, 'toast': 78, 'choice': 1184, 'print': 13, 'printDebate': 14}
+### annot_ok: 27777 bad: 1 [{'file': 'textassets/scripts/zh-Hans/Debug/Debug_Trial.txt', 'line': 63, 'id': '~c651365d|~66fea5a2|~fc2a4de5'}]
+### multi_blocks: 19345 br_lines: 19482 join_violations: 0
+### link_targets: 595 ['Objection_01_01_01_01', 'Objection_01_01_01_02', 'Objection_01_01_02_01', 'Objection_01_01_02_02', 'Objection_01_01_02_03', 'Objection_01_01_03_01', 'Objection_01_01_03_02', 'Objection_01_01_03_03']
+### colors: {'#ff0000': 28, '#9c8eff': 34, '#6B85D0': 3} sizes: {'200': 1}
+### source: {}

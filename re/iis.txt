@@ -1,0 +1,2151 @@
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppSystem;
+using Il2CppSystem.Collections.Generic;
+using Il2CppSystem.Reflection;
+using Unity.Profiling;
+using UnityEngine.InputSystem.Layouts;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Utilities;
+
+namespace UnityEngine.InputSystem;
+
+public static class InputSystem : Il2CppSystem.Object
+{
+	[StructLayout(LayoutKind.Explicit)]
+	public struct StateEventBuffer
+	{
+		[StructLayout(LayoutKind.Explicit)]
+		[ObfuscatedName("UnityEngine.InputSystem.InputSystem+StateEventBuffer+<data>e__FixedBuffer")]
+		public struct _data_e__FixedBuffer
+		{
+			private static readonly System.IntPtr NativeFieldInfoPtr_FixedElementField;
+
+			[FieldOffset(0)]
+			public byte FixedElementField;
+
+			static _data_e__FixedBuffer()
+			{
+				Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr, "<data>e__FixedBuffer");
+				IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr);
+				NativeFieldInfoPtr_FixedElementField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr, "FixedElementField");
+			}
+
+			public unsafe Il2CppSystem.Object BoxIl2CppObject()
+			{
+				return new Il2CppSystem.Object(IL2CPP.il2cpp_value_box(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr, (System.IntPtr)(nint)Unsafe.AsPointer(ref this)));
+			}
+		}
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_stateEvent;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_kMaxSize;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_data;
+
+		[FieldOffset(0)]
+		public StateEvent stateEvent;
+
+		[FieldOffset(25)]
+		public _data_e__FixedBuffer data;
+
+		public unsafe static int kMaxSize
+		{
+			get
+			{
+				Unsafe.SkipInit(out int result);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_kMaxSize, (void*)(&result));
+				return result;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_kMaxSize, (void*)(&num));
+			}
+		}
+
+		static StateEventBuffer()
+		{
+			Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "StateEventBuffer");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr);
+			NativeFieldInfoPtr_stateEvent = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr, "stateEvent");
+			NativeFieldInfoPtr_kMaxSize = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr, "kMaxSize");
+			NativeFieldInfoPtr_data = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr, "data");
+		}
+
+		public unsafe Il2CppSystem.Object BoxIl2CppObject()
+		{
+			return new Il2CppSystem.Object(IL2CPP.il2cpp_value_box(Il2CppClassPointerStore<StateEventBuffer>.NativeClassPtr, (System.IntPtr)(nint)Unsafe.AsPointer(ref this)));
+		}
+	}
+
+	[StructLayout(LayoutKind.Explicit)]
+	public struct DeltaStateEventBuffer
+	{
+		[StructLayout(LayoutKind.Explicit)]
+		[ObfuscatedName("UnityEngine.InputSystem.InputSystem+DeltaStateEventBuffer+<data>e__FixedBuffer")]
+		public struct _data_e__FixedBuffer
+		{
+			private static readonly System.IntPtr NativeFieldInfoPtr_FixedElementField;
+
+			[FieldOffset(0)]
+			public byte FixedElementField;
+
+			static _data_e__FixedBuffer()
+			{
+				Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr, "<data>e__FixedBuffer");
+				IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr);
+				NativeFieldInfoPtr_FixedElementField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr, "FixedElementField");
+			}
+
+			public unsafe Il2CppSystem.Object BoxIl2CppObject()
+			{
+				return new Il2CppSystem.Object(IL2CPP.il2cpp_value_box(Il2CppClassPointerStore<_data_e__FixedBuffer>.NativeClassPtr, (System.IntPtr)(nint)Unsafe.AsPointer(ref this)));
+			}
+		}
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_stateEvent;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_kMaxSize;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr_data;
+
+		[FieldOffset(0)]
+		public DeltaStateEvent stateEvent;
+
+		[FieldOffset(29)]
+		public _data_e__FixedBuffer data;
+
+		public unsafe static int kMaxSize
+		{
+			get
+			{
+				Unsafe.SkipInit(out int result);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_kMaxSize, (void*)(&result));
+				return result;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_kMaxSize, (void*)(&num));
+			}
+		}
+
+		static DeltaStateEventBuffer()
+		{
+			Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "DeltaStateEventBuffer");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr);
+			NativeFieldInfoPtr_stateEvent = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr, "stateEvent");
+			NativeFieldInfoPtr_kMaxSize = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr, "kMaxSize");
+			NativeFieldInfoPtr_data = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr, "data");
+		}
+
+		public unsafe Il2CppSystem.Object BoxIl2CppObject()
+		{
+			return new Il2CppSystem.Object(IL2CPP.il2cpp_value_box(Il2CppClassPointerStore<DeltaStateEventBuffer>.NativeClassPtr, (System.IntPtr)(nint)Unsafe.AsPointer(ref this)));
+		}
+	}
+
+	[System.Serializable]
+	[ObfuscatedName("UnityEngine.InputSystem.InputSystem+<>c")]
+	public sealed class __c : Il2CppSystem.Object
+	{
+		private static readonly System.IntPtr NativeFieldInfoPtr___9;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___9__80_0;
+
+		private static readonly System.IntPtr NativeFieldInfoPtr___9__80_1;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__get_onAnyButtonPress_b__80_0_Internal_InputControl_InputEventPtr_0;
+
+		private static readonly System.IntPtr NativeMethodInfoPtr__get_onAnyButtonPress_b__80_1_Internal_Boolean_InputControl_0;
+
+		public unsafe static __c __9
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9, (void*)(&intPtr));
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<__c>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)_c));
+			}
+		}
+
+		public unsafe static Il2CppSystem.Func<InputEventPtr, InputControl> __9__80_0
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9__80_0, (void*)(&intPtr));
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Func<InputEventPtr, InputControl>>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9__80_0, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)func));
+			}
+		}
+
+		public unsafe static Il2CppSystem.Func<InputControl, bool> __9__80_1
+		{
+			get
+			{
+				Unsafe.SkipInit(out System.IntPtr intPtr);
+				IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr___9__80_1, (void*)(&intPtr));
+				System.IntPtr intPtr2 = intPtr;
+				return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Func<InputControl, bool>>(intPtr2) : null;
+			}
+			set
+			{
+				IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr___9__80_1, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)func));
+			}
+		}
+
+		static __c()
+		{
+			Il2CppClassPointerStore<__c>.NativeClassPtr = IL2CPP.GetIl2CppNestedType(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "<>c");
+			IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<__c>.NativeClassPtr);
+			NativeFieldInfoPtr___9 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9");
+			NativeFieldInfoPtr___9__80_0 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9__80_0");
+			NativeFieldInfoPtr___9__80_1 = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<__c>.NativeClassPtr, "<>9__80_1");
+			NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100664579);
+			NativeMethodInfoPtr__get_onAnyButtonPress_b__80_0_Internal_InputControl_InputEventPtr_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100664580);
+			NativeMethodInfoPtr__get_onAnyButtonPress_b__80_1_Internal_Boolean_InputControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<__c>.NativeClassPtr, 100664581);
+		}
+
+		[CallerCount(0)]
+		public unsafe __c()
+			: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<__c>.NativeClassPtr))
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192553, XrefRangeEnd = 192690, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		public unsafe InputControl _get_onAnyButtonPress_b__80_0(InputEventPtr e)
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&e);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__get_onAnyButtonPress_b__80_0_Internal_InputControl_InputEventPtr_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputControl>(intPtr) : null;
+		}
+
+		[CallerCount(0)]
+		public unsafe bool _get_onAnyButtonPress_b__80_1(InputControl c)
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)c);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__get_onAnyButtonPress_b__80_1_Internal_Boolean_InputControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+
+		public __c(System.IntPtr pointer)
+			: base(pointer)
+		{
+		}
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterLayout_Public_Static_Void_String_Nullable_1_InputDeviceMatcher_0<T>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_Nullable_1_InputDeviceMatcher_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<T>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterLayoutMatcher_Public_Static_Void_InputDeviceMatcher_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_InputDeviceMatcher_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterPrecompiledLayout_Public_Static_Void_String_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterPrecompiledLayout_Public_Static_Void_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_LoadLayout_Public_Static_InputControlLayout_0<TControl>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TControl>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterProcessor_Public_Static_Void_String_0<T>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<T>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_AddDevice_Public_Static_TDevice_String_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_AddDevice_Public_Static_TDevice_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_InternedString_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_InternedString_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_String_0<TDevice>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDevice>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_FindControls_Public_Static_InputControlList_1_TControl_String_0<TControl>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_TControl_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TControl>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_FindControls_Public_Static_Int32_String_byref_InputControlList_1_TControl_0<TControl>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_FindControls_Public_Static_Int32_String_byref_InputControlList_1_TControl_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TControl>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_QueueEvent_Public_Static_Void_byref_TEvent_0<TEvent>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_QueueEvent_Public_Static_Void_byref_TEvent_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TEvent>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_QueueStateEvent_Public_Static_Void_InputDevice_TState_Double_0<TState>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_QueueStateEvent_Public_Static_Void_InputDevice_TState_Double_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TState>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_QueueDeltaStateEvent_Public_Static_Void_InputControl_TDelta_Double_0<TDelta>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_QueueDeltaStateEvent_Public_Static_Void_InputControl_TDelta_Double_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<TDelta>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterInteraction_Public_Static_Void_String_0<T>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<T>.NativeClassPtr)) }))));
+	}
+
+	private sealed class MethodInfoStoreGeneric_RegisterBindingComposite_Public_Static_Void_String_0<T>
+	{
+		internal static System.IntPtr Pointer = IL2CPP.il2cpp_method_get_from_reflection(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)new MethodInfo(IL2CPP.il2cpp_method_get_object(NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_String_0, Il2CppClassPointerStore<InputSystem>.NativeClassPtr)).MakeGenericMethod(new Il2CppReferenceArray<Il2CppSystem.Type>(new Il2CppSystem.Type[1] { Il2CppSystem.Type.internal_from_handle(IL2CPP.il2cpp_class_get_type(Il2CppClassPointerStore<T>.NativeClassPtr)) }))));
+	}
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_kAssemblyVersion;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_kDocUrl;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_k_InputResetMarker;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_s_Manager;
+
+	private static readonly System.IntPtr NativeFieldInfoPtr_s_Remote;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onLayoutChange_Public_Static_add_Void_Action_2_String_InputControlLayoutChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onLayoutChange_Public_Static_rem_Void_Action_2_String_InputControlLayoutChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_Type_String_Nullable_1_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_Nullable_1_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_String_Nullable_1_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayoutOverride_Public_Static_Void_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_String_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterLayoutBuilder_Public_Static_Void_Func_1_InputControlLayout_String_String_Nullable_1_InputDeviceMatcher_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterPrecompiledLayout_Public_Static_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RemoveLayout_Public_Static_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TryFindMatchingLayout_Public_Static_String_InputDeviceDescription_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListLayouts_Public_Static_IEnumerable_1_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListLayoutsBasedOn_Public_Static_IEnumerable_1_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetNameOfBaseLayout_Public_Static_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_IsFirstLayoutBasedOnSecond_Public_Static_Boolean_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TryGetProcessor_Public_Static_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListProcessors_Public_Static_IEnumerable_1_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_devices_Public_Static_get_ReadOnlyArray_1_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_disconnectedDevices_Public_Static_get_ReadOnlyArray_1_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onDeviceChange_Public_Static_add_Void_Action_2_InputDevice_InputDeviceChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onDeviceChange_Public_Static_rem_Void_Action_2_InputDevice_InputDeviceChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onDeviceCommand_Public_Static_add_Void_InputDeviceCommandDelegate_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onDeviceCommand_Public_Static_rem_Void_InputDeviceCommandDelegate_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onFindLayoutForDevice_Public_Static_add_Void_InputDeviceFindControlLayoutDelegate_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onFindLayoutForDevice_Public_Static_rem_Void_InputDeviceFindControlLayoutDelegate_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_pollingFrequency_Public_Static_get_Single_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_set_pollingFrequency_Public_Static_set_Void_Single_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_String_String_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDevice_Public_Static_TDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_InputDeviceDescription_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDevice_Public_Static_Void_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RemoveDevice_Public_Static_Void_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FlushDisconnectedDevices_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_Type_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_InternedString_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetDeviceById_Public_Static_InputDevice_Int32_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_List_1_InputDeviceDescription_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_Int32_List_1_InputDeviceDescription_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_EnableDevice_Public_Static_Void_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_DisableDevice_Public_Static_Void_InputDevice_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TrySyncDevice_Public_Static_Boolean_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ResetDevice_Public_Static_Void_InputDevice_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TryResetDevice_Public_Static_Boolean_InputDevice_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_PauseHaptics_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ResumeHaptics_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ResetHaptics_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_InternedString_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_InternedString_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_InternedString_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FindControl_Public_Static_InputControl_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_InputControl_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_TControl_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_FindControls_Public_Static_Int32_String_byref_InputControlList_1_TControl_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_isProcessingEvents_Internal_Static_get_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_onEvent_Public_Static_get_InputEventListener_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_set_onEvent_Public_Static_set_Void_InputEventListener_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_onAnyButtonPress_Public_Static_get_IObservable_1_InputControl_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueEvent_Public_Static_Void_InputEventPtr_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueEvent_Public_Static_Void_byref_TEvent_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueStateEvent_Public_Static_Void_InputDevice_TState_Double_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueDeltaStateEvent_Public_Static_Void_InputControl_TDelta_Double_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueConfigChangeEvent_Public_Static_Void_InputDevice_Double_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_QueueTextEvent_Public_Static_Void_InputDevice_Char_Double_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Update_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_Update_Internal_Static_Void_InputUpdateType_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onBeforeUpdate_Public_Static_add_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onBeforeUpdate_Public_Static_rem_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onAfterUpdate_Public_Static_add_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onAfterUpdate_Public_Static_rem_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_settings_Public_Static_get_InputSettings_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_set_settings_Public_Static_set_Void_InputSettings_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onSettingsChange_Public_Static_add_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onSettingsChange_Public_Static_rem_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_EnableActions_Private_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_DisableActions_Private_Static_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_actions_Public_Static_get_InputActionAsset_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_set_actions_Public_Static_set_Void_InputActionAsset_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onActionsChange_Public_Static_add_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onActionsChange_Public_Static_rem_Void_Action_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_add_onActionChange_Public_Static_add_Void_Action_2_Object_InputActionChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_remove_onActionChange_Public_Static_rem_Void_Action_2_Object_InputActionChange_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TryGetInteraction_Public_Static_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListInteractions_Public_Static_IEnumerable_1_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_TryGetBindingComposite_Public_Static_Type_String_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_DisableAllEnabledActions_Public_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListEnabledActions_Public_Static_List_1_InputAction_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_ListEnabledActions_Public_Static_Int32_List_1_InputAction_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_remoting_Public_Static_get_InputRemoting_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_version_Public_Static_get_Version_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_runInBackground_Public_Static_get_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_set_runInBackground_Public_Static_set_Void_Boolean_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_scrollWheelDeltaPerTick_Internal_Static_get_Single_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_get_metrics_Public_Static_get_InputMetrics_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RunInitializeInPlayer_Private_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_EnsureInitialized_Internal_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_InitializeInPlayer_Private_Static_Void_IInputRuntime_InputSettings_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_RunInitialUpdate_Private_Static_Void_0;
+
+	private static readonly System.IntPtr NativeMethodInfoPtr_PerformDefaultPluginInitialization_Private_Static_Void_0;
+
+	public unsafe static string kAssemblyVersion
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_kAssemblyVersion, (void*)(&intPtr));
+			return IL2CPP.Il2CppStringToManaged(intPtr);
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_kAssemblyVersion, (void*)IL2CPP.ManagedStringToIl2Cpp(text));
+		}
+	}
+
+	public unsafe static string kDocUrl
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_kDocUrl, (void*)(&intPtr));
+			return IL2CPP.Il2CppStringToManaged(intPtr);
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_kDocUrl, (void*)IL2CPP.ManagedStringToIl2Cpp(text));
+		}
+	}
+
+	public unsafe static ProfilerMarker k_InputResetMarker
+	{
+		get
+		{
+			Unsafe.SkipInit(out ProfilerMarker result);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_k_InputResetMarker, (void*)(&result));
+			return result;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_k_InputResetMarker, (void*)(&profilerMarker));
+		}
+	}
+
+	public unsafe static InputManager s_Manager
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_s_Manager, (void*)(&intPtr));
+			System.IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputManager>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_s_Manager, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)inputManager));
+		}
+	}
+
+	public unsafe static InputRemoting s_Remote
+	{
+		get
+		{
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_s_Remote, (void*)(&intPtr));
+			System.IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputRemoting>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_s_Remote, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)inputRemoting));
+		}
+	}
+
+	public unsafe static ReadOnlyArray<InputDevice> devices
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193024, XrefRangeEnd = 193029, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			System.IntPtr pointer = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_devices_Public_Static_get_ReadOnlyArray_1_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr);
+			return new ReadOnlyArray<InputDevice>(pointer);
+		}
+	}
+
+	public unsafe static ReadOnlyArray<InputDevice> disconnectedDevices
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193029, XrefRangeEnd = 193034, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr);
+			System.IntPtr pointer = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_disconnectedDevices_Public_Static_get_ReadOnlyArray_1_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr);
+			return new ReadOnlyArray<InputDevice>(pointer);
+		}
+	}
+
+	public unsafe static float pollingFrequency
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193131, XrefRangeEnd = 193135, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_pollingFrequency_Public_Static_get_Single_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(float*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193135, XrefRangeEnd = 193142, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&value);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_pollingFrequency_Public_Static_set_Void_Single_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe static bool isProcessingEvents
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193478, XrefRangeEnd = 193482, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_isProcessingEvents_Internal_Static_get_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+	}
+
+	public unsafe static InputEventListener onEvent
+	{
+		[CallerCount(0)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_onEvent_Public_Static_get_InputEventListener_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(InputEventListener*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+		[CallerCount(0)]
+		set
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&value);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_onEvent_Public_Static_set_Void_InputEventListener_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe static Il2CppSystem.IObservable<InputControl> onAnyButtonPress
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193482, XrefRangeEnd = 193525, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_onAnyButtonPress_Public_Static_get_IObservable_1_InputControl_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.IObservable<InputControl>>(intPtr) : null;
+		}
+	}
+
+	public unsafe static InputSettings settings
+	{
+		[CallerCount(24)]
+		[CachedScanResults(RefRangeStart = 193763, RefRangeEnd = 193787, XrefRangeStart = 193759, XrefRangeEnd = 193763, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_settings_Public_Static_get_InputSettings_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputSettings>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193787, XrefRangeEnd = 193813, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_settings_Public_Static_set_Void_InputSettings_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe static InputActionAsset actions
+	{
+		[CallerCount(8)]
+		[CachedScanResults(RefRangeStart = 193865, RefRangeEnd = 193873, XrefRangeStart = 193861, XrefRangeEnd = 193865, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_actions_Public_Static_get_InputActionAsset_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputActionAsset>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193873, XrefRangeEnd = 193895, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_actions_Public_Static_set_Void_InputActionAsset_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe static InputRemoting remoting
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194029, XrefRangeEnd = 194033, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_remoting_Public_Static_get_InputRemoting_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputRemoting>(intPtr) : null;
+		}
+	}
+
+	public unsafe static Il2CppSystem.Version version
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194033, XrefRangeEnd = 194040, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_version_Public_Static_get_Version_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Version>(intPtr) : null;
+		}
+	}
+
+	public unsafe static bool runInBackground
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194040, XrefRangeEnd = 194048, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_runInBackground_Public_Static_get_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194048, XrefRangeEnd = 194056, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			System.IntPtr* ptr = stackalloc System.IntPtr[1];
+			*ptr = (nint)(&value);
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_runInBackground_Public_Static_set_Void_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe static float scrollWheelDeltaPerTick
+	{
+		[CallerCount(2)]
+		[CachedScanResults(RefRangeStart = 194062, RefRangeEnd = 194064, XrefRangeStart = 194056, XrefRangeEnd = 194062, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_scrollWheelDeltaPerTick_Internal_Static_get_Single_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(float*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+	}
+
+	public unsafe static InputMetrics metrics
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194064, XrefRangeEnd = 194069, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			System.IntPtr* ptr = null;
+			Unsafe.SkipInit(out System.IntPtr intPtr2);
+			System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_metrics_Public_Static_get_InputMetrics_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return *(InputMetrics*)IL2CPP.il2cpp_object_unbox(intPtr);
+		}
+	}
+
+	static InputSystem()
+	{
+		Il2CppClassPointerStore<InputSystem>.NativeClassPtr = IL2CPP.GetIl2CppClass("Unity.InputSystem.dll", "UnityEngine.InputSystem", "InputSystem");
+		NativeFieldInfoPtr_kAssemblyVersion = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "kAssemblyVersion");
+		NativeFieldInfoPtr_kDocUrl = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "kDocUrl");
+		NativeFieldInfoPtr_k_InputResetMarker = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "k_InputResetMarker");
+		NativeFieldInfoPtr_s_Manager = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "s_Manager");
+		NativeFieldInfoPtr_s_Remote = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, "s_Remote");
+		NativeMethodInfoPtr_add_onLayoutChange_Public_Static_add_Void_Action_2_String_InputControlLayoutChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664464);
+		NativeMethodInfoPtr_remove_onLayoutChange_Public_Static_rem_Void_Action_2_String_InputControlLayoutChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664465);
+		NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_Type_String_Nullable_1_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664466);
+		NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_Nullable_1_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664467);
+		NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_String_Nullable_1_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664468);
+		NativeMethodInfoPtr_RegisterLayoutOverride_Public_Static_Void_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664469);
+		NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_String_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664470);
+		NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664471);
+		NativeMethodInfoPtr_RegisterLayoutBuilder_Public_Static_Void_Func_1_InputControlLayout_String_String_Nullable_1_InputDeviceMatcher_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664472);
+		NativeMethodInfoPtr_RegisterPrecompiledLayout_Public_Static_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664473);
+		NativeMethodInfoPtr_RemoveLayout_Public_Static_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664474);
+		NativeMethodInfoPtr_TryFindMatchingLayout_Public_Static_String_InputDeviceDescription_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664475);
+		NativeMethodInfoPtr_ListLayouts_Public_Static_IEnumerable_1_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664476);
+		NativeMethodInfoPtr_ListLayoutsBasedOn_Public_Static_IEnumerable_1_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664477);
+		NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664478);
+		NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664479);
+		NativeMethodInfoPtr_GetNameOfBaseLayout_Public_Static_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664480);
+		NativeMethodInfoPtr_IsFirstLayoutBasedOnSecond_Public_Static_Boolean_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664481);
+		NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664482);
+		NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664483);
+		NativeMethodInfoPtr_TryGetProcessor_Public_Static_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664484);
+		NativeMethodInfoPtr_ListProcessors_Public_Static_IEnumerable_1_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664485);
+		NativeMethodInfoPtr_get_devices_Public_Static_get_ReadOnlyArray_1_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664486);
+		NativeMethodInfoPtr_get_disconnectedDevices_Public_Static_get_ReadOnlyArray_1_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664487);
+		NativeMethodInfoPtr_add_onDeviceChange_Public_Static_add_Void_Action_2_InputDevice_InputDeviceChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664488);
+		NativeMethodInfoPtr_remove_onDeviceChange_Public_Static_rem_Void_Action_2_InputDevice_InputDeviceChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664489);
+		NativeMethodInfoPtr_add_onDeviceCommand_Public_Static_add_Void_InputDeviceCommandDelegate_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664490);
+		NativeMethodInfoPtr_remove_onDeviceCommand_Public_Static_rem_Void_InputDeviceCommandDelegate_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664491);
+		NativeMethodInfoPtr_add_onFindLayoutForDevice_Public_Static_add_Void_InputDeviceFindControlLayoutDelegate_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664492);
+		NativeMethodInfoPtr_remove_onFindLayoutForDevice_Public_Static_rem_Void_InputDeviceFindControlLayoutDelegate_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664493);
+		NativeMethodInfoPtr_get_pollingFrequency_Public_Static_get_Single_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664494);
+		NativeMethodInfoPtr_set_pollingFrequency_Public_Static_set_Void_Single_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664495);
+		NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_String_String_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664496);
+		NativeMethodInfoPtr_AddDevice_Public_Static_TDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664497);
+		NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_InputDeviceDescription_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664498);
+		NativeMethodInfoPtr_AddDevice_Public_Static_Void_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664499);
+		NativeMethodInfoPtr_RemoveDevice_Public_Static_Void_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664500);
+		NativeMethodInfoPtr_FlushDisconnectedDevices_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664501);
+		NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664502);
+		NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664503);
+		NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_Type_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664504);
+		NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_InternedString_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664505);
+		NativeMethodInfoPtr_GetDevice_Public_Static_TDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664506);
+		NativeMethodInfoPtr_GetDeviceById_Public_Static_InputDevice_Int32_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664507);
+		NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_List_1_InputDeviceDescription_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664508);
+		NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_Int32_List_1_InputDeviceDescription_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664509);
+		NativeMethodInfoPtr_EnableDevice_Public_Static_Void_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664510);
+		NativeMethodInfoPtr_DisableDevice_Public_Static_Void_InputDevice_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664511);
+		NativeMethodInfoPtr_TrySyncDevice_Public_Static_Boolean_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664512);
+		NativeMethodInfoPtr_ResetDevice_Public_Static_Void_InputDevice_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664513);
+		NativeMethodInfoPtr_TryResetDevice_Public_Static_Boolean_InputDevice_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664514);
+		NativeMethodInfoPtr_PauseHaptics_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664515);
+		NativeMethodInfoPtr_ResumeHaptics_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664516);
+		NativeMethodInfoPtr_ResetHaptics_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664517);
+		NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664518);
+		NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_InternedString_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664519);
+		NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664520);
+		NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_InternedString_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664521);
+		NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664522);
+		NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_InternedString_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664523);
+		NativeMethodInfoPtr_FindControl_Public_Static_InputControl_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664524);
+		NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_InputControl_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664525);
+		NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_TControl_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664526);
+		NativeMethodInfoPtr_FindControls_Public_Static_Int32_String_byref_InputControlList_1_TControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664527);
+		NativeMethodInfoPtr_get_isProcessingEvents_Internal_Static_get_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664528);
+		NativeMethodInfoPtr_get_onEvent_Public_Static_get_InputEventListener_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664529);
+		NativeMethodInfoPtr_set_onEvent_Public_Static_set_Void_InputEventListener_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664530);
+		NativeMethodInfoPtr_get_onAnyButtonPress_Public_Static_get_IObservable_1_InputControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664531);
+		NativeMethodInfoPtr_QueueEvent_Public_Static_Void_InputEventPtr_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664532);
+		NativeMethodInfoPtr_QueueEvent_Public_Static_Void_byref_TEvent_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664533);
+		NativeMethodInfoPtr_QueueStateEvent_Public_Static_Void_InputDevice_TState_Double_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664534);
+		NativeMethodInfoPtr_QueueDeltaStateEvent_Public_Static_Void_InputControl_TDelta_Double_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664535);
+		NativeMethodInfoPtr_QueueConfigChangeEvent_Public_Static_Void_InputDevice_Double_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664536);
+		NativeMethodInfoPtr_QueueTextEvent_Public_Static_Void_InputDevice_Char_Double_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664537);
+		NativeMethodInfoPtr_Update_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664538);
+		NativeMethodInfoPtr_Update_Internal_Static_Void_InputUpdateType_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664539);
+		NativeMethodInfoPtr_add_onBeforeUpdate_Public_Static_add_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664540);
+		NativeMethodInfoPtr_remove_onBeforeUpdate_Public_Static_rem_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664541);
+		NativeMethodInfoPtr_add_onAfterUpdate_Public_Static_add_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664542);
+		NativeMethodInfoPtr_remove_onAfterUpdate_Public_Static_rem_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664543);
+		NativeMethodInfoPtr_get_settings_Public_Static_get_InputSettings_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664544);
+		NativeMethodInfoPtr_set_settings_Public_Static_set_Void_InputSettings_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664545);
+		NativeMethodInfoPtr_add_onSettingsChange_Public_Static_add_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664546);
+		NativeMethodInfoPtr_remove_onSettingsChange_Public_Static_rem_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664547);
+		NativeMethodInfoPtr_EnableActions_Private_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664548);
+		NativeMethodInfoPtr_DisableActions_Private_Static_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664549);
+		NativeMethodInfoPtr_get_actions_Public_Static_get_InputActionAsset_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664550);
+		NativeMethodInfoPtr_set_actions_Public_Static_set_Void_InputActionAsset_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664551);
+		NativeMethodInfoPtr_add_onActionsChange_Public_Static_add_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664552);
+		NativeMethodInfoPtr_remove_onActionsChange_Public_Static_rem_Void_Action_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664553);
+		NativeMethodInfoPtr_add_onActionChange_Public_Static_add_Void_Action_2_Object_InputActionChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664554);
+		NativeMethodInfoPtr_remove_onActionChange_Public_Static_rem_Void_Action_2_Object_InputActionChange_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664555);
+		NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664556);
+		NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664557);
+		NativeMethodInfoPtr_TryGetInteraction_Public_Static_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664558);
+		NativeMethodInfoPtr_ListInteractions_Public_Static_IEnumerable_1_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664559);
+		NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664560);
+		NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664561);
+		NativeMethodInfoPtr_TryGetBindingComposite_Public_Static_Type_String_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664562);
+		NativeMethodInfoPtr_DisableAllEnabledActions_Public_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664563);
+		NativeMethodInfoPtr_ListEnabledActions_Public_Static_List_1_InputAction_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664564);
+		NativeMethodInfoPtr_ListEnabledActions_Public_Static_Int32_List_1_InputAction_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664565);
+		NativeMethodInfoPtr_get_remoting_Public_Static_get_InputRemoting_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664566);
+		NativeMethodInfoPtr_get_version_Public_Static_get_Version_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664567);
+		NativeMethodInfoPtr_get_runInBackground_Public_Static_get_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664568);
+		NativeMethodInfoPtr_set_runInBackground_Public_Static_set_Void_Boolean_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664569);
+		NativeMethodInfoPtr_get_scrollWheelDeltaPerTick_Internal_Static_get_Single_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664570);
+		NativeMethodInfoPtr_get_metrics_Public_Static_get_InputMetrics_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664571);
+		NativeMethodInfoPtr_RunInitializeInPlayer_Private_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664573);
+		NativeMethodInfoPtr_EnsureInitialized_Internal_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664574);
+		NativeMethodInfoPtr_InitializeInPlayer_Private_Static_Void_IInputRuntime_InputSettings_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664575);
+		NativeMethodInfoPtr_RunInitialUpdate_Private_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664576);
+		NativeMethodInfoPtr_PerformDefaultPluginInitialization_Private_Static_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<InputSystem>.NativeClassPtr, 100664577);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192690, XrefRangeEnd = 192704, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onLayoutChange(Il2CppSystem.Action<string, InputControlLayoutChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onLayoutChange_Public_Static_add_Void_Action_2_String_InputControlLayoutChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192704, XrefRangeEnd = 192718, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onLayoutChange(Il2CppSystem.Action<string, InputControlLayoutChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onLayoutChange_Public_Static_rem_Void_Action_2_String_InputControlLayoutChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192718, XrefRangeEnd = 192734, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayout(Il2CppSystem.Type type, string name = null, Il2CppSystem.Nullable<InputDeviceMatcher> matches = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)type);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matches));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_Type_String_Nullable_1_InputDeviceMatcher_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(34)]
+	[CachedScanResults(RefRangeStart = 192761, RefRangeEnd = 192795, XrefRangeStart = 192734, XrefRangeEnd = 192761, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayout<T>(string name = null, Il2CppSystem.Nullable<InputDeviceMatcher> matches = null) where T : InputControl
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matches));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterLayout_Public_Static_Void_String_Nullable_1_InputDeviceMatcher_0<T>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 192809, RefRangeEnd = 192812, XrefRangeStart = 192795, XrefRangeEnd = 192809, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayout(string json, string name = null, Il2CppSystem.Nullable<InputDeviceMatcher> matches = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(json);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matches));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterLayout_Public_Static_Void_String_String_Nullable_1_InputDeviceMatcher_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192812, XrefRangeEnd = 192817, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayoutOverride(string json, string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(json);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterLayoutOverride_Public_Static_Void_String_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192817, XrefRangeEnd = 192823, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayoutMatcher(string layoutName, InputDeviceMatcher matcher)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(layoutName);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matcher));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterLayoutMatcher_Public_Static_Void_String_InputDeviceMatcher_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(19)]
+	[CachedScanResults(RefRangeStart = 192837, RefRangeEnd = 192856, XrefRangeStart = 192823, XrefRangeEnd = 192837, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayoutMatcher<TDevice>(InputDeviceMatcher matcher) where TDevice : InputDevice
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matcher));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterLayoutMatcher_Public_Static_Void_InputDeviceMatcher_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 192870, RefRangeEnd = 192872, XrefRangeStart = 192856, XrefRangeEnd = 192870, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterLayoutBuilder(Il2CppSystem.Func<InputControlLayout> buildMethod, string name, string baseLayout = null, Il2CppSystem.Nullable<InputDeviceMatcher> matches = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[4];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buildMethod);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(baseLayout);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)3u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)matches));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterLayoutBuilder_Public_Static_Void_Func_1_InputControlLayout_String_String_Nullable_1_InputDeviceMatcher_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192872, XrefRangeEnd = 192879, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterPrecompiledLayout<TDevice>(string metadata) where TDevice : InputDevice, new()
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(metadata);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterPrecompiledLayout_Public_Static_Void_String_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 192885, RefRangeEnd = 192886, XrefRangeStart = 192879, XrefRangeEnd = 192885, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RemoveLayout(string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RemoveLayout_Public_Static_Void_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192886, XrefRangeEnd = 192892, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static string TryFindMatchingLayout(InputDeviceDescription deviceDescription)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)deviceDescription));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TryFindMatchingLayout_Public_Static_String_InputDeviceDescription_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.Il2CppStringToManaged(intPtr);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192892, XrefRangeEnd = 192898, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static IEnumerable<string> ListLayouts()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListLayouts_Public_Static_IEnumerable_1_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerable<string>>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192898, XrefRangeEnd = 192910, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static IEnumerable<string> ListLayoutsBasedOn(string baseLayout)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(baseLayout);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListLayoutsBasedOn_Public_Static_IEnumerable_1_String_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerable<string>>(intPtr) : null;
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 192916, RefRangeEnd = 192918, XrefRangeStart = 192910, XrefRangeEnd = 192916, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputControlLayout LoadLayout(string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_LoadLayout_Public_Static_InputControlLayout_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputControlLayout>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192918, XrefRangeEnd = 192932, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputControlLayout LoadLayout<TControl>() where TControl : InputControl
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_LoadLayout_Public_Static_InputControlLayout_0<TControl>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputControlLayout>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192932, XrefRangeEnd = 192940, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static string GetNameOfBaseLayout(string layoutName)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(layoutName);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetNameOfBaseLayout_Public_Static_String_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.Il2CppStringToManaged(intPtr);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 192940, XrefRangeEnd = 192950, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static bool IsFirstLayoutBasedOnSecond(string firstLayoutName, string secondLayoutName)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(firstLayoutName);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(secondLayoutName);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_IsFirstLayoutBasedOnSecond_Public_Static_Boolean_String_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193001, RefRangeEnd = 193003, XrefRangeStart = 192950, XrefRangeEnd = 193001, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterProcessor(Il2CppSystem.Type type, string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)type);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterProcessor_Public_Static_Void_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193003, XrefRangeEnd = 193014, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterProcessor<T>(string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterProcessor_Public_Static_Void_String_0<T>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193014, XrefRangeEnd = 193019, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static Il2CppSystem.Type TryGetProcessor(string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TryGetProcessor_Public_Static_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Type>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193019, XrefRangeEnd = 193024, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static IEnumerable<string> ListProcessors()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListProcessors_Public_Static_IEnumerable_1_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerable<string>>(intPtr) : null;
+	}
+
+	[SpecialName]
+	[CallerCount(5)]
+	[CachedScanResults(RefRangeStart = 193048, RefRangeEnd = 193053, XrefRangeStart = 193034, XrefRangeEnd = 193048, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onDeviceChange(Il2CppSystem.Action<InputDevice, InputDeviceChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onDeviceChange_Public_Static_add_Void_Action_2_InputDevice_InputDeviceChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(5)]
+	[CachedScanResults(RefRangeStart = 193067, RefRangeEnd = 193072, XrefRangeStart = 193053, XrefRangeEnd = 193067, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onDeviceChange(Il2CppSystem.Action<InputDevice, InputDeviceChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onDeviceChange_Public_Static_rem_Void_Action_2_InputDevice_InputDeviceChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193072, XrefRangeEnd = 193086, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onDeviceCommand(InputDeviceCommandDelegate value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onDeviceCommand_Public_Static_add_Void_InputDeviceCommandDelegate_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193086, XrefRangeEnd = 193100, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onDeviceCommand(InputDeviceCommandDelegate value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onDeviceCommand_Public_Static_rem_Void_InputDeviceCommandDelegate_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193115, RefRangeEnd = 193117, XrefRangeStart = 193100, XrefRangeEnd = 193115, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onFindLayoutForDevice(InputDeviceFindControlLayoutDelegate value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onFindLayoutForDevice_Public_Static_add_Void_InputDeviceFindControlLayoutDelegate_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193117, XrefRangeEnd = 193131, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onFindLayoutForDevice(InputDeviceFindControlLayoutDelegate value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onFindLayoutForDevice_Public_Static_rem_Void_InputDeviceFindControlLayoutDelegate_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193148, RefRangeEnd = 193150, XrefRangeStart = 193142, XrefRangeEnd = 193148, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputDevice AddDevice(string layout, string name = null, string variants = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(layout);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(variants);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_String_String_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputDevice>(intPtr) : null;
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 193170, RefRangeEnd = 193171, XrefRangeStart = 193150, XrefRangeEnd = 193170, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static TDevice AddDevice<TDevice>(string name = null) where TDevice : InputDevice
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_AddDevice_Public_Static_TDevice_String_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.PointerToValueGeneric<TDevice>(intPtr, false, true);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193171, XrefRangeEnd = 193177, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputDevice AddDevice(InputDeviceDescription description)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)description));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_AddDevice_Public_Static_InputDevice_InputDeviceDescription_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputDevice>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193177, XrefRangeEnd = 193189, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void AddDevice(InputDevice device)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_AddDevice_Public_Static_Void_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 193195, RefRangeEnd = 193198, XrefRangeStart = 193189, XrefRangeEnd = 193195, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RemoveDevice(InputDevice device)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RemoveDevice_Public_Static_Void_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193198, XrefRangeEnd = 193204, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void FlushDisconnectedDevices()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FlushDisconnectedDevices_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193204, XrefRangeEnd = 193210, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputDevice GetDevice(string nameOrLayout)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(nameOrLayout);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputDevice>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193210, XrefRangeEnd = 193224, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static TDevice GetDevice<TDevice>() where TDevice : InputDevice
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.PointerToValueGeneric<TDevice>(intPtr, false, true);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193242, RefRangeEnd = 193244, XrefRangeStart = 193224, XrefRangeEnd = 193242, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputDevice GetDevice(Il2CppSystem.Type type)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)type);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetDevice_Public_Static_InputDevice_Type_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputDevice>(intPtr) : null;
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 193269, RefRangeEnd = 193272, XrefRangeStart = 193244, XrefRangeEnd = 193269, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static TDevice GetDevice<TDevice>(InternedString usage) where TDevice : InputDevice
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)usage));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_InternedString_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.PointerToValueGeneric<TDevice>(intPtr, false, true);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193272, XrefRangeEnd = 193278, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static TDevice GetDevice<TDevice>(string usage) where TDevice : InputDevice
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(usage);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_GetDevice_Public_Static_TDevice_String_0<TDevice>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return IL2CPP.PointerToValueGeneric<TDevice>(intPtr, false, true);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 193284, RefRangeEnd = 193287, XrefRangeStart = 193278, XrefRangeEnd = 193284, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputDevice GetDeviceById(int deviceId)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&deviceId);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetDeviceById_Public_Static_InputDevice_Int32_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputDevice>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193287, XrefRangeEnd = 193297, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static List<InputDeviceDescription> GetUnsupportedDevices()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_List_1_InputDeviceDescription_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<InputDeviceDescription>>(intPtr) : null;
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 193307, RefRangeEnd = 193308, XrefRangeStart = 193297, XrefRangeEnd = 193307, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static int GetUnsupportedDevices(List<InputDeviceDescription> descriptions)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)descriptions);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_GetUnsupportedDevices_Public_Static_Int32_List_1_InputDeviceDescription_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(int*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193313, RefRangeEnd = 193315, XrefRangeStart = 193308, XrefRangeEnd = 193313, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void EnableDevice(InputDevice device)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_EnableDevice_Public_Static_Void_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 193320, RefRangeEnd = 193323, XrefRangeStart = 193315, XrefRangeEnd = 193320, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void DisableDevice(InputDevice device, bool keepSendingEvents = false)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(bool**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &keepSendingEvents;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_DisableDevice_Public_Static_Void_InputDevice_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193323, XrefRangeEnd = 193337, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static bool TrySyncDevice(InputDevice device)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TrySyncDevice_Public_Static_Boolean_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193337, XrefRangeEnd = 193342, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void ResetDevice(InputDevice device, bool alsoResetDontResetControls = false)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(bool**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &alsoResetDontResetControls;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ResetDevice_Public_Static_Void_InputDevice_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193342, XrefRangeEnd = 193349, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static bool TryResetDevice(InputDevice device)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TryResetDevice_Public_Static_Boolean_InputDevice_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(bool*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193349, XrefRangeEnd = 193366, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void PauseHaptics()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_PauseHaptics_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193366, XrefRangeEnd = 193383, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void ResumeHaptics()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ResumeHaptics_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193383, XrefRangeEnd = 193400, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void ResetHaptics()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ResetHaptics_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193400, XrefRangeEnd = 193409, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void SetDeviceUsage(InputDevice device, string usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(usage);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 193414, RefRangeEnd = 193415, XrefRangeStart = 193409, XrefRangeEnd = 193414, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void SetDeviceUsage(InputDevice device, InternedString usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)usage));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_SetDeviceUsage_Public_Static_Void_InputDevice_InternedString_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193415, XrefRangeEnd = 193421, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void AddDeviceUsage(InputDevice device, string usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(usage);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193421, XrefRangeEnd = 193426, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void AddDeviceUsage(InputDevice device, InternedString usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)usage));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_AddDeviceUsage_Public_Static_Void_InputDevice_InternedString_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193426, XrefRangeEnd = 193432, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RemoveDeviceUsage(InputDevice device, string usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(usage);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193432, XrefRangeEnd = 193437, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RemoveDeviceUsage(InputDevice device, InternedString usage)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)usage));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RemoveDeviceUsage_Public_Static_Void_InputDevice_InternedString_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193437, XrefRangeEnd = 193450, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputControl FindControl(string path)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(path);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FindControl_Public_Static_InputControl_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<InputControl>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193450, XrefRangeEnd = 193460, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputControlList<InputControl> FindControls(string path)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(path);
+		Unsafe.SkipInit(out System.IntPtr intPtr);
+		System.IntPtr pointer = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_FindControls_Public_Static_InputControlList_1_InputControl_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr);
+		return new InputControlList<InputControl>(pointer);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193460, XrefRangeEnd = 193465, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static InputControlList<TControl> FindControls<TControl>(string path) where TControl : InputControl
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(path);
+		Unsafe.SkipInit(out System.IntPtr intPtr);
+		System.IntPtr pointer = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_FindControls_Public_Static_InputControlList_1_TControl_String_0<TControl>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr);
+		return new InputControlList<TControl>(pointer);
+	}
+
+	[CallerCount(4)]
+	[CachedScanResults(RefRangeStart = 193474, RefRangeEnd = 193478, XrefRangeStart = 193465, XrefRangeEnd = 193474, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static int FindControls<TControl>(string path, ref InputControlList<TControl> controls) where TControl : InputControl
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(path);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.il2cpp_object_unbox(IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)controls));
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_FindControls_Public_Static_Int32_String_byref_InputControlList_1_TControl_0<TControl>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(int*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(4)]
+	[CachedScanResults(RefRangeStart = 193538, RefRangeEnd = 193542, XrefRangeStart = 193525, XrefRangeEnd = 193538, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueEvent(InputEventPtr eventPtr)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&eventPtr);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_QueueEvent_Public_Static_Void_InputEventPtr_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193542, XrefRangeEnd = 193550, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueEvent<TEvent>(ref TEvent inputEvent) where TEvent : new()
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		System.IntPtr intPtr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)Unsafe.As<TEvent, object>(ref inputEvent));
+		*ptr = (nint)(&intPtr);
+		Unsafe.SkipInit(out System.IntPtr intPtr3);
+		System.IntPtr intPtr2 = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_QueueEvent_Public_Static_Void_byref_TEvent_0<TEvent>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr3);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr3);
+		System.IntPtr intPtr4 = intPtr;
+		Unsafe.As<TEvent, object>(ref inputEvent) = ((intPtr4 == (System.IntPtr)0) ? ((TEvent)null) : IL2CPP.PointerToValueGeneric<TEvent>(intPtr4, false, false));
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 193576, RefRangeEnd = 193577, XrefRangeStart = 193550, XrefRangeEnd = 193576, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueStateEvent<TState>(InputDevice device, TState state, double time = -1.0) where TState : new()
+	{
+		//IL_0057->IL005a: Incompatible stack types: I vs Ref
+		//IL_004a->IL005a: Incompatible stack types: I vs Ref
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		byte* num = (byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)));
+		ref TState reference;
+		if (!typeof(TState).IsValueType)
+		{
+			object obj = state;
+			reference = ref *(?*)((!(obj is string)) ? IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)((obj is Il2CppObjectBase) ? obj : null)) : IL2CPP.ManagedStringToIl2Cpp(obj as string));
+		}
+		else
+		{
+			reference = ref state;
+		}
+		*(void**)num = Unsafe.AsPointer(ref reference);
+		*(double**)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = &time;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_QueueStateEvent_Public_Static_Void_InputDevice_TState_Double_0<TState>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193577, XrefRangeEnd = 193609, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueDeltaStateEvent<TDelta>(InputControl control, TDelta delta, double time = -1.0) where TDelta : new()
+	{
+		//IL_0057->IL005a: Incompatible stack types: I vs Ref
+		//IL_004a->IL005a: Incompatible stack types: I vs Ref
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)control);
+		byte* num = (byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)));
+		ref TDelta reference;
+		if (!typeof(TDelta).IsValueType)
+		{
+			object obj = delta;
+			reference = ref *(?*)((!(obj is string)) ? IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)((obj is Il2CppObjectBase) ? obj : null)) : IL2CPP.ManagedStringToIl2Cpp(obj as string));
+		}
+		else
+		{
+			reference = ref delta;
+		}
+		*(void**)num = Unsafe.AsPointer(ref reference);
+		*(double**)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = &time;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_QueueDeltaStateEvent_Public_Static_Void_InputControl_TDelta_Double_0<TDelta>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193609, XrefRangeEnd = 193628, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueConfigChangeEvent(InputDevice device, double time = -1.0)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(double**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &time;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_QueueConfigChangeEvent_Public_Static_Void_InputDevice_Double_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193628, XrefRangeEnd = 193647, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void QueueTextEvent(InputDevice device, char character, double time = -1.0)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[3];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)device);
+		*(char**)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = &character;
+		*(double**)((byte*)ptr + checked((nuint)2u * unchecked((nuint)sizeof(System.IntPtr)))) = &time;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_QueueTextEvent_Public_Static_Void_InputDevice_Char_Double_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193647, XrefRangeEnd = 193658, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void Update()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Update_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 193684, RefRangeEnd = 193685, XrefRangeStart = 193658, XrefRangeEnd = 193684, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void Update(InputUpdateType updateType)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&updateType);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_Update_Internal_Static_Void_InputUpdateType_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(5)]
+	[CachedScanResults(RefRangeStart = 193700, RefRangeEnd = 193705, XrefRangeStart = 193685, XrefRangeEnd = 193700, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onBeforeUpdate(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onBeforeUpdate_Public_Static_add_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(5)]
+	[CachedScanResults(RefRangeStart = 193719, RefRangeEnd = 193724, XrefRangeStart = 193705, XrefRangeEnd = 193719, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onBeforeUpdate(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onBeforeUpdate_Public_Static_rem_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(4)]
+	[CachedScanResults(RefRangeStart = 193738, RefRangeEnd = 193742, XrefRangeStart = 193724, XrefRangeEnd = 193738, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onAfterUpdate(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onAfterUpdate_Public_Static_add_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 193756, RefRangeEnd = 193759, XrefRangeStart = 193742, XrefRangeEnd = 193756, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onAfterUpdate(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onAfterUpdate_Public_Static_rem_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193813, XrefRangeEnd = 193821, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onSettingsChange(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onSettingsChange_Public_Static_add_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193821, XrefRangeEnd = 193829, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onSettingsChange(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onSettingsChange_Public_Static_rem_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193829, XrefRangeEnd = 193846, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void EnableActions()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_EnableActions_Private_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193846, XrefRangeEnd = 193861, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void DisableActions(bool triggerSetupChanged = false)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = (nint)(&triggerSetupChanged);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_DisableActions_Private_Static_Void_Boolean_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193895, XrefRangeEnd = 193903, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onActionsChange(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onActionsChange_Public_Static_add_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193903, XrefRangeEnd = 193911, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onActionsChange(Il2CppSystem.Action value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onActionsChange_Public_Static_rem_Void_Action_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193911, XrefRangeEnd = 193924, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void add_onActionChange(Il2CppSystem.Action<Il2CppSystem.Object, InputActionChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_add_onActionChange_Public_Static_add_Void_Action_2_Object_InputActionChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[SpecialName]
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193924, XrefRangeEnd = 193937, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void remove_onActionChange(Il2CppSystem.Action<Il2CppSystem.Object, InputActionChange> value)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_remove_onActionChange_Public_Static_rem_Void_Action_2_Object_InputActionChange_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193949, RefRangeEnd = 193951, XrefRangeStart = 193937, XrefRangeEnd = 193949, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterInteraction(Il2CppSystem.Type type, string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)type);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterInteraction_Public_Static_Void_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193951, XrefRangeEnd = 193962, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterInteraction<T>(string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterInteraction_Public_Static_Void_String_0<T>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193962, XrefRangeEnd = 193967, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static Il2CppSystem.Type TryGetInteraction(string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TryGetInteraction_Public_Static_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Type>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193967, XrefRangeEnd = 193972, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static IEnumerable<string> ListInteractions()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListInteractions_Public_Static_IEnumerable_1_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<IEnumerable<string>>(intPtr) : null;
+	}
+
+	[CallerCount(2)]
+	[CachedScanResults(RefRangeStart = 193984, RefRangeEnd = 193986, XrefRangeStart = 193972, XrefRangeEnd = 193984, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterBindingComposite(Il2CppSystem.Type type, string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)type);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RegisterBindingComposite_Public_Static_Void_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193986, XrefRangeEnd = 193997, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RegisterBindingComposite<T>(string name = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(MethodInfoStoreGeneric_RegisterBindingComposite_Public_Static_Void_String_0<T>.Pointer, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 193997, XrefRangeEnd = 194002, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static Il2CppSystem.Type TryGetBindingComposite(string name)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.ManagedStringToIl2Cpp(name);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_TryGetBindingComposite_Public_Static_Type_String_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<Il2CppSystem.Type>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194002, XrefRangeEnd = 194006, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void DisableAllEnabledActions()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_DisableAllEnabledActions_Public_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194006, XrefRangeEnd = 194019, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static List<InputAction> ListEnabledActions()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListEnabledActions_Public_Static_List_1_InputAction_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return (intPtr != (System.IntPtr)0) ? Il2CppObjectPool.Get<List<InputAction>>(intPtr) : null;
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194019, XrefRangeEnd = 194029, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static int ListEnabledActions(List<InputAction> actions)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[1];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)actions);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_ListEnabledActions_Public_Static_Int32_List_1_InputAction_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		return *(int*)IL2CPP.il2cpp_object_unbox(intPtr);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194069, XrefRangeEnd = 194075, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RunInitializeInPlayer()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RunInitializeInPlayer_Private_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	public unsafe static void EnsureInitialized()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_EnsureInitialized_Internal_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 194136, RefRangeEnd = 194137, XrefRangeStart = 194075, XrefRangeEnd = 194136, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void InitializeInPlayer(IInputRuntime runtime = null, InputSettings settings = null)
+	{
+		System.IntPtr* ptr = stackalloc System.IntPtr[2];
+		*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)runtime);
+		*(System.IntPtr*)((byte*)ptr + checked((nuint)1u * unchecked((nuint)sizeof(System.IntPtr)))) = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)settings);
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_InitializeInPlayer_Private_Static_Void_IInputRuntime_InputSettings_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 194137, XrefRangeEnd = 194141, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void RunInitialUpdate()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_RunInitialUpdate_Private_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 194174, RefRangeEnd = 194175, XrefRangeStart = 194141, XrefRangeEnd = 194174, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe static void PerformDefaultPluginInitialization()
+	{
+		System.IntPtr* ptr = null;
+		Unsafe.SkipInit(out System.IntPtr intPtr2);
+		System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_PerformDefaultPluginInitialization_Private_Static_Void_0, (System.IntPtr)0, (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	public InputSystem(System.IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}
+You are not using the latest version of the tool, please update.
+Latest version is '11.2.0.10050' (yours is '9.1.0.7988')

@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ManosabaProbe：最小探针插件。
+       目的：证明 BepInEx 6 IL2CPP 插件能被加载、Class::Init 注入能成功、
+             interop 绑定能调用 UnityEngine API、并 dump 一次场景对象树。
+       编译目标 net6.0（BepInEx be.788 运行时就是 .NET 6.0.7）；
+       本机只有 .NET SDK 8.0.404，但 Microsoft.NETCore.App.Ref 6.0.36 已在 NuGet 缓存里，
+       所以 `dotnet build -f net6.0` 能直接出 net6.0 产物，不需要装 .NET 6 SDK。
+       引用全部 HintPath 指向《魔法少女ノ魔女裁判》自己生成出来的 BepInEx\core 与 BepInEx\interop。 -->
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>ManosabaProbe</AssemblyName>
+    <RootNamespace>ManosabaProbe</RootNamespace>
+    <Version>0.4.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CodePage>65001</CodePage>
+    <NoWarn>$(NoWarn);CS0436;CS0437;CS1701;CS1702;MSB3277</NoWarn>
+    <Deterministic>true</Deterministic>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <EnableSourceLink>false</EnableSourceLink>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GameDir Condition="'$(GameDir)'==''">D:\Steam\steamapps\common\manosaba_game</GameDir>
+    <CoreDir>$(GameDir)\BepInEx\core</CoreDir>
+    <InteropDir>$(GameDir)\BepInEx\interop</InteropDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx.Core">
+      <HintPath>$(CoreDir)\BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>$(CoreDir)\BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.Common">
+      <HintPath>$(CoreDir)\BepInEx.Unity.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(CoreDir)\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(CoreDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(InteropDir)\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(InteropDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(InteropDir)\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(InteropDir)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(InteropDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(InteropDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Elringus.Naninovel.Runtime">
+      <HintPath>$(InteropDir)\Elringus.Naninovel.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

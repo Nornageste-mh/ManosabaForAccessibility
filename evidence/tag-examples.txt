@@ -1,0 +1,122 @@
+== br
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:9  0101Adv01_Narrative002 | (narration) | 樱羽艾玛只想捂紧耳朵，<br>
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:14  0101Adv01_Narrative003 | (narration) | 可是，她被无形的锁链束缚着，<br>
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:43  0101Adv01_Narrative010 | (narration) | 霸凌日益变本加厉，<br>
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:48  0101Adv01_Narrative011 | (narration) | 住手吧。<br>
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:61  0101Adv01_Narrative014 | (narration) | 被辱骂、被欺侮、被嘲笑，<br>
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:70  0101Adv01_Narrative016 | (narration) | 她不禁开始责备比任何人都胆小的自己。<br>
+
+== link
+  Act01_Chapter01\Act01_Chapter01_Trial01.txt:36  0101Trial01_Sherry003 | @printDebate pos:65,35 |#0101Trial01_Sherry003| | 在这些地方都有<link="Objection_01_01_01_01">用血画下</link><br>
+  Act01_Chapter01\Act01_Chapter01_Trial01.txt:44  0101Trial01_Sherry004 | @printDebate pos:65,35 |#0101Trial01_Sherry004| | <link="Objection_01_01_01_02">用手上的笔</link>画下的<br>
+  Act01_Chapter01\Act01_Chapter01_Trial02.txt:31  0101Trial02_Sherry003 | @printDebate pos:70,50 roll:4 |#0101Trial02_Sherry003| | <link="Objection_01_01_02_01">诺亚</link>她在<link="Objection_01_01_02_02">死前</link>，<br>
+  Act01_Chapter01\Act01_Chapter01_Trial02.txt:33  0101Trial02_Sherry003 | @printDebate pos:70,50 roll:4 |#0101Trial02_Sherry003| | 玛格是<link="Objection_01_01_02_03">凶手</link><br>
+  Act01_Chapter01\Act01_Chapter01_Trial03.txt:61  0101Trial03_Margo007 | @printDebate |#0101Trial03_Margo007| | 多么美丽的<link="Objection_01_01_03_01">自杀</link>。<br>
+  Act01_Chapter01\Act01_Chapter01_Trial03.txt:68  0101Trial03_Margo008 | @printDebate |#0101Trial03_Margo008| | 那<link="Objection_01_01_03_02">房间内的状况</link>，<br>
+
+== ruby
+  Act01_Chapter01\Act01_Chapter01_Adv10.txt:103  0101Adv10_Sherry004 | Sherry: |#0101Adv10_Sherry004| | “<ruby="Balloon">气球</ruby>”可是世界有名的街头艺术家哦！
+  Act01_Chapter01\Act01_Chapter01_Adv18.txt:120  0101Adv18_Ema007 | Ema: |#0101Adv18_Ema007| | 这里是【<ruby="SALAMANDER">火精</ruby>之室】……？
+  Act01_Chapter01\Act01_Chapter01_Adv18.txt:125  0101Adv18_Sherry006 | Sherry: |#0101Adv18_Sherry006| | 这边是【<ruby="UNDINE">水精</ruby>之室】耶！
+  Act01_Chapter01\Act01_Chapter01_Adv18.txt:130  0101Adv18_Ema008 | Ema: |#0101Adv18_Ema008| | 那，这里就是【<ruby="GNOME">地精</ruby>之室】了。<br>
+  Act01_Chapter01\Act01_Chapter01_Adv27.txt:295  0101Adv27_Sherry008 | Sherry: |#0101Adv27_Sherry008| | 是<ruby="pyrokinesis">点火超能力</ruby>耶！<br>
+  Act01_Chapter01\Act01_Chapter01_Trial12.txt:509  0101Trial12_Ema032 | Ema: |#0101Trial12_Ema032| | （<ruby="pit organ">蛇颊窝</ruby>……！！）
+
+== color_ff0000
+  Act01_Chapter01\Act01_Chapter01_Adv13.txt:64  0101Adv13_Narrative007 | (narration) | <color=#ff0000>救命</color>
+  Act01_Chapter01\Act01_Chapter01_Bad03.txt:30  0101Bad03_Narrative004 | (narration) | <color=#ff0000>【好恨】</color>
+  Act01_Chapter01\Act01_Chapter01_Bad03.txt:65  0101Bad03_Narrative006 | (narration) | <color=#ff0000>【←】</color>标记。
+  Act01_Chapter01\Act01_Chapter01_Bad03.txt:109  0101Bad03_Narrative010 | (narration) | <color=#ff0000>一醒来，发现自己在牢房之中——</color>
+  Act01_Chapter01\Act01_Chapter01_Bad03.txt:113  0101Bad03_Narrative011 | (narration) | <color=#ff0000>年纪相近的女孩子被关在一起——</color>
+  Act01_Chapter01\Act01_Chapter01_Bad03.txt:142  0101Bad03_Narrative015 | (narration) | <color=#ff0000>憎恨，不可原谅，再也不信任任何人——</color>
+
+== color_9c8eff
+  Act01_Chapter02\Act01_Chapter02_Trial07.txt:1068  0102Trial07_AnAn012 | AnAn: |#0102Trial07_AnAn012| | ……跟案件无关的发言<color=#9c8eff><b>【不要再说】</b></color>了。<br>
+  Act01_Chapter02\Act01_Chapter02_Trial11.txt:850  0102Trial11_AnAn013 | AnAn: |#0102Trial11_AnAn013| | ……<color=#9c8eff><b>【没错吧】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial11.txt:903  0102Trial11_AnAn014 | AnAn: |#0102Trial11_AnAn014| | 吾辈的话……可都<color=#9c8eff><b>【听好了】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:83  0102Trial12_AnAn008 | @printDebate pos:70,50 roll:4 |#0102Trial12_AnAn008| | 你们<color=#9c8eff><b>【该投票】</b></color><br>
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:203  0102Trial12_AnAn010 | AnAn: |#0102Trial12_AnAn010| | <color=#9c8eff><b>【怀疑艾玛吧】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:254  0102Trial12_AnAn013 | AnAn: |#0102Trial12_AnAn013| | <color=#9c8eff><b>【怀疑艾玛吧】</b></color>！！
+
+== bold
+  Act01_Chapter02\Act01_Chapter02_Trial07.txt:1068  0102Trial07_AnAn012 | AnAn: |#0102Trial07_AnAn012| | ……跟案件无关的发言<color=#9c8eff><b>【不要再说】</b></color>了。<br>
+  Act01_Chapter02\Act01_Chapter02_Trial11.txt:850  0102Trial11_AnAn013 | AnAn: |#0102Trial11_AnAn013| | ……<color=#9c8eff><b>【没错吧】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial11.txt:903  0102Trial11_AnAn014 | AnAn: |#0102Trial11_AnAn014| | 吾辈的话……可都<color=#9c8eff><b>【听好了】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:83  0102Trial12_AnAn008 | @printDebate pos:70,50 roll:4 |#0102Trial12_AnAn008| | 你们<color=#9c8eff><b>【该投票】</b></color><br>
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:203  0102Trial12_AnAn010 | AnAn: |#0102Trial12_AnAn010| | <color=#9c8eff><b>【怀疑艾玛吧】</b></color>！！
+  Act01_Chapter02\Act01_Chapter02_Trial12.txt:254  0102Trial12_AnAn013 | AnAn: |#0102Trial12_AnAn013| | <color=#9c8eff><b>【怀疑艾玛吧】</b></color>！！
+
+== size
+  Act01_Chapter02\Act01_Chapter02_Trial14.txt:110  0102Trial14_AnAn004 | @printDebate pos:40,50 roll:-4 |#0102Trial14_AnAn004| | <size=200><color=#9c8eff>【投票吧】</color>！</size>
+
+== brackets
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:704  0101Adv04_Warden003 | Warden: |#0101Adv04_Warden003| | 各位的身上拥有成为【魔女】的因子。
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:733  0101Adv04_Warden004 | Warden: |#0101Adv04_Warden004| | 【魔女】是给这个国家带来灾难的邪恶化身。
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:750  0101Adv04_Warden007 | Warden: |#0101Adv04_Warden007| | 因为各位都有化为【魔女】的可能性，<br>
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:781  0101Adv04_Warden011 | Warden: |#0101Adv04_Warden011| | 只要能找到【大魔女】，就能将各位的诅咒……
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:814  0101Adv04_Warden015 | Warden: |#0101Adv04_Warden015| | 我们称之为【残骸】。
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:980  0101Adv04_Narrative079 | (narration) | 在这里，明显是【错误】的事物，<br>
+
+== paren_open
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:55  0101Adv02_Ema004 | Ema: |#0101Adv02_Ema004| | （昨天是想到明天我就要上高中了……<br>
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:70  0101Adv02_Ema005 | Ema: |#0101Adv02_Ema005| | （记得睡觉前……我还看着挂在墙上的<br>
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:81  0101Adv02_Ema006 | Ema: |#0101Adv02_Ema006| | （还下了决心，一切要重新开始……）
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:95  0101Adv02_Ema007 | Ema: |#0101Adv02_Ema007| | （这是噩梦的后续……？）
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:152  0101Adv02_Ema009 | Ema: |#0101Adv02_Ema009| | （……太好了，被关进来的<br>
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:195  0101Adv02_Ema011 | Ema: |#0101Adv02_Ema011| | （真的假的……<br>
+
+== dash_start
+  Act01_Chapter01\Act01_Chapter01_Adv01.txt:5  0101Adv01_Narrative001 | (narration) | ——这里是囚牢。
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:6  0101Adv02_Ema001 | Ema: |#0101Adv02_Ema001| | ——不对！
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:164  0101Adv02_Unknown004 | Unknown: |#0101Adv02_Unknown004| | ——能不能给我安静一下？
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:185  0101Adv02_Ema010 | Ema: |#0101Adv02_Ema010| | ——！！
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:326  0101Adv02_Narrative036 | (narration) | ——然后缓慢地将视线挪动到过道上。
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:389  0101Adv02_Narrative045 | (narration) | ——唰。<br>
+
+== ellipsis_start
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:395  0101Adv02_Ema018 | Ema: |#0101Adv02_Ema018| | ……！
+  Act01_Chapter01\Act01_Chapter01_Adv03.txt:65  0101Adv03_Hiro001 | Hiro: |#0101Adv03_Hiro001| | ……
+  Act01_Chapter01\Act01_Chapter01_Adv03.txt:83  0101Adv03_Hiro002 | Hiro: |#0101Adv03_Hiro002| | ……
+  Act01_Chapter01\Act01_Chapter01_Adv03.txt:98  0101Adv03_Hiro003 | Hiro: |#0101Adv03_Hiro003| | ……
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:80  0101Adv04_Unknown001 | Unknown: |#0101Adv04_Unknown001| | …………
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:119  0101Adv04_Unknown005 | Unknown: |#0101Adv04_Unknown005| | ……哎呀呀。
+
+== heart
+  Act01_Chapter01\Act01_Chapter01_Trial03.txt:327  0101Trial03_Margo012 | Margo: |#0101Trial03_Margo012| | 这就是所谓的恶魔的证明♡
+  Act01_Chapter01\Act01_Chapter01_Trial03.txt:632  0101Trial03_Margo031 | Margo: |#0101Trial03_Margo031| | 差点就遗漏了重要的情报呢♡<br>
+  Act01_Chapter01\Act01_Chapter01_Trial03.txt:708  0101Trial03_Margo035 | Margo: |#0101Trial03_Margo035| | 讲一讲大家的脑袋里面在想什么……♡
+  Act01_Chapter02\Act01_Chapter02_Adv03.txt:182  0102Adv03_Margo011 | Margo: |#0102Adv03_Margo011| | 有兴趣的话我也可以给你们占卜哦♡<br>
+  Act01_Chapter02\Act01_Chapter02_Adv03.txt:183  0102Adv03_Margo011 | Margo: |#0102Adv03_Margo011| | 当然是付费的。呵呵呵♡
+  Act01_Chapter02\Act01_Chapter02_Bad01.txt:43  0102Bad01_Margo003 | Margo: |#0102Bad01_Margo003| | ……不过我也不介意用身体支付哦♡
+
+== note
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:90  0101Adv04_Unknown002 | Unknown: |#0101Adv04_Unknown002| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Adv07.txt:79  0101Adv07_Noah001 | Noah: |#0101Adv07_Noah001| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Adv09.txt:40  0101Adv09_Noah001 | Noah: |#0101Adv09_Noah001| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Adv09.txt:347  0101Adv09_Noah008 | Noah: |#0101Adv09_Noah008| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Adv10.txt:56  0101Adv10_Noah001 | Noah: |#0101Adv10_Noah001| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Trial01.txt:377  0101Trial01_Margo006 | Margo: |#0101Trial01_Margo006| | 真是有趣的推理♪
+
+== wave
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:90  0101Adv04_Unknown002 | Unknown: |#0101Adv04_Unknown002| | 哼哼哼～哼♪
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:155  0101Adv04_Unknown008 | Unknown: |#0101Adv04_Unknown008| | 哎呀～真是厉害啊～
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:171  0101Adv04_Unknown010 | Unknown: |#0101Adv04_Unknown010| | 真让人兴奋耶～！
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:191  0101Adv04_Unknown011 | Unknown: |#0101Adv04_Unknown011| | “真让人兴奋耶～”，兴奋个头啦！
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:295  0101Adv04_Hanna004 | Hanna: |#0101Adv04_Hanna004| | 你别管我了～～！！就这样！！
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:310  0101Adv04_Sherry001 | Sherry: |#0101Adv04_Sherry001| | 嗨嗨～！我叫橘雪莉。<br>
+
+== squares
+  Act02_Chapter02\Act02_Chapter02_Bad01.txt:149  0202Bad01_Unknown001 | Unknown: |#0202Bad01_Unknown001| | ■■■■■■
+  Act02_Chapter02\Act02_Chapter02_Bad01.txt:192  0202Bad01_Unknown002 | Unknown: |#0202Bad01_Unknown002| | ■■■■■！
+  Act02_Chapter02\Act02_Chapter02_Bad01.txt:272  0202Bad01_Unknown003 | Unknown: |#0202Bad01_Unknown003| | ■■■■■！
+  Act02_Chapter02\Act02_Chapter02_Bad01.txt:356  0202Bad01_Unknown004 | Unknown: |#0202Bad01_Unknown004| | ■是■■的。你■■误■。你■错误■
+  Act02_Chapter02\Act02_Chapter02_Bad01.txt:372  0202Bad01_Unknown005 | Unknown: |#0202Bad01_Unknown005| | 你是■误的。■是错误的。你是错■的。
+
+== ideographic_space
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:56  0101Adv02_Ema004 | Ema: |#0101Adv02_Ema004| | 　很开心地睡着了才对）
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:71  0101Adv02_Ema005 | Ema: |#0101Adv02_Ema005| | 　全新的高中制服）
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:153  0101Adv02_Ema009 | Ema: |#0101Adv02_Ema009| | 　不止我一个人）
+  Act01_Chapter01\Act01_Chapter01_Adv02.txt:196  0101Adv02_Ema011 | Ema: |#0101Adv02_Ema011| | 　是二阶堂希罗……？）
+  Act01_Chapter01\Act01_Chapter01_Adv03.txt:31  0101Adv03_Ema002 | Ema: |#0101Adv03_Ema002| | 　要是全部人都是初中的同学，我该怎么办呢……）
+  Act01_Chapter01\Act01_Chapter01_Adv04.txt:349  0101Adv04_Ema004 | Ema: |#0101Adv04_Ema004| | 　我的第一印象就靠自我介绍决定了，要打起精神……！）
+

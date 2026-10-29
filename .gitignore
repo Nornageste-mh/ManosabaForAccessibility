@@ -1,0 +1,62 @@
+# 构建产物
+bin/
+obj/
+dist/
+dl/
+bep_dl/
+nvda_dl/
+package/bepinex_be.zip
+package/*.zip
+mod/bin/
+mod/obj/
+mod/dist/
+mod/dl/
+mod/package/dist/
+mod/package/bepinex_be.zip
+mod/package/Il2CppInterop.Runtime.dll
+# package\ 里的 BepInEx 6 / .NET 6 运行时是二进制复用（34MB），不入库；
+# 只把随包文档与配置模板留在仓库里，其余由 mod\build.ps1 现场组装。
+mod/package/BepInEx/
+mod/package/dotnet/
+mod/package/*.dll
+mod/package/*.exe
+mod/package/doorstop_config.ini
+mod/package/.doorstop_version
+
+# 游戏资源与反编译产物（IP 红线：一律不入库、不分发）
+textassets/
+re/decompiled/
+decompiled/
+extracted/
+*.bundle
+*.assets
+*.resS
+*.resource
+global-metadata.dat
+GameAssembly.dll
+Assembly-CSharp.dll
+il2cpp_data/
+
+# 探针 / 运行期证据（不要入库 LogOutput.log：含台词原文）
+probe/logs/
+probe/evidence/logs/
+LogOutput.log
+*.log
+!docs/**/*.log
+probe/installed_manifest.txt
+
+# 玩家配置与存档样本
+BepInEx/config/
+save_backup*/
+*.sav
+
+# 本地环境
+.vs/
+.idea/
+*.user
+*.swp
+
+# 对照组暂存（把插件挪出 plugins 做纯净测试时的临时目录）
+probe/_stash_out/
+*.dll
+!mod/licenses/*.dll

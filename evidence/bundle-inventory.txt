@@ -1,0 +1,183 @@
+index keys: ['counts', 'assets', 'errors']
+index entries: 448
+kinds: {'source-ui': 4, 'zh-Hans-script': 440, 'zh-Hans-ui': 4}
+
+== bundles that provided extracted text assets (bundle: count) ==
+  general-localization-zhhans-scripts-act01_chapter01_advbad_assets_all.bundle  assets=44  bytes=223,961
+  general-localization-zhhans-scripts-act01_chapter01_trial_assets_all.bundle  assets=17  bytes=144,708
+  general-localization-zhhans-scripts-act01_chapter02_advbad_assets_all.bundle  assets=31  bytes=149,739
+  general-localization-zhhans-scripts-act01_chapter02_trial_assets_all.bundle  assets=17  bytes=138,850
+  general-localization-zhhans-scripts-act01_chapter03_advbad_assets_all.bundle  assets=30  bytes=111,027
+  general-localization-zhhans-scripts-act01_chapter03_trial_assets_all.bundle  assets=16  bytes=124,743
+  general-localization-zhhans-scripts-act01_chapter04_advbad_assets_all.bundle  assets=14  bytes=61,253
+  general-localization-zhhans-scripts-act01_chapter04_trial_assets_all.bundle  assets=14  bytes=76,202
+  general-localization-zhhans-scripts-act01_chapter05_advbad_assets_all.bundle  assets=13  bytes=89,079
+  general-localization-zhhans-scripts-act01_chapter05_trial_assets_all.bundle  assets=12  bytes=94,394
+  general-localization-zhhans-scripts-act02_chapter01_advbad_assets_all.bundle  assets=29  bytes=165,269
+  general-localization-zhhans-scripts-act02_chapter01_trial_assets_all.bundle  assets=15  bytes=145,663
+  general-localization-zhhans-scripts-act02_chapter02_advbad_assets_all.bundle  assets=23  bytes=106,717
+  general-localization-zhhans-scripts-act02_chapter02_trial_assets_all.bundle  assets=15  bytes=108,706
+  general-localization-zhhans-scripts-act02_chapter03_advbad_assets_all.bundle  assets=16  bytes=87,327
+  general-localization-zhhans-scripts-act02_chapter03_trial_assets_all.bundle  assets=16  bytes=117,297
+  general-localization-zhhans-scripts-act02_chapter04_advbad_assets_all.bundle  assets=20  bytes=118,371
+  general-localization-zhhans-scripts-act02_chapter04_trial_assets_all.bundle  assets=13  bytes=91,535
+  general-localization-zhhans-scripts-act02_chapter05_advbad_assets_all.bundle  assets=10  bytes=66,521
+  general-localization-zhhans-scripts-act02_chapter05_trial_assets_all.bundle  assets=30  bytes=168,309
+  general-localization-zhhans-scripts-act02_chapter06_trial_assets_all.bundle  assets=12  bytes=82,052
+  general-localization-zhhans-scripts-common_assets_all.bundle  assets=13  bytes=32,988
+  general-localization-zhhans-scripts-debug_assets_all.bundle  assets=16  bytes=12,563
+  general-localization-zhhans-scripts-system_assets_all.bundle  assets=4  bytes=1,682
+  general-localization-zhhans-text_assets_all.bundle  assets=4  bytes=4,188
+  general-managedtext_assets_all.bundle  assets=4  bytes=3,408
+  TOTAL bytes of those bundles: 2,526,552
+
+== all aa bundle files grouped by prefix ==
+  55380811edfdb64537c6fcb0ac6baaca_monoscripts.bundle          files= 1 bytes=12,607
+  55380811edfdb64537c6fcb0ac6baaca_unitybuiltinassets.bundle   files= 1 bytes=93,539
+  general-choicebuttons                                        files= 1 bytes=20,608
+  general-data                                                 files= 1 bytes=115,319
+  general-fonts-common                                         files= 1 bytes=105,133
+  general-fonts-pixelmplus10                                   files= 1 bytes=424,343
+  general-fonts-sourcehansanskr                                files= 1 bytes=14,957,892
+  general-fonts-sourcehanserifsc                               files= 1 bytes=22,097,660
+  general-fonts-specialthanks                                  files= 1 bytes=6,174,921
+  general-fonts-tsukushimincho                                 files= 1 bytes=9,428,338
+  general-localization-zhhans-movies                           files= 1 bytes=0
+  general-localization-zhhans-scripts-act01_chapter01_advbad   files= 1 bytes=223,961
+  general-localization-zhhans-scripts-act01_chapter01_trial    files= 1 bytes=144,708
+  general-localization-zhhans-scripts-act01_chapter02_advbad   files= 1 bytes=149,739
+  general-localization-zhhans-scripts-act01_chapter02_trial    files= 1 bytes=138,850
+  general-localization-zhhans-scripts-act01_chapter03_advbad   files= 1 bytes=111,027
+  general-localization-zhhans-scripts-act01_chapter03_trial    files= 1 bytes=124,743
+  general-localization-zhhans-scripts-act01_chapter04_advbad   files= 1 bytes=61,253
+  general-localization-zhhans-scripts-act01_chapter04_trial    files= 1 bytes=76,202
+  general-localization-zhhans-scripts-act01_chapter05_advbad   files= 1 bytes=89,079
+  general-localization-zhhans-scripts-act01_chapter05_trial    files= 1 bytes=94,394
+  general-localization-zhhans-scripts-act02_chapter01_advbad   files= 1 bytes=165,269
+  general-localization-zhhans-scripts-act02_chapter01_trial    files= 1 bytes=145,663
+  general-localization-zhhans-scripts-act02_chapter02_advbad   files= 1 bytes=106,717
+  general-localization-zhhans-scripts-act02_chapter02_trial    files= 1 bytes=108,706
+  general-localization-zhhans-scripts-act02_chapter03_advbad   files= 1 bytes=87,327
+  general-localization-zhhans-scripts-act02_chapter03_trial    files= 1 bytes=117,297
+  general-localization-zhhans-scripts-act02_chapter04_advbad   files= 1 bytes=118,371
+  general-localization-zhhans-scripts-act02_chapter04_trial    files= 1 bytes=91,535
+  general-localization-zhhans-scripts-act02_chapter05_advbad   files= 1 bytes=66,521
+  general-localization-zhhans-scripts-act02_chapter05_trial    files= 1 bytes=168,309
+  general-localization-zhhans-scripts-act02_chapter06_trial    files= 1 bytes=82,052
+  general-localization-zhhans-scripts-common                   files= 1 bytes=32,988
+  general-localization-zhhans-scripts-debug                    files= 1 bytes=12,563
+  general-localization-zhhans-scripts-system                   files= 1 bytes=1,682
+  general-localization-zhhans-text                             files= 1 bytes=4,188
+  general-managedtext                                          files= 1 bytes=3,408
+  general-prefabs                                              files= 1 bytes=17,126,617
+  general-sprites                                              files= 1 bytes=23,236,547
+  general-transitions                                          files= 1 bytes=254,983
+  general-voice-act01_chapter01_advbad                         files= 1 bytes=266,212,474
+  general-voice-act01_chapter01_trial                          files= 1 bytes=331,094,545
+  general-voice-act01_chapter02_advbad                         files= 1 bytes=216,014,580
+  general-voice-act01_chapter02_trial                          files= 1 bytes=323,739,387
+  general-voice-act01_chapter03_advbad                         files= 1 bytes=160,311,502
+  general-voice-act01_chapter03_trial                          files= 1 bytes=287,764,475
+  general-voice-act01_chapter04_advbad                         files= 1 bytes=79,367,057
+  general-voice-act01_chapter04_trial                          files= 1 bytes=188,989,897
+  general-voice-act01_chapter05_advbad                         files= 1 bytes=161,787,347
+  general-voice-act01_chapter05_trial                          files= 1 bytes=245,297,977
+  general-voice-act02_chapter01_advbad                         files= 1 bytes=205,744,177
+  general-voice-act02_chapter01_trial                          files= 1 bytes=326,042,983
+  general-voice-act02_chapter02_advbad                         files= 1 bytes=131,608,861
+  general-voice-act02_chapter02_trial                          files= 1 bytes=240,506,706
+  general-voice-act02_chapter03_advbad                         files= 1 bytes=97,492,339
+  general-voice-act02_chapter03_trial                          files= 1 bytes=259,333,875
+  general-voice-act02_chapter04_advbad                         files= 1 bytes=135,069,019
+  general-voice-act02_chapter04_trial                          files= 1 bytes=207,848,239
+  general-voice-act02_chapter05_advbad                         files= 1 bytes=84,603,704
+  general-voice-act02_chapter05_trial                          files= 1 bytes=385,879,035
+  general-voice-act02_chapter06_trial                          files= 1 bytes=215,171,427
+  general-voice-commonbad01                                    files= 1 bytes=4,857,489
+  general-voice-commonbad02                                    files= 1 bytes=1,778,540
+  general-voice-commonbad03                                    files= 1 bytes=1,873,213
+  general-voice-commonbad04                                    files= 1 bytes=7,178,475
+  general-voice-commonbad05                                    files= 1 bytes=9,866,625
+  general-voice-commonbad06                                    files= 1 bytes=3,078,099
+  general-voice-commonbad07                                    files= 1 bytes=2,175,105
+  general-voice-commonbad08                                    files= 1 bytes=2,924,444
+  general-voice-commonbad09                                    files= 1 bytes=2,535,342
+  general-voice-commonbad10                                    files= 1 bytes=1,091,522
+  general-voice-commonbad11                                    files= 1 bytes=542,006
+  general-voice-commonbad12                                    files= 1 bytes=453,712
+  general-voice-commonbad13                                    files= 1 bytes=1,662,009
+  general-voice-commontrial                                    files= 1 bytes=3,184,344
+  general-witchbook                                            files= 1 bytes=8,549,575
+  naninovel-audio                                              files=66 bytes=770,809,527
+  naninovel-backgrounds                                        files= 1 bytes=0
+  naninovel-characters                                         files= 1 bytes=0
+  naninovel-choicehandlers                                     files= 1 bytes=14,719
+  naninovel-movies                                             files= 1 bytes=0
+  naninovel-scripts                                            files=24 bytes=10,535,556
+  naninovel-spawn                                              files= 1 bytes=340,429,846
+  naninovel-textprinters                                       files= 1 bytes=17,405
+  naninovel-ui                                                 files= 1 bytes=423,305
+  bundle files: 173  total bytes: 5820435523
+  non-bundle entries: ['AddressablesLink', 'catalog.bin', 'catalog.hash', 'settings.json']
+
+== naninovel source bundles ==
+  naninovel-scripts_assets_naninovelscripts-act01_chapter01_advbad.bundle 688,371
+  naninovel-scripts_assets_naninovelscripts-act01_chapter01_trial.bundle 654,561
+  naninovel-scripts_assets_naninovelscripts-act01_chapter02_advbad.bundle 455,254
+  naninovel-scripts_assets_naninovelscripts-act01_chapter02_trial.bundle 691,590
+  naninovel-scripts_assets_naninovelscripts-act01_chapter03_advbad.bundle 341,194
+  naninovel-scripts_assets_naninovelscripts-act01_chapter03_trial.bundle 594,728
+  naninovel-scripts_assets_naninovelscripts-act01_chapter04_advbad.bundle 189,217
+  naninovel-scripts_assets_naninovelscripts-act01_chapter04_trial.bundle 403,108
+  naninovel-scripts_assets_naninovelscripts-act01_chapter05_advbad.bundle 280,832
+  naninovel-scripts_assets_naninovelscripts-act01_chapter05_trial.bundle 468,061
+  naninovel-scripts_assets_naninovelscripts-act02_chapter01_advbad.bundle 488,062
+  naninovel-scripts_assets_naninovelscripts-act02_chapter01_trial.bundle 651,131
+  naninovel-scripts_assets_naninovelscripts-act02_chapter02_advbad.bundle 331,453
+  naninovel-scripts_assets_naninovelscripts-act02_chapter02_trial.bundle 569,021
+  naninovel-scripts_assets_naninovelscripts-act02_chapter03_advbad.bundle 269,363
+  naninovel-scripts_assets_naninovelscripts-act02_chapter03_trial.bundle 567,620
+  naninovel-scripts_assets_naninovelscripts-act02_chapter04_advbad.bundle 366,332
+  naninovel-scripts_assets_naninovelscripts-act02_chapter04_trial.bundle 444,338
+  naninovel-scripts_assets_naninovelscripts-act02_chapter05_advbad.bundle 243,025
+  naninovel-scripts_assets_naninovelscripts-act02_chapter05_trial.bundle 949,291
+  naninovel-scripts_assets_naninovelscripts-act02_chapter06_trial.bundle 416,239
+  naninovel-scripts_assets_naninovelscripts-common.bundle 119,608
+  naninovel-scripts_assets_naninovelscripts-debug.bundle 254,573
+  naninovel-scripts_assets_naninovelscripts-system.bundle 98,584
+
+== zh-Hans script bundle names ==
+  general-localization-zhhans-scripts-act01_chapter01_advbad_assets_all.bundle 223,961
+  general-localization-zhhans-scripts-act01_chapter01_trial_assets_all.bundle 144,708
+  general-localization-zhhans-scripts-act01_chapter02_advbad_assets_all.bundle 149,739
+  general-localization-zhhans-scripts-act01_chapter02_trial_assets_all.bundle 138,850
+  general-localization-zhhans-scripts-act01_chapter03_advbad_assets_all.bundle 111,027
+  general-localization-zhhans-scripts-act01_chapter03_trial_assets_all.bundle 124,743
+  general-localization-zhhans-scripts-act01_chapter04_advbad_assets_all.bundle 61,253
+  general-localization-zhhans-scripts-act01_chapter04_trial_assets_all.bundle 76,202
+  general-localization-zhhans-scripts-act01_chapter05_advbad_assets_all.bundle 89,079
+  general-localization-zhhans-scripts-act01_chapter05_trial_assets_all.bundle 94,394
+  general-localization-zhhans-scripts-act02_chapter01_advbad_assets_all.bundle 165,269
+  general-localization-zhhans-scripts-act02_chapter01_trial_assets_all.bundle 145,663
+  general-localization-zhhans-scripts-act02_chapter02_advbad_assets_all.bundle 106,717
+  general-localization-zhhans-scripts-act02_chapter02_trial_assets_all.bundle 108,706
+  general-localization-zhhans-scripts-act02_chapter03_advbad_assets_all.bundle 87,327
+  general-localization-zhhans-scripts-act02_chapter03_trial_assets_all.bundle 117,297
+  general-localization-zhhans-scripts-act02_chapter04_advbad_assets_all.bundle 118,371
+  general-localization-zhhans-scripts-act02_chapter04_trial_assets_all.bundle 91,535
+  general-localization-zhhans-scripts-act02_chapter05_advbad_assets_all.bundle 66,521
+  general-localization-zhhans-scripts-act02_chapter05_trial_assets_all.bundle 168,309
+  general-localization-zhhans-scripts-act02_chapter06_trial_assets_all.bundle 82,052
+  general-localization-zhhans-scripts-common_assets_all.bundle 32,988
+  general-localization-zhhans-scripts-debug_assets_all.bundle 12,563
+  general-localization-zhhans-scripts-system_assets_all.bundle 1,682
+
+== zhhans text bundle ==
+  general-localization-zhhans-movies_assets_naninovel 0
+  general-localization-zhhans-text_assets_all.bundle 4,188
+
+== catalog locale strings ==
+  b'zh-Hans'@3047198: b'sukushiMincho@Shadow6.mat\xc3~.\x00\xc3{.\x00\xb7~.@\xdd~.@\x86\xf7\x06@`{.\x00\x00\x00\x00\x00\xff\xff\xff\xff~p.\x00\x04\x00\x00\x009\x06\x07\x00\r\x00\x00\x00Act01_Opening\x0e\x00\x00\x00zh-Hans/Movies\x0c\x00\x00\x00Localization0\x7f.\x004\x99\x08\x00\x1e\x7f.\x00<\x7f.\x00\r\x7f.\x00D\x7f.\x00\x11\x00\x00\x00Ac'
+  b'zh-Hans'@3047549: b'\x7f.\x00\x11\x00\x00\x00Act02_Opening.mp4*\x80.\x00q\x7f.\x00\x1e\x80.@;\x80.@\x86\xf7\x06@\t\x80.\x00\x00\x00\x00\x00\xff\xff\xff\xff\xe1\x7f.\x00\x04\x00\x00\x00\xa4)\x07\x00\x0e\x00\x00\x00CharacterNames\x0c\x00\x00\x00zh-Hans/Text}\x80.\x00<\x7f.\x00k\x80.\x00\x89\x80.\x00\x12\x00\x00\x00CharacterNames.txt}\x80.\x00i\x7f.\x00\x9d\x80'
+  b'zh-Hans'@3047851: b'\x89\x80.\x00\r\x00\x00\x00DefaultUI.txtY\x81.\x00\xaf\x80.\x00M\x81.@f\x81.@\x86\xf7\x06@c\x80.\x00\x00\x00\x00\x00\xff\xff\xff\xff\xd4\x80.\x00\x0c\x00\x00\x00Text/Locales\x14\x00\x00\x00Localization/zh-Hans\x9e\x81.\x004\x99\x08\x00\x8e\x81.\x00\xb2\x81.\x00\x0b\x00\x00\x00Locales.txt\xc6\x81.\x00\xaf\x80.\x00\xba\x81.@\xd1\x81.@\x86\xf7\x06@c\x80'
+  b'Localization/zh-Hans'@3047838: b'DefaultUID\x81.\x00\x89\x80.\x00\r\x00\x00\x00DefaultUI.txtY\x81.\x00\xaf\x80.\x00M\x81.@f\x81.@\x86\xf7\x06@c\x80.\x00\x00\x00\x00\x00\xff\xff\xff\xff\xd4\x80.\x00\x0c\x00\x00\x00Text/Locales\x14\x00\x00\x00Localization/zh-Hans\x9e\x81.\x004\x99\x08\x00\x8e\x81.\x00\xb2\x81.\x00\x0b\x00\x00\x00Locales.txt\xc6\x81.\x00\xaf\x80.\x00\xba'

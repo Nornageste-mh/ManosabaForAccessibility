@@ -1,0 +1,82 @@
+== roles ==
+  dialogue     24492
+  narration    7058
+  printDebate  2003
+  choice       1184
+  toast        78
+  print        21
+
+== ASCII after stripping markup (per role) ==
+  blocks checked: 34382
+  blocks with ASCII letters after strip: 43
+  blocks with ASCII digits after strip: 242
+
+== tag open/close counts in display text ==
+  br         25693
+  link       1192
+  color      130
+  b          72
+  ruby       50
+  size       2
+
+== per-act aggregation ==
+  Act01_Chapter01 {'files': 58, 'lines': 4689, 'chars': 115752, 'choice': 127, 'dialogue': 3174, 'narration': 1209, 'toast': 13, 'printDebate': 0}
+  Act01_Chapter02 {'files': 45, 'lines': 3973, 'chars': 92326, 'choice': 120, 'dialogue': 2870, 'narration': 724, 'toast': 6, 'printDebate': 0}
+  Act01_Chapter03 {'files': 43, 'lines': 3117, 'chars': 76350, 'choice': 122, 'dialogue': 2283, 'narration': 541, 'toast': 4, 'printDebate': 0}
+  Act01_Chapter04 {'files': 26, 'lines': 1853, 'chars': 46493, 'choice': 71, 'dialogue': 1339, 'narration': 326, 'toast': 3, 'printDebate': 0}
+  Act01_Chapter05 {'files': 23, 'lines': 2490, 'chars': 62063, 'choice': 93, 'dialogue': 1836, 'narration': 439, 'toast': 2, 'printDebate': 0}
+  Act02_Chapter01 {'files': 42, 'lines': 4123, 'chars': 95924, 'choice': 89, 'dialogue': 2952, 'narration': 918, 'toast': 11, 'printDebate': 0}
+  Act02_Chapter02 {'files': 36, 'lines': 3100, 'chars': 65464, 'choice': 85, 'dialogue': 2211, 'narration': 591, 'toast': 7, 'printDebate': 0}
+  Act02_Chapter03 {'files': 30, 'lines': 2820, 'chars': 64112, 'choice': 82, 'dialogue': 2033, 'narration': 502, 'toast': 5, 'printDebate': 0}
+  Act02_Chapter04 {'files': 31, 'lines': 2902, 'chars': 64818, 'choice': 80, 'dialogue': 1868, 'narration': 797, 'toast': 4, 'printDebate': 0}
+  Act02_Chapter05 {'files': 39, 'lines': 3585, 'chars': 73034, 'choice': 147, 'dialogue': 2700, 'narration': 408, 'toast': 21, 'printDebate': 0}
+  Act02_Chapter06 {'files': 11, 'lines': 1238, 'chars': 26664, 'choice': 54, 'dialogue': 1014, 'narration': 0, 'toast': 1, 'printDebate': 0}
+  Common {'files': 13, 'lines': 476, 'chars': 10598, 'choice': 0, 'dialogue': 191, 'narration': 285, 'toast': 0, 'printDebate': 0}
+  Debug {'files': 15, 'lines': 468, 'chars': 0, 'choice': 112, 'dialogue': 21, 'narration': 318, 'toast': 1, 'printDebate': 0}
+  System {'files': 1, 'lines': 2, 'chars': 10, 'choice': 2, 'dialogue': 0, 'narration': 0, 'toast': 0, 'printDebate': 0}
+
+== voice bundles ==
+  bundles: 35 clips: 26083 unique: 26083
+  total bundle bytes: 4593080531
+  clips per bundle min/max: 3 2512
+  largest bundles:
+    general-voice-act02_chapter05_trial_assets_all.bundle clips=2512 bytes=385879035
+    general-voice-act02_chapter01_trial_assets_all.bundle clips=1918 bytes=326042983
+    general-voice-act01_chapter02_trial_assets_all.bundle clips=1891 bytes=323739387
+    general-voice-act01_chapter01_trial_assets_all.bundle clips=1753 bytes=331094545
+    general-voice-act02_chapter03_trial_assets_all.bundle clips=1647 bytes=259333875
+
+== voice id prefixes ==
+  0201Trial06            298
+  0201Trial08            254
+  0206Trial04            222
+  0105Trial09            210
+  0204Trial04            206
+  0201Trial11            206
+  0101Trial13            203
+  0105Trial08            196
+  0205Trial09            194
+  0202Trial09            191
+  0202Trial04            190
+  0101Trial07            188
+  0203Trial06            183
+  0202Trial11            177
+  0101Trial14            175
+  0103Trial09            172
+  0201Trial12            172
+  0105Adv09              171
+  0206Trial08            171
+  0102Trial01            169
+  0102Trial13            169
+  0202Trial08            168
+  0105Trial07            168
+  0102Trial07            168
+  0102Trial10            165
+
+== catalog locale evidence ==
+  b'zh-Hans': 3
+  b'zhhans': 56
+  b'Localization/zh-Hans': 1
+  b'Text/Scripts': 1
+  b'Scripts/Act01': 0
+  catalog size: 5529450

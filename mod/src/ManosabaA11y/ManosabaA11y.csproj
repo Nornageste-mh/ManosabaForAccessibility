@@ -1,0 +1,155 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    逐作 csproj：IL2CPP 路线（BepInEx 6.0.0-be.788 / net6.0）。
+
+    ★ 三行可复现构建属性**一条都不能少**（README「构建与打包」）：
+        Deterministic
+        IncludeSourceRevisionInInformationalVersion=false
+        EnableSourceLink=false
+      只关前两条是不够的：SDK 默认 EnableSourceLink=true，会把当前 git 提交写进 PDB，
+      PDB 的内容哈希又进 DLL 的 debug 目录与确定性 MVID。
+
+    ★ GameDir 属性名必须与 build.ps1 的 -p: 参数完全一致。
+      这里给了默认值，所以「无参 dotnet build」也能找到引用。
+  -->
+
+  <PropertyGroup>
+    <!-- 游戏根目录：build.ps1 用 -p:ManosabaGameDir=<路径> 覆盖；-GameDir 改的就是它 -->
+    <ManosabaGameDir Condition="'$(ManosabaGameDir)' == ''">D:\Steam\steamapps\common\manosaba_game</ManosabaGameDir>
+    <BepInExCoreDir>$(ManosabaGameDir)\BepInEx\core</BepInExCoreDir>
+    <InteropDir>$(ManosabaGameDir)\BepInEx\interop</InteropDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>ManosabaA11y</AssemblyName>
+    <RootNamespace>ManosabaA11y</RootNamespace>
+    <Version>0.1.0.0</Version>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>CS0169;CS0414;CS0649;CS0436;CS0437;CS1701;CS1702</NoWarn>
+
+    <!-- 可复现构建三行 -->
+    <Deterministic>true</Deterministic>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <EnableSourceLink>false</EnableSourceLink>
+
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+
+    <!-- IL2CPP 路线额外配置（流水线 §3） -->
+    <TargetFramework>net6.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodePage>65001</CodePage>
+  </PropertyGroup>
+
+  <!-- BepInEx 6 运行时：从游戏目录里已安装的 BepInEx 取（先跑一次游戏才会生成 interop） -->
+  <ItemGroup>
+    <Reference Include="BepInEx.Core">
+      <HintPath>$(BepInExCoreDir)\BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>$(BepInExCoreDir)\BepInEx.Unity.IL2CPP.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Unity.Common">
+      <HintPath>$(BepInExCoreDir)\BepInEx.Unity.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(BepInExCoreDir)\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    interop：env-probe 让游戏跑过一次后生成在 <GameDir>\BepInEx\interop\。
+
+    ★ 只引用**确实存在且非 0 字节**的 dll。interop 生成失败时会留下 0 字节的
+      占位文件，直接 HintPath 引用它们会让 csc 报「不是有效的程序集」，
+      而不是「找不到引用」—— 排查方向会被带偏。
+  -->
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(InteropDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(InteropDir)\Il2Cppmscorlib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(InteropDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(InteropDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>$(InteropDir)\UnityEngine.InputModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(InteropDir)\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(InteropDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(InteropDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(InteropDir)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(InteropDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- 新输入系统：只给无人值守测试用的输入注入（InputInject.cs）用。
+         本作是 Unity 6 + InputSystem，Naninovel 的输入是每帧轮询设备状态，
+         所以自动化测试必须往 InputSystem 队列里塞状态事件，而不是只发 Win32 消息。 -->
+    <Reference Include="Unity.InputSystem">
+      <HintPath>$(InteropDir)\Unity.InputSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!--
+    Naninovel 运行时（L3 逐作层要挂它的 Harmony 点）：
+      · Elringus.Naninovel.Runtime.dll —— TextPrinterManager / UITextPrinter / ChoiceHandlerPanel / PrintedMessage
+      · Naninovel.Common.dll          —— 基础类型（LocalizableText/AsyncToken 等所在，按需）
+    这两个是插件的**编译期引用**，运行时由游戏自身加载，绝不随包分发。
+  -->
+  <ItemGroup>
+    <Reference Include="Elringus.Naninovel.Runtime">
+      <HintPath>$(InteropDir)\Elringus.Naninovel.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- GigaCreation.NaninovelExtender.Core：基类 NaninovelManager（StartGameScenarioName 在它身上） -->
+    <Reference Include="GigaCreation.NaninovelExtender.Core">
+      <HintPath>$(InteropDir)\GigaCreation.NaninovelExtender.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+  </ItemGroup>
+
+  <!--
+    平台层（L1）从 A11yFramework 整份拷进 src\ManosabaA11y\ 下，
+    和逐作文件放在同一个目录里编译。默认的 glob 已经会带上它们，不需要额外配置。
+  -->
+
+</Project>
+
+

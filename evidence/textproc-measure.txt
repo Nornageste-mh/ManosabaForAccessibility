@@ -1,0 +1,145 @@
+game records (non-Debug): 34368
+
+[dialogue] n=24471
+  starts with （: 5049
+  starts with 【: 150
+  contains 【】: 1597
+  contains ♡: 80  ♪: 14
+  starts with '…': 3122
+  starts with '—': 305
+  ends with '？': 3566  '！': 4201  '……': 3244
+  plain chars: p50=18 p90=33 max=70
+  >120 chars: 0  >60: 9
+
+[narration] n=6740
+  starts with （: 0
+  starts with 【: 10
+  contains 【】: 142
+  contains ♡: 0  ♪: 0
+  starts with '…': 30
+  starts with '—': 273
+  ends with '？': 37  '！': 20  '……': 68
+  plain chars: p50=21 p90=33 max=62
+  >120 chars: 0  >60: 1
+
+[print] n=9
+  starts with （: 0
+  starts with 【: 1
+  contains 【】: 1
+  contains ♡: 0  ♪: 0
+  starts with '…': 1
+  starts with '—': 3
+  ends with '？': 1  '！': 0  '……': 0
+  plain chars: p50=13 p90=40 max=40
+  >120 chars: 0  >60: 0
+
+[printDebate] n=1999
+  starts with （: 2
+  starts with 【: 20
+  contains 【】: 175
+  contains ♡: 7  ♪: 1
+  starts with '…': 242
+  starts with '—': 9
+  ends with '？': 371  '！': 459  '……': 320
+  plain chars: p50=22 p90=37 max=71
+  >120 chars: 0  >60: 3
+
+[choice] n=1072
+  starts with （: 0
+  starts with 【: 13
+  contains 【】: 14
+  contains ♡: 0  ♪: 0
+  starts with '…': 0
+  starts with '—': 0
+  ends with '？': 27  '！': 2  '……': 0
+  plain chars: p50=6 p90=10 max=19
+  >120 chars: 0  >60: 0
+
+[toast] n=77
+  starts with （: 0
+  starts with 【: 0
+  contains 【】: 0
+  contains ♡: 0  ♪: 0
+  starts with '…': 0
+  starts with '—': 0
+  ends with '？': 0  '！': 0  '……': 66
+  plain chars: p50=8 p90=8 max=8
+  >120 chars: 0  >60: 0
+
+== openings (first 12 chars, top 15) ==
+  '……' 3395
+  '艾玛' 892
+  '（…' 809
+  '——' 590
+  '如果' 408
+  '（我' 321
+  '所以' 277
+  '我们' 234
+  '（但' 200
+  '可是' 198
+  '诺亚' 196
+  '雪莉' 194
+  '因为' 189
+  '虽然' 183
+  '（不' 182
+
+== closing (last 8 chars, top 15) ==
+  '……' 3631
+  '…！' 1380
+  '了。' 1334
+  '！）' 1226
+  '…）' 1200
+  '吗？' 772
+  '！？' 729
+  '——' 644
+  '吧。' 638
+  '…？' 574
+  '？）' 551
+  '的。' 551
+  '吧？' 468
+  '！！' 422
+  '来。' 339
+
+== br position: leading <br> count ==
+  text starting with <br>: 0
+  text ending with <br>: 376
+  consecutive <br><br>: 16
+  leading/trailing spaces: 1 0
+
+== u3000 usage samples ==
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv02.txt:52 '（昨天是想到明天我就要上高中了……<br>\u3000很开心地睡着了才对）'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv02.txt:67 '（记得睡觉前……我还看着挂在墙上的<br>\u3000全新的高中制服）'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv02.txt:149 '（……太好了，被关进来的<br>\u3000不止我一个人）'
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Adv02.txt:192 '（真的假的……<br>\u3000是二阶堂希罗……？）'
+  blocks with u3000: 2845  total u3000 chars: 3346
+
+== link tag context ==
+  textassets/scripts/zh-Hans/Act01_Chapter01/Act01_Chapter01_Trial01.txt:31 id=0101Trial01_Sherry003 plain='看尸体的下面，还有旁边……在这些地方都有用血画下的蝴蝶绘画！'
+  lines with link: 467
+
+== choice ids shape sample ==
+   ['0101Adv05_Choice001', '0101Adv05_Choice002', '0101Adv07_Choice001', '0101Adv07_Choice002', '0101Adv13_Choice001', '0101Adv13_Choice002', '0101Adv18_Choice001', '0101Adv18_Choice002', '0101Adv18_Choice003', '0101Adv19_Choice001']
+== toast ids ==
+   ['Toast_001', 'Toast_002', 'Toast_101', 'Toast_102', 'Toast_103', 'Toast_104', 'Toast_105', 'Toast_106', 'Toast_107', 'Toast_108', 'Toast_109', 'Toast_110', 'Toast_111']
+
+== id prefix taxonomy (non-debug) ==
+  0201/Trial06 323
+  0105/Adv09 304
+  0205/Bad01 303
+  0201/Trial08 263
+  0101/Adv04 244
+  0206/Trial04 232
+  0202/Adv19 221
+  0105/Trial09 219
+  0102/Bad02 218
+  0101/Trial13 218
+  0204/Trial04 215
+  0201/Trial11 214
+  0101/Trial07 211
+  0201/Bad01 209
+  0105/Adv07 207
+  0205/Trial09 205
+  0105/Trial08 205
+  0103/Adv27 204
+  0102/Adv27 204
+  0202/Trial09 203

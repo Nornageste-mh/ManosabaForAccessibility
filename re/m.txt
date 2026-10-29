@@ -1,0 +1,575 @@
+using System;
+using System.Runtime.CompilerServices;
+using Il2CppInterop.Common.Attributes;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.Runtime;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
+
+namespace UnityEngine.InputSystem;
+
+public class Mouse : Pointer
+{
+	private static readonly IntPtr NativeFieldInfoPtr__scroll_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__leftButton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__middleButton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__rightButton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__backButton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__forwardButton_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__clickCount_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr__current_k__BackingField;
+
+	private static readonly IntPtr NativeFieldInfoPtr_s_PlatformMouseDevice;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_scroll_Public_get_DeltaControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_scroll_Protected_set_Void_DeltaControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_leftButton_Public_get_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_leftButton_Protected_set_Void_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_middleButton_Public_get_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_middleButton_Protected_set_Void_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_rightButton_Public_get_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_rightButton_Protected_set_Void_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_backButton_Public_get_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_backButton_Protected_set_Void_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_forwardButton_Public_get_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_forwardButton_Protected_set_Void_ButtonControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_clickCount_Public_get_IntegerControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_clickCount_Protected_set_Void_IntegerControl_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_get_current_Public_Static_get_Mouse_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_set_current_Private_Static_set_Void_Mouse_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_MakeCurrent_Public_Virtual_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_OnAdded_Protected_Virtual_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_OnRemoved_Protected_Virtual_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_WarpCursorPosition_Public_Void_Vector2_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_FinishSetup_Protected_Virtual_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_OnNextUpdate_Protected_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_OnStateEvent_Protected_Void_InputEventPtr_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnNextUpdate_Private_Virtual_Final_New_Void_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnStateEvent_Private_Virtual_Final_New_Void_InputEventPtr_0;
+
+	private static readonly IntPtr NativeMethodInfoPtr__ctor_Public_Void_0;
+
+	public unsafe DeltaControl _scroll_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__scroll_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<DeltaControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__scroll_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)deltaControl));
+		}
+	}
+
+	public unsafe ButtonControl _leftButton_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__leftButton_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__leftButton_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buttonControl));
+		}
+	}
+
+	public unsafe ButtonControl _middleButton_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__middleButton_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__middleButton_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buttonControl));
+		}
+	}
+
+	public unsafe ButtonControl _rightButton_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__rightButton_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__rightButton_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buttonControl));
+		}
+	}
+
+	public unsafe ButtonControl _backButton_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backButton_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__backButton_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buttonControl));
+		}
+	}
+
+	public unsafe ButtonControl _forwardButton_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__forwardButton_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__forwardButton_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)buttonControl));
+		}
+	}
+
+	public unsafe IntegerControl _clickCount_k__BackingField
+	{
+		get
+		{
+			nint num = (nint)IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this) + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__clickCount_k__BackingField);
+			IntPtr intPtr = *(IntPtr*)num;
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<IntegerControl>(intPtr) : null;
+		}
+		set
+		{
+			IntPtr num = IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IL2CPP.il2cpp_gc_wbarrier_set_field(num, (IntPtr)((nint)num + (int)IL2CPP.il2cpp_field_get_offset(NativeFieldInfoPtr__clickCount_k__BackingField)), IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)integerControl));
+		}
+	}
+
+	public new unsafe static Mouse _current_k__BackingField
+	{
+		get
+		{
+			Unsafe.SkipInit(out IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr__current_k__BackingField, (void*)(&intPtr));
+			IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (IntPtr)0) ? Il2CppObjectPool.Get<Mouse>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr__current_k__BackingField, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)mouse));
+		}
+	}
+
+	public unsafe static Mouse s_PlatformMouseDevice
+	{
+		get
+		{
+			Unsafe.SkipInit(out IntPtr intPtr);
+			IL2CPP.il2cpp_field_static_get_value(NativeFieldInfoPtr_s_PlatformMouseDevice, (void*)(&intPtr));
+			IntPtr intPtr2 = intPtr;
+			return (intPtr2 != (IntPtr)0) ? Il2CppObjectPool.Get<Mouse>(intPtr2) : null;
+		}
+		set
+		{
+			IL2CPP.il2cpp_field_static_set_value(NativeFieldInfoPtr_s_PlatformMouseDevice, (void*)IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)mouse));
+		}
+	}
+
+	public unsafe DeltaControl scroll
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_scroll_Public_get_DeltaControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<DeltaControl>(intPtr) : null;
+		}
+		[CallerCount(12)]
+		[CachedScanResults(RefRangeStart = 185382, RefRangeEnd = 185394, XrefRangeStart = 185382, XrefRangeEnd = 185394, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_scroll_Protected_set_Void_DeltaControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe ButtonControl leftButton
+	{
+		[CallerCount(10)]
+		[CachedScanResults(RefRangeStart = 185394, RefRangeEnd = 185404, XrefRangeStart = 185394, XrefRangeEnd = 185404, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_leftButton_Public_get_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		[CallerCount(11)]
+		[CachedScanResults(RefRangeStart = 185404, RefRangeEnd = 185415, XrefRangeStart = 185404, XrefRangeEnd = 185415, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_leftButton_Protected_set_Void_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe ButtonControl middleButton
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_middleButton_Public_get_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		[CallerCount(11)]
+		[CachedScanResults(RefRangeStart = 185415, RefRangeEnd = 185426, XrefRangeStart = 185415, XrefRangeEnd = 185426, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_middleButton_Protected_set_Void_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe ButtonControl rightButton
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_rightButton_Public_get_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_rightButton_Protected_set_Void_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe ButtonControl backButton
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_backButton_Public_get_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_backButton_Protected_set_Void_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe ButtonControl forwardButton
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_forwardButton_Public_get_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<ButtonControl>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_forwardButton_Protected_set_Void_ButtonControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public unsafe IntegerControl clickCount
+	{
+		[CallerCount(0)]
+		get
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_clickCount_Public_get_IntegerControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<IntegerControl>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		set
+		{
+			IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_clickCount_Protected_set_Void_IntegerControl_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	public new unsafe static Mouse current
+	{
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199565, XrefRangeEnd = 199567, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		get
+		{
+			IntPtr* ptr = null;
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_get_current_Public_Static_get_Mouse_0, (IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+			return (intPtr != (IntPtr)0) ? Il2CppObjectPool.Get<Mouse>(intPtr) : null;
+		}
+		[CallerCount(0)]
+		[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199567, XrefRangeEnd = 199570, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+		set
+		{
+			IntPtr* ptr = stackalloc IntPtr[1];
+			*ptr = IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)value);
+			Unsafe.SkipInit(out IntPtr intPtr2);
+			IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_set_current_Private_Static_set_Void_Mouse_0, (IntPtr)0, (void**)ptr, ref intPtr2);
+			Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+		}
+	}
+
+	static Mouse()
+	{
+		Il2CppClassPointerStore<Mouse>.NativeClassPtr = IL2CPP.GetIl2CppClass("Unity.InputSystem.dll", "UnityEngine.InputSystem", "Mouse");
+		IL2CPP.il2cpp_runtime_class_init(Il2CppClassPointerStore<Mouse>.NativeClassPtr);
+		NativeFieldInfoPtr__scroll_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<scroll>k__BackingField");
+		NativeFieldInfoPtr__leftButton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<leftButton>k__BackingField");
+		NativeFieldInfoPtr__middleButton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<middleButton>k__BackingField");
+		NativeFieldInfoPtr__rightButton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<rightButton>k__BackingField");
+		NativeFieldInfoPtr__backButton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<backButton>k__BackingField");
+		NativeFieldInfoPtr__forwardButton_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<forwardButton>k__BackingField");
+		NativeFieldInfoPtr__clickCount_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<clickCount>k__BackingField");
+		NativeFieldInfoPtr__current_k__BackingField = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "<current>k__BackingField");
+		NativeFieldInfoPtr_s_PlatformMouseDevice = IL2CPP.GetIl2CppField(Il2CppClassPointerStore<Mouse>.NativeClassPtr, "s_PlatformMouseDevice");
+		NativeMethodInfoPtr_get_scroll_Public_get_DeltaControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665175);
+		NativeMethodInfoPtr_set_scroll_Protected_set_Void_DeltaControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665176);
+		NativeMethodInfoPtr_get_leftButton_Public_get_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665177);
+		NativeMethodInfoPtr_set_leftButton_Protected_set_Void_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665178);
+		NativeMethodInfoPtr_get_middleButton_Public_get_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665179);
+		NativeMethodInfoPtr_set_middleButton_Protected_set_Void_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665180);
+		NativeMethodInfoPtr_get_rightButton_Public_get_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665181);
+		NativeMethodInfoPtr_set_rightButton_Protected_set_Void_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665182);
+		NativeMethodInfoPtr_get_backButton_Public_get_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665183);
+		NativeMethodInfoPtr_set_backButton_Protected_set_Void_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665184);
+		NativeMethodInfoPtr_get_forwardButton_Public_get_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665185);
+		NativeMethodInfoPtr_set_forwardButton_Protected_set_Void_ButtonControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665186);
+		NativeMethodInfoPtr_get_clickCount_Public_get_IntegerControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665187);
+		NativeMethodInfoPtr_set_clickCount_Protected_set_Void_IntegerControl_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665188);
+		NativeMethodInfoPtr_get_current_Public_Static_get_Mouse_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665189);
+		NativeMethodInfoPtr_set_current_Private_Static_set_Void_Mouse_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665190);
+		NativeMethodInfoPtr_MakeCurrent_Public_Virtual_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665191);
+		NativeMethodInfoPtr_OnAdded_Protected_Virtual_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665192);
+		NativeMethodInfoPtr_OnRemoved_Protected_Virtual_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665193);
+		NativeMethodInfoPtr_WarpCursorPosition_Public_Void_Vector2_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665194);
+		NativeMethodInfoPtr_FinishSetup_Protected_Virtual_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665195);
+		NativeMethodInfoPtr_OnNextUpdate_Protected_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665196);
+		NativeMethodInfoPtr_OnStateEvent_Protected_Void_InputEventPtr_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665197);
+		NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnNextUpdate_Private_Virtual_Final_New_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665198);
+		NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnStateEvent_Private_Virtual_Final_New_Void_InputEventPtr_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665199);
+		NativeMethodInfoPtr__ctor_Public_Void_0 = IL2CPP.GetIl2CppMethodByToken(Il2CppClassPointerStore<Mouse>.NativeClassPtr, 100665200);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199570, XrefRangeEnd = 199572, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe override void MakeCurrent()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(IL2CPP.il2cpp_object_get_virtual_method(IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)this), NativeMethodInfoPtr_MakeCurrent_Public_Virtual_Void_0), IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199572, XrefRangeEnd = 199575, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe override void OnAdded()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(IL2CPP.il2cpp_object_get_virtual_method(IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)this), NativeMethodInfoPtr_OnAdded_Protected_Virtual_Void_0), IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199575, XrefRangeEnd = 199581, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe override void OnRemoved()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(IL2CPP.il2cpp_object_get_virtual_method(IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)this), NativeMethodInfoPtr_OnRemoved_Protected_Virtual_Void_0), IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(3)]
+	[CachedScanResults(RefRangeStart = 199584, RefRangeEnd = 199587, XrefRangeStart = 199581, XrefRangeEnd = 199584, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe void WarpCursorPosition(Vector2 position)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&position);
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_WarpCursorPosition_Public_Void_Vector2_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199587, XrefRangeEnd = 199623, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe override void FinishSetup()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(IL2CPP.il2cpp_object_get_virtual_method(IL2CPP.Il2CppObjectBaseToPtr((Il2CppObjectBase)(object)this), NativeMethodInfoPtr_FinishSetup_Protected_Virtual_Void_0), IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199623, XrefRangeEnd = 199630, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public new unsafe void OnNextUpdate()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnNextUpdate_Protected_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(1)]
+	[CachedScanResults(RefRangeStart = 199636, RefRangeEnd = 199637, XrefRangeStart = 199630, XrefRangeEnd = 199636, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public new unsafe void OnStateEvent(InputEventPtr eventPtr)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&eventPtr);
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_OnStateEvent_Protected_Void_InputEventPtr_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 0, XrefRangeEnd = 0, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public new unsafe virtual void UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnNextUpdate()
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnNextUpdate_Private_Virtual_Final_New_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 199637, XrefRangeEnd = 199638, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public new unsafe virtual void UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnStateEvent(InputEventPtr eventPtr)
+	{
+		IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this);
+		IntPtr* ptr = stackalloc IntPtr[1];
+		*ptr = (nint)(&eventPtr);
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr_UnityEngine_InputSystem_LowLevel_IInputStateCallbackReceiver_OnStateEvent_Private_Virtual_Final_New_Void_InputEventPtr_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	[CallerCount(0)]
+	[CachedScanResults(RefRangeStart = 0, RefRangeEnd = 0, XrefRangeStart = 0, XrefRangeEnd = 0, MetadataInitTokenRva = 0L, MetadataInitFlagRva = 0L)]
+	public unsafe Mouse()
+		: this(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<Mouse>.NativeClassPtr))
+	{
+		IntPtr* ptr = null;
+		Unsafe.SkipInit(out IntPtr intPtr2);
+		IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(NativeMethodInfoPtr__ctor_Public_Void_0, IL2CPP.Il2CppObjectBaseToPtrNotNull((Il2CppObjectBase)(object)this), (void**)ptr, ref intPtr2);
+		Il2CppException.RaiseExceptionIfNecessary(intPtr2);
+	}
+
+	public Mouse(IntPtr pointer)
+		: base(pointer)
+	{
+	}
+}
+You are not using the latest version of the tool, please update.
+Latest version is '11.2.0.10050' (yours is '9.1.0.7988')
