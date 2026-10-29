@@ -227,6 +227,23 @@ namespace ManosabaA11y
                     case '」': case '』': case '）': case ')': case '＞':
                         return "";
                 }
+
+                // 右侧是「的/了/着/过/地/得/吗/呢/吧/啊/呀/哦」这类粘着语素时也不能补逗号，
+                // 否则会念出「用血画下，的蝴蝶绘画」这种断在助词前面的句子（run38 辩论实机日志）。
+                string rest = m.Result("$'");
+                for (int i = 0; i < rest.Length; i++)
+                {
+                    char r = rest[i];
+                    if (r == ' ' || r == '\u3000' || r == '\t' || r == '\r' || r == '\n') continue;
+                    switch (r)
+                    {
+                        case '的': case '了': case '着': case '过': case '地': case '得':
+                        case '吗': case '呢': case '吧': case '啊': case '呀': case '哦':
+                        case '。': case '，': case '！': case '？': case '、': case '；': case '：':
+                            return "";
+                    }
+                    break;
+                }
                 return "，";
             }
             catch { return "，"; }
