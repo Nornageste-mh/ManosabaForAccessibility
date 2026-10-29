@@ -216,3 +216,32 @@ Framework 仓库未改动：`git status --porcelain` 为空。
 - 实机验证：插件加载日志、启动播报、interop 生成稳定性、窗口焦点（决定 A3）。
 - `docs\无障碍可行性验证.md` / `docs\测试问卷.md` 的逐作统计要等 text-extract 的数值，
   **不要替它编数字**。
+
+---
+
+## 9. 实机阶段回填（Lead，2026-10-29）
+
+### 9.1 已推翻的旧假设
+
+- **A3 已改**：实机证明窗口焦点可以拿到（`focused=True`），`A11yHost.UseGlobalKeys` 保持 `false` 仍是对的，
+  因为补丁不需要全局热键就能收到键盘（游戏在前台时 Naninovel 自己轮询输入）。
+- **A4 已改**：`CfgQuitNames` 默认值从 `"TODO"` 改为空串，并在说明里写清「本作退出按钮对象名尚未取证」；
+  留 `"TODO"` 会把占位符塞进玩家配置。
+
+### 9.2 新增铁律（本作实机打出来的，建议回流 Framework 文档 §7 陷阱表）
+
+1. **不要 patch 返回 `UniTask` / `Task` / 其它非 blittable 结构体的 Naninovel 方法。**
+   `TextPrinterManager.Print` 一挂，`PrintText.Print` 的 `await` 就抛
+   `MethodAccessException: ... 'Naninovel.Async.IAwaiter.get_IsCompleted'`，
+   命令永不结束 → 剧情卡在当前行、任何输入都推不动（但文本仍被 Prefix 念出来，极易误判成输入问题）。
+   二分开关：`MANOSABA_A11Y_NOPATCH=print`。
+2. **做「无补丁对照组」时，插件必须挪出游戏目录。**
+   BepInEx 递归扫描 `BepInEx\plugins` 的子目录，挪进 `plugins\_stash\` 仍会被加载，
+   会得出「无补丁也卡」的错误结论（本项目为此浪费了一轮排查）。
+3. **自动化点击不能当验收路径。** 本作 6 FPS + 新输入系统（`InputSystem.QueueStateEvent` 可注入但
+   进正片成功率不稳），所有结论都以「真人点击 + 日志核对」为准。
+
+### 9.3 交付状态
+
+- 对话/旁白朗读 + 说话人：**实机通过**（31 句连续、无异常）。
+- 选项 / 辩论 / 系统菜单导航：补丁已挂，**尚未跑到对应剧情位置实测**，见 `CHANGELOG.md`。
