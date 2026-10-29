@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using BepInEx;
 using BepInEx.Configuration;
@@ -33,7 +33,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.1";
+        public const string Version = "0.0.0.2";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -57,6 +57,12 @@ namespace ManosabaA11y
 
         // ==================== 界面导航 ====================
         internal static ConfigEntry<bool> CfgMenuNav;
+        /// <summary>导航开关键（组合键写法）。默认 Alt+Shift+F1 —— 因为本作标题画面会吃掉 Tab。</summary>
+        internal static ConfigEntry<string> CfgNavKey;
+        /// <summary>除组合键外是否再接受 Tab 当导航开关（Boot/加载阶段有效，标题画面可能被吃掉）。</summary>
+        internal static ConfigEntry<bool> CfgNavKeyAllowTab;
+        /// <summary>运行中切换语音后端的按键（默认 F7）。</summary>
+        internal static ConfigEntry<string> CfgCycleBackendKey;
         internal static ConfigEntry<bool> CfgSortByPosition;
         internal static ConfigEntry<bool> CfgVisibleOnly;
         internal static ConfigEntry<bool> CfgQuitConfirm;
@@ -95,6 +101,39 @@ namespace ManosabaA11y
             _syntheticNavCount++;
             A11yHost.Diag("TEST NAV: 合成 Tab 第 " + _syntheticNavCount + " 次 t=" + now.ToString("F1"));
             return true;
+        }
+
+        /// <summary>
+        /// 「这一帧要不要切换导航模式」（平台层唯一的开关键入口）。
+        ///
+        /// 为什么默认不再只有 Tab（2026-10-29 用户实机反馈）：
+        ///   「主界面还没加载出来时按 Tab 有反应，主界面加载后按 Tab 就没反应了。」
+        /// 也就是标题画面出来后，游戏自己把 Tab 当成菜单键吃掉了。
+        ///
+        /// 处理：主键改成游戏不会用的组合键（默认 Alt+Shift+F1），
+        /// Tab 保留为备用键（可由「同时允许 Tab」关掉）。
+        /// 组合键解析走平台层 Hotkey（自带边沿闩锁与 try/catch）。
+        /// </summary>
+        private static bool NavKeyPressed()
+        {
+            string spec = CfgNavKey == null ? "" : (CfgNavKey.Value ?? "");
+            bool chord = false;
+            try { chord = Hotkey.Down(spec); } catch { chord = false; }
+            if (chord)
+            {
+                A11yHost.Diag("导航开关键按下: " + spec);
+                return true;
+            }
+
+            if (CfgNavKeyAllowTab != null && CfgNavKeyAllowTab.Value)
+            {
+                if (KeyEdge.Pressed(KeyCode.Tab))
+                {
+                    A11yHost.Diag("导航开关键按下: Tab");
+                    return true;
+                }
+            }
+            return false;
         }
 
         public override void Load()
@@ -150,6 +189,11 @@ namespace ManosabaA11y
                 _nextSyntheticNavAt = Time.realtimeSinceStartup + 45f;
                 A11yHost.NavTogglePressed = SyntheticNavPressed;
                 L.LogInfo("[a11y] TEST NAV MODE: 45s 后每 25s 合成一次 Tab");
+            }
+            else
+            {
+                // 默认：可配置组合键（Alt+Shift+F1）+ 可选 Tab 备用键。
+                A11yHost.NavTogglePressed = NavKeyPressed;
             }
 
             A11yHost.Validate();
@@ -255,7 +299,17 @@ namespace ManosabaA11y
                 "本作实测有明显的黑屏加载段（点新游戏后），所以默认开。");
 
             CfgMenuNav = Config.Bind("界面导航", "菜单键盘导航", true,
-                "Tab 键在可交互控件间移动并朗读，方向键/回车等按平台层规则工作。");
+                "进入界面导航后，用方向键在可交互控件间移动并朗读，回车激活。");
+            CfgNavKey = Config.Bind("界面导航", "导航开关键", "Alt+Shift+F1",
+                "进入/退出界面导航的快捷键（组合键写法，例如 Ctrl+Alt+G）。\n" +
+                "★ 默认不是 Tab：本作标题画面会把 Tab 吃掉（主界面出现前按 Tab 有反应、\n" +
+                "  出现后没反应），所以主键改成组合键。改坏了也能用下面的「同时允许 Tab」救回来。");
+            CfgNavKeyAllowTab = Config.Bind("界面导航", "同时允许 Tab", true,
+                "除上面的组合键外，再接受 Tab 当导航开关（Boot/加载阶段有效，标题画面可能被游戏吃掉）。");
+            CfgCycleBackendKey = Config.Bind("朗读", "切换语音后端按键", "F7",
+                "按一下切到下一个可用的语音后端，并念出新的后端名。\n" +
+                "★ 同时装了 NVDA 和争渡的机器，「语音后端 = 自动」会按平台顺序挑中 NVDA；\n" +
+                "  如果你平时用争渡却听不到声音，在游戏里按这个键换到争渡即可。");
             CfgSortByPosition = Config.Bind("界面导航", "按屏幕位置排序控件", true,
                 "按屏幕坐标（上→下、左→右）排，而不是 Hierarchy 顺序。");
             CfgVisibleOnly = Config.Bind("界面导航", "只导航看得见的控件", true,
@@ -333,9 +387,31 @@ namespace ManosabaA11y
 
                 if (Plugin.CfgStartupHint != null && Plugin.CfgStartupHint.Value)
                 {
-                    try { Repeat.Say("魔法少女ノ魔女裁判 无障碍补丁已加载"); } catch { }
+                    // 念出后端名：用户「听不到声音」时，第一句就能定位是不是后端挑错了
+                    // （同时装 NVDA 与争渡的机器，自动档会挑 NVDA）。
+                    try { Repeat.Say("魔法少女ノ魔女裁判 无障碍补丁已加载。语音后端 " + Speech.BackendName); } catch { }
                 }
             }
+
+            // 键盘链路诊断（仅 MANOSABA_A11Y_KEYDIAG=1）：每 0.5 秒把「平台层到底能不能读到
+            // 方向键/回车」打出来。为什么需要：本作只启用新 Input System，裸 Input 恒抛异常，
+            // 所有键盘读取都靠 GlobalKeys（GetAsyncKeyState）兜底；一旦兜底失效，
+            // 表现是「导航能进但方向键没反应」这种非常难猜的静默故障。
+            try { KeyDiagTick(); } catch (Exception e) { A11yHost.Diag("KeyDiag: " + e.Message); }
+
+            // 运行中切换语音后端（默认 F7）。实机反馈：机器上同时跑 NVDA 和争渡，
+            // 自动档挑了 NVDA，玩家实际用争渡 → 一句都听不到。必须给一个游戏内逃生键，
+            // 不能要求先去改 cfg 再重启。
+            try
+            {
+                if (Plugin.CfgCycleBackendKey != null && Hotkey.Down(Plugin.CfgCycleBackendKey.Value))
+                {
+                    string msg = Speech.CycleAvailable();
+                    if (!string.IsNullOrEmpty(msg)) Repeat.Say(msg, true);
+                    Plugin.L.LogInfo("[a11y] 语音后端切换 -> " + Speech.BackendName);
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("CycleBackend: " + e.Message); }
 
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }
@@ -366,6 +442,43 @@ namespace ManosabaA11y
 
             // 文本语言（配置里指定，读屏用户摸不到游戏内语言下拉框）
             try { Locale.Update(); } catch (Exception e) { A11yHost.Diag("Locale.Update: " + e.Message); }
+        }
+
+        // ==================== 键盘链路诊断 ====================
+        // 本作只启用新 Input System（旧 UnityEngine.Input 恒抛 InvalidOperationException），
+        // 所以平台层的 Tab/方向键/回车全部要经 GlobalKeys（Win32 GetAsyncKeyState）兜底。
+        // 一旦兜底失效，症状是「导航能进、方向键没反应」——静默且极难猜，所以留一个开关。
+        private static bool _keyDiagRead;
+        private static bool _keyDiagOn;
+        private static float _keyDiagAt;
+
+        private static void KeyDiagTick()
+        {
+            if (!_keyDiagRead)
+            {
+                _keyDiagRead = true;
+                _keyDiagOn = Environment.GetEnvironmentVariable("MANOSABA_A11Y_KEYDIAG") == "1";
+                if (_keyDiagOn) Plugin.L.LogInfo("[a11y] KEYDIAG MODE: 每 0.5s 打印键盘读取状态");
+            }
+            if (!_keyDiagOn) return;
+
+            float now = Time.realtimeSinceStartup;
+            if (now < _keyDiagAt) return;
+            _keyDiagAt = now + 0.5f;
+
+            try
+            {
+                Plugin.L.LogInfo("KEYDIAG reading=" + GlobalKeys.Reading
+                    + " available=" + GlobalKeys.Available
+                    + " up=" + GlobalKeys.Held(KeyCode.UpArrow)
+                    + " down=" + GlobalKeys.Held(KeyCode.DownArrow)
+                    + " enter=" + GlobalKeys.Held(KeyCode.Return)
+                    + " tab=" + GlobalKeys.Held(KeyCode.Tab)
+                    + " f1=" + GlobalKeys.Held(KeyCode.F1)
+                    + " alt=" + GlobalKeys.Held(KeyCode.LeftAlt)
+                    + " shift=" + GlobalKeys.Held(KeyCode.LeftShift));
+            }
+            catch (Exception e) { Plugin.L.LogInfo("KEYDIAG 异常: " + e.Message); }
         }
 
         private static string _jumpPath;

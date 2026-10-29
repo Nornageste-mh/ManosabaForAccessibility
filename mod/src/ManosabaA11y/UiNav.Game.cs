@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // 《魔法少女ノ魔女裁判》逐作区（UiNav 的 partial class 补充）
 //
 // 这个文件是 A11yFramework 模板 UiNav.Game.cs 的逐作实现，平台层保持不动。
@@ -56,6 +56,10 @@ namespace ManosabaA11y
             { "Tab_Audio",      "音频页签" },
             { "Tab_Graphics",   "画面页签" },
             { "Tab_Message",    "消息页签" },
+
+            // ---- 引擎初始化进度条（run47 实测：EngineInitializationUI(Clone)/Wrapper/Progress）----
+            // 启动阶段唯一可导航的控件，不给名字就会被念成「未命名滑条」。
+            { "Progress",       "加载进度" },
         };
 
         /// <summary>
@@ -221,6 +225,7 @@ namespace ManosabaA11y
             { "SmartPhone",  "手机菜单" },
             { "DebateUI",    "辩论" },
             { "LoadingUI",   "加载" },
+            { "EngineInitializationUI", "引擎初始化" },
         };
 
         internal static string GameGroupName(Transform root)

@@ -304,3 +304,25 @@ Framework 仓库未改动：`git status --porcelain` 为空。
   - `GameTextIsNoise`：`TitleUI/Wrapper/VersionNumberLabel` 的 `Ver. 1.1.2` 会被
     「同行文字」退路拿去当按钮标签，整排按钮全念版本号。
   - `GameGroupName`：组根叫 `Wrapper`，不映射就只能兜底「面板」。
+
+## 12. 第四轮：导航开关键被游戏吃掉 + 语音后端切换（0.0.0.2）
+
+- **用户实机反馈**：标题画面出现后按 `Tab` 完全没反应；加载阶段按 `Tab` 有反应。
+  说明游戏自己的标题菜单在抢 `Tab`（Naninovel 的菜单键 / UI Selectable 导航）。
+  - 平台层不能改，走逐作钩子 `A11yHost.NavTogglePressed`：主键改成 `Alt+Shift+F1`
+    （`Hotkey.Down`），`Tab` 降为备用键（`KeyEdge.Pressed`），两个都在配置里可改。
+  - 教训：**平台层的默认键位一定会遇到「游戏自己也用这个键」**。逐作层必须留一个
+    「换键 + 保留旧键」的口子，且默认值要挑游戏不会碰的组合键。
+- **「没声音」≠「没生效」**：用户的日志里 15 条 `[UiNav] 导航开关`、18 条 `[朗读]`
+  证明导航与朗读都在跑，只是听不到。根因是 `语音后端 = 自动` 在同装 NVDA + 争渡的机器上
+  按平台顺序挑中 NVDA。修法两条，都不改平台层：
+  1. 启动播报带后端名（`… 无障碍补丁已加载。语音后端 争渡读屏`）；
+  2. `F7` 运行中循环切换后端并念出新名字（`Speech.CycleAvailable()` 原本没有任何热键接线）。
+- **键盘链路诊断开关**：`MANOSABA_A11Y_KEYDIAG=1` 每 0.5 秒打印
+  `reading/available/up/down/enter/tab/f1/alt/shift` 的 `GlobalKeys` 读数。
+  这次它一次就定位了「方向键没反应」的真凶：**补丁没问题，是测试脚本的问题** ——
+  `keybd_event` 对方向键/Home/End 这类**扩展键**必须带 `KEYEVENTF_EXTENDEDKEY (0x0001)`，
+  否则系统按小键盘键处理，`GetAsyncKeyState(VK_DOWN)` 恒为 0（实测 `0x0000`）。
+  修正后 run50 实测：`系统设置，按钮。2 / 5` → `鉴赏模式，按钮。3 / 5` → `Home` 回第 1 项。
+  - 一般化教训：**「按键没生效」要先用一个独立读数确认按键有没有到达进程**，
+    再去怀疑业务逻辑；否则容易在正确的代码上反复改。
