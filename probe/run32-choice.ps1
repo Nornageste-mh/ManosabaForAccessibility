@@ -11,6 +11,7 @@ param(
     [int]$WaitSeconds = 170,
     [string]$Tag = 'run32',
     [string]$Jump = 'Act01_Chapter01/Act01_Chapter01_Adv05',
+    [string]$Locale = 'zh-Hans',
     [switch]$PressKey
 )
 $ErrorActionPreference = 'Continue'
@@ -123,7 +124,7 @@ if (-not (Test-Path (Join-Path $PluginDir 'nvdaControllerClient.dll'))) {
 if (Test-Path $LogPath) { Remove-Item $LogPath -Force }
 
 $env:MANOSABA_A11Y_DIAG   = '1'
-$env:MANOSABA_A11Y_LOCALE = 'zh-Hans'
+$env:MANOSABA_A11Y_LOCALE = $Locale
 $env:MANOSABA_A11Y_JUMP   = $Jump
 Remove-Item Env:MANOSABA_A11Y_TEST -ErrorAction SilentlyContinue
 Remove-Item Env:MANOSABA_A11Y_TEST_PLAY -ErrorAction SilentlyContinue

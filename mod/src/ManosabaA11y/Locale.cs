@@ -60,6 +60,8 @@ namespace ManosabaA11y
                     return;
                 }
 
+                A11yHost.Diag("Locale: selected=" + current + " target=" + target);
+
                 if (string.Equals(current, target, StringComparison.OrdinalIgnoreCase)) return;
 
                 try

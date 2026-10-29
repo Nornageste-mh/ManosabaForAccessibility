@@ -62,6 +62,11 @@
   active Input handling to Input System package in Player Settings.`
   → 平台层热键/导航若走裸 `Input` 会全部静默失效。改开 `A11yHost.UseGlobalKeys = true`
   （窗口无焦点时用 Win32 `GetAsyncKeyState` 兜底），选项数字键改走平台层 `KeyEdge`。
+- 新增：**文本语言（简体中文 / 日文）切换**。本作默认日文
+  （`StreamingAssets\config.json` 的 `available_text_lang` = `ja` / `zh-Hans`），
+  补丁用 `ILocalizationManager.SelectLocale(locale).Forget()` 切换，**已实机双向验证**：
+  默认 `zh-Hans` 读中文（`——这里是囚牢。`），改成 `ja` 后读到日文
+  （`Reader.say[reveal] raw=――ここは獄だ。`），证明真的换了 locale 而不是缓存。
 - 修：**选项重复播报**。面板淡入淡出时 `UiVis.Visible` 会抖一帧 false，旧代码在
   `!live` 分支把去重键清零 → 同一组选项要念两遍（run32）。改法：`!live` 只清按钮列表、
   不清 `_announcedKey`，并加 1.5 秒宽限；`Reset()` 才彻底清空。
@@ -79,7 +84,8 @@
    - 怎么修：**删掉这个补丁**，文本改由 `RevealableText.set_Text`（返回 void）取。
    - 铁律：**不要 patch 返回 UniTask / Task / 其它非 blittable 结构体的 Naninovel 方法**。
      二分方法：`MANOSABA_A11Y_NOPATCH=print` 只关这一组补丁即可复现/排除。
-2. **`<br>` 无条件换成逗号**（第二轮又补了一条：右侧是「的/了/着/过」等粘着语素时也不补逗号，\n   否则辩论里会念出「用血画下的，蝴蝶绘画」）。
+2. **`<br>` 无条件换成逗号**（第二轮又补了一条：右侧是「的/了/着/过」等粘着语素时也不补逗号，
+   否则辩论里会念出「用血画下的，蝴蝶绘画」）。
    - 现象：`原来是做梦。她才刚安下心来——<br>眼前的光景就逐渐清晰了起来。`
      被念成「……安下心来——，眼前……」。
    - 怎么修：换成命名方法 `BrEvaluator`，前一字符是句读/破折号/引号收尾时换行直接省略，
@@ -88,16 +94,12 @@
 
 **未验证 / 已知缺口（想帮忙的话优先测这些）**
 
-- 审判辩论（`@printDebate`，全作 2003 条）：`DebateTextPrinterPanel.SetText(string)`
-  **挂不上**（Harmony `IL Compile Error (unknown location)`，两个独立探针都复现），
-  改挂 `AddMessage(PrintedMessage)` / `SetMessages(IReadOnlyList<PrintedMessage>)`；
-  **尚未跑到辩论章节实测**（尚未实机复测）。
+- 审判辩论的**说话人**：辩论界面没有名字框（`SetAuthorNameText` 不走辩论链），
+  所以辩论句只念文本、不报名字 —— 这是有意的保守选择，避免把 A 的话安到 B 头上。
+  另外 `DebateTextPrinterPanel.SetText(string)` **挂不上**（Harmony `IL Compile Error`），
+  实机主路是 `AddText(string)`。
 - 魔女手册（WitchBook）：页面用 `Present/Dismiss` 而非 `SetActive`，页签是
   `WitchTrialsTabToggle : SlideToggle`；朗读与导航**尚未实机复测**。
-- 游戏内文本语言：本作标题画面默认日文（`StreamingAssets\config.json` 里
-  `available_text_lang` = `ja` / `zh-Hans`）。补丁新增配置「文本语言」，
-  用 `ILocalizationManager.SelectLocale` 切到 zh-Hans；**默认「跟随游戏」**，
-  日文环境下的玩家需要自己切成「简体中文」（切换效果尚未实机复测）。
 - 有配音时是否跳过朗读：本作语音 26083 条、对白覆盖率 98.2%，但
   **暂未做「有配音就只放语音」**（读屏玩家需要中文文本，日配中文不同步；
   且 `Naninovel.AudioManager` 没有「当前配音 clip」的公开入口，拿不到「这句有没有配音」）。
