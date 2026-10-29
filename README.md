@@ -26,8 +26,8 @@
 | 快捷键 | 功能 |
 |---|---|
 | `1`-`9` | 选择对应编号的选项 |
-| `0` | 限时选择里「立刻沉默」 |
-| `Backspace` | 重读最近朗读过的一段 |
+| `0` | 立刻停止朗读（沉默键，不改变游戏状态） |
+| `Backspace` | **重读上一句剧情/选项**（有配音的句子也会被念出来） |
 | `Alt`+`Shift`+`F1` | 进入 / 退出界面导航模式（**主键**；`Tab` 会失效，见下） |
 | `Tab` | 备用导航键（Boot/加载阶段有效；标题画面出现后会被游戏吃掉） |
 | `F7` | 切换语音后端（自动 → Tolk → NVDA → 争渡 → SAPI），并念出新的后端名 |
@@ -50,7 +50,7 @@
 本作是 Naninovel，`Ctrl` 快进、`Enter`/`Space`/鼠标左键推进、`Esc` 菜单。
 补丁只在**界面导航模式**和**选项编号键**上接管输入，其余按键原样交给游戏。
 
-## 当前进度（v0.0.0.2）
+## 当前进度（v0.0.0.3）
 
 | 功能 | 状态 |
 |---|---|
@@ -59,6 +59,9 @@
 | 对话朗读（含旁白与对白） | ✅ 实机验证（单轮连续 82 句无异常） |
 | 说话人朗读（`樱羽艾玛：……`） | ✅ 实机验证（旁白不报名字） |
 | 文本清洗（`<br>`/`<ruby>`/`<link>`/`<color>` 等） | ✅ 实机验证 |
+| **有配音的行不自动朗读**（只报说话人，`Backspace` 可 TTS 重读） | ✅ 实机验证（run58：22 条配音行跳过，退格念回原文） |
+| **`Backspace` 退格重读上一句剧情/选项** | ✅ 实机验证（run57/run58；导航播报不会被退回） |
+| **隐藏 BepInEx 控制台窗口** | ✅ 实机验证（有 `ConsoleWindowClass` 校验，不会误隐藏游戏窗口） |
 | 选项朗读 / 数字键选择 | ✅ 实机验证（第 1 章第 5 幕，2 个选项，数字键选中后走对应分支） |
 | 加载播报（点「新游戏」后的黑屏加载段） | ✅ 实机验证（`LoadingUiExtended` 可见性钩子） |
 | 菜单 / 设置界面中文名与当前值 | ✅ 别名表按实机取证建立（探针转储 79 个 `Selectable`） |
@@ -139,9 +142,10 @@ mod/
 | 朗读出口 | `Repeat`（平台层唯一出口；L3 不许直接调 `Speech.Speak`） |
 | 启动播报 | `PluginBehaviour.Update()` 首帧 `Speech.Init` 后 `Repeat.Say` |
 | 对话 / 旁白文本 | `Naninovel.UI.RevealableText.set_Text` Postfix → `Reader.OnRevealText` |
+| 行 id / 配音判定 | `Naninovel.UITextPrinter.AddMessage(PrintedMessage)` + `SetMessages(...)` Postfix（返回 `void`，可安全挂）→ `Text.parts[i].id` → `VoiceLineIds` |
 | 说话人 | `WitchTrialsTextPrinterPanel.SetMessageAuthor(MessageAuthor)` + `RevealableTextPrinterPanel.SetAuthorNameText(string)` Postfix |
-| 选项（已挂，待实测） | `Naninovel.UI.ChoiceHandlerPanel.AddChoiceButton(ChoiceState)` Postfix → `Choices.OnButtonAdded` |
-| 审判辩论（已挂，待实测） | `DebateTextPrinterPanel.AddMessage(PrintedMessage)` / `SetMessages(IReadOnlyList<PrintedMessage>)` |
+| 选项 | `Naninovel.UI.ChoiceHandlerPanel.AddChoiceButton(ChoiceState)` Postfix → `Choices.OnButtonAdded` |
+| 审判辩论 | `DebateTextPrinterPanel.AddMessage(PrintedMessage)` / `SetMessages(IReadOnlyList<PrintedMessage>)` |
 | 文本语言切换 | `ILocalizationManager.SelectLocale("zh-Hans")` |
 | 界面导航 | 平台层 `UiNav` 每帧扫描（`TickUiNav` 钩子）+ `UiNav.Game.cs` 逐作规则 |
 
@@ -157,6 +161,14 @@ mod/
    Linux/macOS 解压成一坨；一律走 `tools/makezip.ps1`。
 5. **`BepInPlugin` 版本号必须纯数字四段**（`System.Version`）；带字母会让 BepInEx
    **静默跳过整个插件**，日志只有一行 Warning。
+6. **永远不要 patch 返回 `UniTask`/`Task`/非 blittable 结构体的方法**（本作实测：
+   `TextPrinterManager.Print` 的 Prefix 会搬坏返回值 → `PrintText.Print` 的 `await` 抛
+   `MethodAccessException` → 剧情永久卡死、任何输入都推不动）。要文本就挂返回 `void`
+   的 `UITextPrinter.AddMessage` / `RevealableText.set_Text`。
+7. **面板级 `UITextPrinterPanel.AddMessage` 在本作 ADV 路径不触发**（挂了也一条日志没有）：
+   ADV 真入口是 actor 级的 `Naninovel.UITextPrinter.AddMessage`，行 id 只能从这里拿。
+8. **`ShowWindow(GetConsoleWindow(), SW_HIDE)` 必须先校验窗口类名**：实测本作里
+   `GetConsoleWindow()` 返回的句柄可能就是游戏主窗口，直接隐藏会把游戏窗口一起藏掉。
 
 ## 如何复现分析
 

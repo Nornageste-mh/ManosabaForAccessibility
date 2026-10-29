@@ -213,6 +213,9 @@ namespace ManosabaA11y
                     if (hotkeys) sb.Append("按数字键选择。");
 
                     Repeat.Say(sb.ToString());   // Note + Speak，退格能重读整组选项
+                    // 选项播报也进「剧情专用重读缓冲」：玩家按重读键要能重听选项，
+                    // 但界面导航播报（「系统设置，按钮。2 / 5」）不会进这条缓冲。
+                    Reader.Remember(sb.ToString());
                 }
                 A11yHost.Diag("CHOICE 播报 " + _labels.Count + " 项: " + key);
             }

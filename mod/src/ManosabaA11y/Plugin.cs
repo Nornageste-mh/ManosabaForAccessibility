@@ -1,5 +1,7 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -33,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.2";
+        public const string Version = "0.0.0.3";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -41,6 +43,8 @@ namespace ManosabaA11y
 
         // ==================== 朗读 ====================
         internal static ConfigEntry<bool> CfgReadUnvoiced;
+        /// <summary>有配音的行是否还报一次说话人名（文本交给游戏语音念）。</summary>
+        internal static ConfigEntry<bool> CfgAnnounceOnVoiced;
         internal static ConfigEntry<bool> CfgSpeakWhenUnknown;
         internal static ConfigEntry<bool> CfgSpeakName;
         internal static ConfigEntry<bool> CfgReadChoices;
@@ -72,6 +76,8 @@ namespace ManosabaA11y
         // ==================== 其它 ====================
         internal static ConfigEntry<bool> CfgStartupHint;
         internal static ConfigEntry<bool> CfgDiagLog;
+        /// <summary>隐藏 BepInEx 的控制台窗口（默认开）。</summary>
+        internal static ConfigEntry<bool> CfgHideConsole;
 
         private Harmony _harmony;
 
@@ -142,6 +148,7 @@ namespace ManosabaA11y
             A11yHost.Log = Log;
 
             BindConfig();
+            HideConsoleWindow();
 
             // ---------- 填契约 ----------
             A11yHost.CfgSpeechBackend = CfgSpeechBackend;
@@ -234,6 +241,10 @@ namespace ManosabaA11y
                 //   MethodAccessException 并把剧情永久卡死（2026-10-29 实机 + 二分证据）。
                 //   文本主钩子是 RevealableText.set_Text，见 Patches.Patch_RevealText 注释。
                 if (!skipPanel) _harmony.PatchAll(typeof(Patches.Patch_PanelAddMessage));
+                // printer 级 AddMessage / SetMessages：本作 ADV 真入口（面板级一条都不响），
+                // 也是「行 id」的唯一来源 → 配音闸门依赖它。返回值 void，detour 安全。
+                _harmony.PatchAll(typeof(Patches.Patch_PrinterAddMessage));
+                _harmony.PatchAll(typeof(Patches.Patch_PrinterSetMessages));
                 if (!skipChoice) _harmony.PatchAll(typeof(Patches.Patch_AddChoiceButton));
                 if (!skipReveal) _harmony.PatchAll(typeof(Patches.Patch_RevealText));
                 if (!skipAuthor) { Patches.ApplyAdvAuthor(_harmony); Patches.ApplyAdvAuthorName(_harmony); }
@@ -254,6 +265,28 @@ namespace ManosabaA11y
             }
 
             L.LogInfo("[a11y] loaded v" + Version + " (IL2CPP, BepInEx 6)");
+
+            // 功能键配置在启动时**解析一次并写日志**：Hotkey.Down 对认不出的键名静默返回 false，
+            // 症状是「按了没反应、日志什么都没有」——正是 0.0.0.3 第一次实机退格失效的排查成本。
+            try
+            {
+                Hotkey.Spec sp; string why;
+                if (Hotkey.Parse(CfgRepeatKey.Value, out sp, out why))
+                    L.LogInfo("[a11y] 重读按键=" + CfgRepeatKey.Value + " -> KeyCode." + sp.Key);
+                else
+                    L.LogWarning("[a11y] 重读按键认不出来: " + why);
+
+                if (Hotkey.Parse(CfgSilenceKey.Value, out sp, out why))
+                    L.LogInfo("[a11y] 沉默按键=" + CfgSilenceKey.Value + " -> KeyCode." + sp.Key);
+                else
+                    L.LogWarning("[a11y] 沉默按键认不出来: " + why);
+
+                if (Hotkey.Parse(CfgCycleBackendKey.Value, out sp, out why))
+                    L.LogInfo("[a11y] 切换语音后端按键=" + CfgCycleBackendKey.Value + " -> KeyCode." + sp.Key);
+                else
+                    L.LogWarning("[a11y] 切换语音后端按键认不出来: " + why);
+            }
+            catch (Exception e) { L.LogWarning("[a11y] 功能键解析: " + e.Message); }
         }
 
         public override bool Unload()
@@ -265,6 +298,79 @@ namespace ManosabaA11y
         }
 
         // ====================================================================
+        // 控制台窗口隐藏
+        //
+        // 本作是 Unity，BepInEx 会在玩家机器上开一个控制台黑窗口。
+        // 那个窗口会抢焦点、在切场景时闪一下，读屏（NVDA/争渡）还会把它的内容
+        // 当成活动窗口念 —— 对读屏用户是纯噪声，所以加载后直接隐藏。
+        //
+        // ★ 运行时隐藏而不是改 `BepInEx.cfg`：不该动别人的配置文件，
+        //   而且玩家可能本来就装了 BepInEx（cfg 里有他自己的设置）。
+        //   参考实现《不存在》Plugin.cs:348-378 是同一做法。
+        // ====================================================================
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        private const int SwHide = 0;
+
+        [DllImport("kernel32.dll")]
+        private static extern uint GetCurrentProcessId();
+
+        private static void HideConsoleWindow()
+        {
+            try
+            {
+                if (CfgHideConsole == null || !CfgHideConsole.Value) return;
+                IntPtr h = GetConsoleWindow();
+                if (h == IntPtr.Zero)
+                {
+                    A11yHost.Diag("隐藏控制台: 没有控制台窗口（可能未分配/已关闭）");
+                    return;
+                }
+
+                // ★ 安全闸门：只隐藏真正的控制台窗口（窗口类必须是 ConsoleWindowClass）。
+                //   第一版直接 ShowWindow(SW_HIDE) 打到了游戏主窗口上（run55 实机：
+                //   日志里的 hwnd 与游戏主窗口句柄相同 → 后面的点击全部点空），
+                //   所以这里必须先验类名/进程号，宁可不隐藏也不能把游戏窗口藏了。
+                var cls = new StringBuilder(64);
+                GetClassName(h, cls, cls.Capacity);
+                var title = new StringBuilder(128);
+                GetWindowText(h, title, title.Capacity);
+                uint pid;
+                GetWindowThreadProcessId(h, out pid);
+
+                string className = cls.ToString();
+                bool sameProcess = pid == GetCurrentProcessId();
+                L.LogInfo("[a11y] 控制台候选 hwnd=" + h + " class=[" + className + "] title=[" + title + "] pid=" + pid + " 本进程=" + sameProcess);
+
+                if (!string.Equals(className, "ConsoleWindowClass", StringComparison.OrdinalIgnoreCase))
+                {
+                    L.LogInfo("[a11y] 跳过隐藏：窗口类不是 ConsoleWindowClass（不是控制台窗口）");
+                    return;
+                }
+
+                bool ok = ShowWindow(h, SwHide);
+                L.LogInfo("[a11y] 隐藏控制台窗口 hwnd=" + h + " ok=" + ok);
+            }
+            catch (Exception e)
+            {
+                A11yHost.Diag("隐藏控制台失败: " + e.Message);
+            }
+        }
+
+        // ====================================================================
         // 配置：分组名固定三组「朗读」「界面导航」「其它」
         // （流水线 §P2；换名字会让老用户的 cfg 失效）
         // ====================================================================
@@ -272,6 +378,9 @@ namespace ManosabaA11y
         {
             CfgReadUnvoiced = Config.Bind("朗读", "朗读无配音剧情", true,
                 "有语音的台词由游戏自己播，再念一遍会重叠；没配音的行必须念。");
+            CfgAnnounceOnVoiced = Config.Bind("朗读", "有配音时也报说话人", true,
+                "有配音的行不念正文（游戏语音在念），但仍然念出说话人名字。\n" +
+                "关掉 = 有配音的行完全安静，只留游戏语音。");
             CfgSpeakWhenUnknown = Config.Bind("朗读", "无法判定时也朗读", true,
                 "拿不到「这行有没有配音」的判断时，宁可多念一遍也不要漏。");
             CfgSpeakName = Config.Bind("朗读", "朗读时带上说话人", true,
@@ -285,7 +394,7 @@ namespace ManosabaA11y
             CfgSilenceKey = Config.Bind("朗读", "沉默按键", "0",
                 "按一下立刻停止朗读（不改变游戏状态）。");
             CfgRepeatKey = Config.Bind("朗读", "重读按键", "Backspace",
-                "重念当前这句。");
+                "重读上一句剧情/选项。本作只启用新 Input System，键名照 Unity KeyCode 写。");
             CfgSpeechBackend = Config.Bind("朗读", "语音后端", "自动",
                 "自动 / NVDA / SAPI / 争渡（具体取值见 Speech.CycleAvailable 支持的列表）。");
             CfgReadPhone = Config.Bind("朗读", "朗读手机消息", true,
@@ -328,6 +437,9 @@ namespace ManosabaA11y
 
             CfgStartupHint = Config.Bind("其它", "启动时播报", true,
                 "进游戏时念一句「无障碍补丁已加载」。");
+            CfgHideConsole = Config.Bind("其它", "隐藏控制台窗口", true,
+                "加载后自动隐藏 BepInEx 的控制台窗口（黑窗口会抢前台/闪屏，读屏也读不到它）。\n" +
+                "★ 只隐藏窗口，不改 BepInEx.cfg；需要看日志时把它关掉重启即可。");
             CfgTextLocale = Config.Bind("其它", "文本语言", "跟随游戏",
                 "跟随游戏 / 简体中文 / 日本語。\n" +
                 "★ 游戏本体的语言下拉框在 Options → Message 页（「言語 / Language」），读屏用户摸不到，\n" +
@@ -413,6 +525,13 @@ namespace ManosabaA11y
             }
             catch (Exception e) { A11yHost.Diag("CycleBackend: " + e.Message); }
 
+            // 重读 / 沉默（默认 Backspace / 0）。
+            // ★ 为什么必须自己读键：本作只启用新 Input System，裸 UnityEngine.Input 恒抛
+            //   InvalidOperationException，所以走 Hotkey.Down（内部用 GlobalKeys 的
+            //   GetAsyncKeyState 兜底）。平台层只提供 Repeat 缓冲，不会自己去读这两个键。
+            try { HotkeyTick(); }
+            catch (Exception e) { A11yHost.Diag("Hotkey: " + e.Message); }
+
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }
 
@@ -442,6 +561,36 @@ namespace ManosabaA11y
 
             // 文本语言（配置里指定，读屏用户摸不到游戏内语言下拉框）
             try { Locale.Update(); } catch (Exception e) { A11yHost.Diag("Locale.Update: " + e.Message); }
+        }
+
+        // ==================== 重读 / 沉默 ====================
+        //
+        // 玩家要求（2026-10-29）：退格重读上一句，**只包含剧情文字和选项**。
+        // 为什么不能直接用平台层的 Repeat.Again()：界面导航的播报（「系统设置，按钮。2 / 5」）
+        // 也走 Repeat.Say，直接 Again 会重读那条导航文本，不是玩家要的「上一句剧情」。
+        // 所以 Reader 自己维护一条「剧情专用」的最后一句（含选项播报），这里只重读它。
+        private static void HotkeyTick()
+        {
+            string repeatSpec = Plugin.CfgRepeatKey == null ? "" : (Plugin.CfgRepeatKey.Value ?? "");
+            if (repeatSpec.Length > 0 && Hotkey.Down(repeatSpec))
+            {
+                string last = Reader.LastLine;
+                if (string.IsNullOrEmpty(last))
+                {
+                    Repeat.Say("还没有朗读过内容。", true);
+                }
+                else
+                {
+                    A11yHost.Diag("重读: " + last);
+                    Repeat.Say(last, true);
+                }
+            }
+
+            string silenceSpec = Plugin.CfgSilenceKey == null ? "" : (Plugin.CfgSilenceKey.Value ?? "");
+            if (silenceSpec.Length > 0 && Hotkey.Down(silenceSpec))
+            {
+                try { Speech.Stop(); } catch (Exception e) { A11yHost.Diag("沉默: " + e.Message); }
+            }
         }
 
         // ==================== 键盘链路诊断 ====================
@@ -476,7 +625,11 @@ namespace ManosabaA11y
                     + " tab=" + GlobalKeys.Held(KeyCode.Tab)
                     + " f1=" + GlobalKeys.Held(KeyCode.F1)
                     + " alt=" + GlobalKeys.Held(KeyCode.LeftAlt)
-                    + " shift=" + GlobalKeys.Held(KeyCode.LeftShift));
+                    + " shift=" + GlobalKeys.Held(KeyCode.LeftShift)
+                    + " back=" + GlobalKeys.Held(KeyCode.Backspace)
+                    + " backspaceVk=" + (GlobalKeys.Reading ? "on" : "off")
+                    + " repeat=" + (Plugin.CfgRepeatKey == null ? "<null>" : "[" + Plugin.CfgRepeatKey.Value + "]")
+                    + " last=" + (Reader.LastLine == null ? "<null>" : "len" + Reader.LastLine.Length));
             }
             catch (Exception e) { Plugin.L.LogInfo("KEYDIAG 异常: " + e.Message); }
         }

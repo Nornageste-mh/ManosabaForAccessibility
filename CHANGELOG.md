@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.2`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.3`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -18,6 +18,46 @@
 - 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
+
+### v0.0.0.3（退格重读 + 配音闸门 + 隐藏控制台）
+
+**已实机验证（2026-10-29，Unity 6000.0.48f1 / IL2CPP / BepInEx 6.0.0-be.788）**
+
+- 新增：**退格重读上一句**（配置「朗读 / 重读按键」，默认 `Backspace`）。
+  - 语义：只重读**剧情文字与选项播报**，不重读界面导航的「系统设置，按钮。2 / 5」
+    ——所以逐作层自己维护了一条「剧情专用」最后一句（`Reader.Remember/LastLine`），
+    没有直接用平台层的 `Repeat.Again()`（后者会把导航播报一起退回来）。
+  - 有配音的行**也会**记进这条缓冲：语音错过了，退格把文本念一遍正是读屏用户要的。
+  - 实测（run57/run58）：`重读: 唯有这句话不管怎样都说不出口`、
+    `重读: 樱羽艾玛：牢、牢房……！？为什么！？`（后者是有配音的行，证明可被 TTS 重读）。
+  - 首版失效原因（记录，避免重犯）：`Hotkey.Down` 对「认不出来的键名」静默返回 false，
+    日志里什么都没有 → 现在启动时把三个功能键解析结果各写一行日志。
+- 新增：**有配音的行不自动朗读**（配置「朗读 / 朗读无配音剧情」，默认开；
+  「有配音时也报说话人」默认开）。判定依据是**行 id 的静态配音表**。
+  - 行 id 来源：`PrintedMessage.Text.parts[i].id`。为此新增
+    `Naninovel.UITextPrinter.AddMessage(PrintedMessage)` 与 `SetMessages(IReadOnlyList<PrintedMessage>)`
+    两条补丁 —— 本作 ADV 路径**从不调用面板级** `UITextPrinterPanel.AddMessage`
+    （之前挂的补丁一条日志都没有），拿不到 `PrintedMessage` 就没有行 id，
+    配音闸门只能全放行（run56：`voiced=0`）。
+  - 为什么这两条可以挂、而 `TextPrinterManager.Print` 不行：它们的返回类型是 `void`
+    （ilspycmd 实查），Harmony 原生 detour 不需要搬非 blittable 返回值，
+    不会重演「async 状态机 `MethodAccessException`、剧情永久卡死」的事故。
+  - 配音表：`tools\gen_voicelist.py` 从 `textassets\voice-index.tsv`（26,083 条 clip）
+    生成 `VoiceLineIds.cs`（gzip + base64 内嵌），启动解压成 `HashSet<string>`；
+    解压失败退化为「全部朗读」并写诊断日志。
+  - 实测（run58）：`Reader.voiced[reveal] id=0101Adv02_Ema001 => 有配音，跳过正文（只报名字）`
+    共 22 条，同时 `[朗读] 樱羽艾玛` 只报名字；同一句按退格仍能念出文本。
+- 新增：**隐藏 BepInEx 控制台窗口**（配置「其它 / 隐藏控制台窗口」，默认开）。
+  - 只隐藏窗口，**不改 `BepInEx.cfg`**（不动别人的配置、玩家可能已装 BepInEx）。
+  - **事故与修复**：第一版直接 `ShowWindow(GetConsoleWindow(), SW_HIDE)`，
+    结果实测日志里「控制台 hwnd」与脚本抓到的**游戏主窗口 hwnd 相同**（16717180）
+    —— 等于把游戏窗口隐藏了，10 次点击全部点空、`say=0`。
+    现在先校验 `GetClassName == "ConsoleWindowClass"` + `GetWindowText` + 进程 id，
+    非控制台类就跳过并记日志；run56/run57/run58 均为
+    `控制台候选 … class=[ConsoleWindowClass] title=[BepInEx 6.0.0-be.788… - manosaba]` → `隐藏控制台窗口 … ok=True`。
+- 新增：**沉默键**（配置「朗读 / 沉默按键」，默认 `0`）接线到 `Speech.Stop()`
+  （之前只 Bind、没人读，等于摆设）。
+- 补丁数从 10 条变 12 条（新增 printer 级 `AddMessage` / `SetMessages`）。
 
 ### v0.0.0.2（导航键改为组合键 + 语音后端切换热键）
 

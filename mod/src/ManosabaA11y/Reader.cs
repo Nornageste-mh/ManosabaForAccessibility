@@ -47,11 +47,31 @@ namespace ManosabaA11y
             public string Raw;
             public string AuthorId;
             public string AuthorLabel;
+            /// <summary>剧本行 id（= 语音 clip 名），用来判断这一行有没有配音。</summary>
+            public string LineKey;
             public float At;
             public string Src;
         }
 
         private static Pending _pending;
+
+        /// <summary>
+        /// 剧情专用的「最后一句」——只由剧情文本和选项播报写入，界面导航播报不会碰它。
+        /// 玩家按重读键时念这一条（要求：只重读剧情文字和选项）。
+        /// </summary>
+        private static string _lastLine = "";
+
+        /// <summary>最后一句剧情/选项（给重读键用）。</summary>
+        public static string LastLine { get { return _lastLine; } }
+
+        /// <summary>
+        /// 记一条「可重读」的文本。剧情朗读与选项播报都调它；
+        /// 界面导航播报**不要**调（否则退格会重读「系统设置，按钮。2 / 5」）。
+        /// </summary>
+        public static void Remember(string line)
+        {
+            if (!string.IsNullOrEmpty(line)) _lastLine = line;
+        }
 
         /// <summary>辩论面板整段刷新用的「上次原文」，按实例区分（本作同屏可能有多个面板）。</summary>
         private static readonly Dictionary<int, string> _panelRaw = new Dictionary<int, string>();
@@ -101,7 +121,7 @@ namespace ManosabaA11y
                 catch (Exception e) { A11yHost.Diag("Reader.author: " + e.Message); }
 
                 // ★ 辩论台词的 printerId 是 WitchTrials.Views.PrintDebateText.DebatePrinterId（实读 == "Debate"）
-                Register(raw, authorId, authorLabel, "print:" + printerId);
+                Register(raw, authorId, authorLabel, "print:" + printerId, LineKeyOf(msg));
             }
             catch (Exception e) { A11yHost.Diag("Reader.OnPrint: " + e.Message); }
         }
@@ -135,6 +155,63 @@ namespace ManosabaA11y
         {
             try { OnPrint("debate.panel", msg); }
             catch (Exception e) { A11yHost.Diag("Reader.OnDebateAddMessage: " + e.Message); }
+        }
+
+        /// <summary>
+        /// Naninovel.UITextPrinter.AddMessage(PrintedMessage) 的 Postfix。
+        ///
+        /// ★ 这条是本作 ADV 路径上**唯一**能同时拿到「正文 + 行 id」的入口（run56 实机定位：
+        ///   面板级 AddMessage 一条都不响）。行 id 来自 `message.Text.parts[i].id`，
+        ///   是「这一句有没有配音」的唯一权威判据 —— 没有它，配音闸门只能全放行。
+        ///
+        /// 可见性：printer 的 panel 可能还没显示出来，所以这里只登记、不念；
+        /// 真正出声仍然要等文本级（reveal）钩子确认，或 pending 到点后由 Tick 念。
+        /// </summary>
+        public static void OnPrinterAddMessage(PrintedMessage msg)
+        {
+            try
+            {
+                string printerName = "printer";
+                OnPrint("printer:" + printerName, msg);
+            }
+            catch (Exception e) { A11yHost.Diag("Reader.OnPrinterAddMessage: " + e.Message); }
+        }
+
+        /// <summary>
+        /// Naninovel.UITextPrinter.SetMessages(IReadOnlyList&lt;PrintedMessage&gt;) 的 Postfix。
+        /// 载入存档 / 切面板时会整批重设，只取最后一条登记（行 id 同样来自它的 parts）。
+        /// IReadOnlyList 在 interop 里没有 Count，这里只按索引安全访问（见 Patches 注释）。
+        /// </summary>
+        public static void OnPrinterSetMessages(Il2CppSystem.Collections.Generic.IReadOnlyList<PrintedMessage> messages)
+        {
+            try
+            {
+                if (messages == null) return;
+                PrintedMessage last = LastOf(messages);
+                if (last == null) return;
+                OnPrinterAddMessage(last);
+            }
+            catch (Exception e) { A11yHost.Diag("Reader.OnPrinterSetMessages: " + e.Message); }
+        }
+
+        /// <summary>从 interop 的 IReadOnlyList 里取最后一条（没有 Count 可用，按索引探到 null）。</summary>
+        private static PrintedMessage LastOf(Il2CppSystem.Collections.Generic.IReadOnlyList<PrintedMessage> list)
+        {
+            try
+            {
+                var concrete = list.TryCast<Il2CppSystem.Collections.Generic.List<PrintedMessage>>();
+                if (concrete != null && concrete.Count > 0) return concrete[concrete.Count - 1];
+            }
+            catch { }
+            PrintedMessage last = null;
+            for (int i = 0; i < 64; i++)
+            {
+                PrintedMessage m = null;
+                try { m = list[i]; } catch { break; }
+                if (m == null) break;
+                last = m;
+            }
+            return last;
         }
 
         /// <summary>
@@ -272,9 +349,34 @@ namespace ManosabaA11y
                 if (p == null) return;
                 if (Time.unscaledTime - p.At < PendingDelay) return;
                 _pending = null;
-                SpeakNow(p.Raw, p.AuthorId, p.AuthorLabel, p.Src);
+                SpeakNow(p.Raw, p.AuthorId, p.AuthorLabel, p.Src, p.LineKey);
             }
             catch (Exception e) { A11yHost.Diag("Reader.Tick: " + e.Message); }
+        }
+
+        /// <summary>
+        /// 从 PrintedMessage 里取剧本行 id（= 语音 clip 名，如 0101Adv05_Narrative001）。
+        ///
+        /// ★ 依据（实查，不许猜）：LocalizableText.parts 是 Il2CppReferenceArray&lt;LocalizableTextPart&gt;，
+        ///   LocalizableTextPart 的 id 字段就是行 id；naninovel-re probe4 实测
+        ///   `RE_PRINT_PARTS [0]{id='0101Adv05_Narrative001' ...}`。
+        ///   PrintedMessage.Text 里**不含** `|#id|` 标记，正则文本是拿不到 id 的。
+        /// </summary>
+        private static string LineKeyOf(PrintedMessage msg)
+        {
+            try
+            {
+                var parts = msg.Text.parts;   // Il2CppReferenceArray<LocalizableTextPart>（有 Length / 索引器）
+                if (parts == null || parts.Length <= 0) return "";
+                LocalizableTextPart p = parts[0];
+                if (p == null) return "";
+                return p.id ?? "";
+            }
+            catch (Exception e)
+            {
+                A11yHost.Diag("Reader.LineKey: " + e.Message);
+                return "";
+            }
         }
 
         /// <summary>场景切换 / 读档时清状态，避免旧指纹压掉新台词。</summary>
@@ -284,11 +386,12 @@ namespace ManosabaA11y
             _lastAt = -999f;
             _pending = null;
             _panelRaw.Clear();
+            _lastLine = "";
         }
 
         // ==================== 内部 ====================
 
-        private static void Register(string raw, string authorId, string authorLabel, string src)
+        private static void Register(string raw, string authorId, string authorLabel, string src, string lineKey = "")
         {
             if (string.IsNullOrEmpty(raw)) return;
 
@@ -300,12 +403,16 @@ namespace ManosabaA11y
                 if (TextProc.Fingerprint(old.Raw) == TextProc.Fingerprint(raw))
                 {
                     old.At = Time.unscaledTime;
+                    // 行 id 只可能从消息级入口来（文本级入口没有 PrintedMessage）：
+                    // 后到的这条带了 id 就补上，避免「先到的是 reveal、拿不到配音判定」。
+                    if (string.IsNullOrEmpty(old.LineKey) && !string.IsNullOrEmpty(lineKey))
+                        old.LineKey = lineKey;
                     return;
                 }
 
                 // 真的是新的一句顶掉旧的一句 → 先把旧的念掉（快进时宁可多念，不可漏念）
                 _pending = null;
-                SpeakNow(old.Raw, old.AuthorId, old.AuthorLabel, old.Src + "(flush)");
+                SpeakNow(old.Raw, old.AuthorId, old.AuthorLabel, old.Src + "(flush)", old.LineKey);
             }
 
             _pending = new Pending
@@ -313,6 +420,7 @@ namespace ManosabaA11y
                 Raw = raw,
                 AuthorId = authorId,
                 AuthorLabel = authorLabel,
+                LineKey = lineKey,
                 At = Time.unscaledTime,
                 Src = src
             };
@@ -356,8 +464,8 @@ namespace ManosabaA11y
             return "";
         }
 
-        /// <summary>统一朗读路径：清洗 → 去重闸门 → 说话人 → Repeat.Say。</summary>
-        private static void SpeakNow(string raw, string authorId, string authorLabel, string src)
+        /// <summary>统一朗读路径：清洗 → 去重闸门 → 说话人 → 配音闸门 → Repeat.Say。</summary>
+        private static void SpeakNow(string raw, string authorId, string authorLabel, string src, string lineKey = "")
         {
             if (string.IsNullOrEmpty(raw)) return;
             if (!TextProc.ShouldRead(raw)) return;
@@ -392,9 +500,45 @@ namespace ManosabaA11y
             _lastAt = now;
             _spoken++;
 
+            // 先记进「可重读」缓冲：**有配音的行也要记**——语音跑过去了，退格重读中文正是玩家要的
+            // （《不存在》Plugin.cs:387-433 同一做法；这也是各个仓库的标配）。
+            Remember(line);
+
+            // —— 配音闸门：这一行有游戏配音时不自动朗读（否则语音和 TTS 会叠在一起互相盖住）
+            bool voiced = VoiceLineIds.Has(lineKey);
+            if (voiced)
+            {
+                try { Speech.Stop(); } catch { }   // 上一句 TTS 还没念完时，别盖住这句语音
+                bool announceName = withName
+                                    && (Plugin.CfgAnnounceOnVoiced == null || Plugin.CfgAnnounceOnVoiced.Value);
+                if (announceName)
+                {
+                    try { Repeat.Note(speaker); Repeat.Say(speaker, false); } catch { }
+                }
+                if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
+                {
+                    A11yHost.Diag("Reader.voiced[" + src + "] id=" + lineKey + " => 有配音，跳过正文"
+                                  + (announceName ? "（只报名字）" : ""));
+                }
+                return;
+            }
+
+            // 无配音（或拿不到 id）：按配置决定念不念
+            bool unknown = string.IsNullOrEmpty(lineKey);
+            bool wantRead = Plugin.CfgReadUnvoiced == null || Plugin.CfgReadUnvoiced.Value;
+            if (unknown && Plugin.CfgSpeakWhenUnknown != null) wantRead = Plugin.CfgSpeakWhenUnknown.Value;
+            if (!wantRead)
+            {
+                if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
+                {
+                    A11yHost.Diag("Reader.skip[" + src + "] id=" + lineKey + " => 配置为不朗读无配音剧情");
+                }
+                return;
+            }
+
             if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
             {
-                A11yHost.Diag("Reader.say[" + src + "] raw=" + raw + " => " + line);
+                A11yHost.Diag("Reader.say[" + src + "] id=" + lineKey + " raw=" + raw + " => " + line);
             }
 
             try { Repeat.Say(line); }

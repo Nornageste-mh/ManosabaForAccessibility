@@ -326,3 +326,47 @@ Framework 仓库未改动：`git status --porcelain` 为空。
   修正后 run50 实测：`系统设置，按钮。2 / 5` → `鉴赏模式，按钮。3 / 5` → `Home` 回第 1 项。
   - 一般化教训：**「按键没生效」要先用一个独立读数确认按键有没有到达进程**，
     再去怀疑业务逻辑；否则容易在正确的代码上反复改。
+
+## 13. 第五轮：退格重读 / 配音闸门 / 隐藏控制台（0.0.0.3）
+
+用户要求（原话）：「我们的按下退格朗读上一句(仅包含剧情文字和选项)呢？」
+「移除/隐藏控制台窗口」「有语音的部分不朗读(可被TTS重复朗读)也是我们每一个仓库的标配」。
+
+**结论一：文本主钩子换成 actor 级 `UITextPrinter.AddMessage`。**
+本作 ADV 路径**从不调用** `Naninovel.UI.UITextPrinterPanel.AddMessage` ——
+面板级补丁挂了、`patchedMethods` 也算上了，但实机 `Reader.say[reveal] id=` 全是空
+（run56：`voiced=0`）。真正被调的是 `Naninovel.UITextPrinter.AddMessage(PrintedMessage)`
+（ilspycmd 实查返回 `void`），行 id 只能从 `message.Text.parts[i].id` 拿。
+
+**一般化铁律（比 0.0.0.1 那条更细）：**
+- patch 之前先看**返回类型**：`UniTask`/`Task`/非 blittable 结构体一律不挂；
+  `void` + 简单参数（`string`/`bool`/托管引用）安全。
+- 「挂上了」≠「会被调用」：`patchedMethods` 只说明 detour 装好了，
+  必须再用一条实机日志证明命中次数 > 0。本作有两条补丁就是「装着但永不触发」。
+
+**结论二：退格重读不能直接复用平台层 `Repeat.Again()`。**
+平台 `Repeat` 是所有朗读（含界面导航「系统设置，按钮。2 / 5」）的公共出口，
+用户要的是「仅剧情文字和选项」→ 逐作层自己维护 `Reader.Remember/LastLine`，
+导航播报只走 `Repeat.Say` 不入这条缓冲。有配音的行也要 `Remember`（语音错过了，
+退格把文本念一遍正是读屏用户要的）。
+
+**结论三：功能键必须把「解析结果」写进日志。**
+`Hotkey.Down("Backspace")` 对认不出的键名**静默返回 false**，症状是「按了没反应、
+日志一片空白」——这正是 0.0.0.3 第一次实机退格失效的排查成本（最后发现是
+测试脚本只按了 90ms、被 6 FPS 吞掉，但当时无法从日志区分）。
+现在 `Load()` 会打「重读按键=Backspace -> KeyCode.Backspace」等三行。
+
+**结论四：隐藏控制台要先校验窗口类名。**
+`GetConsoleWindow()` 在本作实测返回的句柄与游戏主窗口**相同**（run55：两者都是 16717180），
+直接 `ShowWindow(SW_HIDE)` 会把游戏窗口一起藏掉，表现为「点了 10 次没有任何反应」。
+现在必须 `GetClassName == "ConsoleWindowClass"` + `GetWindowThreadProcessId` 才动手。
+
+**实测证据（0.0.0.3）：**
+- run57（Adv01）：`say=42 voiced=8 重读=2`，`Reader.voiced[reveal] id=0101Adv02_Ema001`
+  → `[朗读] 樱羽艾玛`，`重读: 唯有这句话不管怎样都说不出口`。
+- run58（Adv02）：`say=33 voiced=22 重读=3`，`重读: 樱羽艾玛：牢、牢房……！？为什么！？`
+  —— 有配音的行可以被退格用 TTS 重读，满足用户「可被TTS重复朗读」的要求。
+- 两轮均为 `隐藏控制台窗口 hwnd=… ok=True`，且游戏窗口未被误隐藏（6 次点击进正片）。
+
+**仍未做（诚实记录）：** 魔女手册朗读/页签、存读档界面、关键选项「重要选项」提示、
+快进经过的行能否重读 —— 都还没实机复测。

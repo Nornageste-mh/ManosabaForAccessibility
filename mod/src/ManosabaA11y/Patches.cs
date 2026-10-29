@@ -138,6 +138,49 @@ namespace ManosabaA11y
             }
         }
 
+        // ==================== ADV：printer 级 AddMessage（行 id 的唯一可靠来源）====================
+
+        /// <summary>
+        /// Naninovel.UITextPrinter.AddMessage(PrintedMessage)。
+        ///
+        /// 为什么必须是它（2026-10-29 run56 实机定位）：
+        ///   本作 ADV 路径**从不调用** `Naninovel.UI.UITextPrinterPanel.AddMessage`
+        ///   （给面板挂的补丁一条日志都没有），真正被调的是 actor 级的这一条。
+        ///   没有它就拿不到 `PrintedMessage`，也就拿不到 `Text.parts[i].id`（行 id）——
+        ///   配音闸门（有配音的行不自动朗读）完全无从判断。
+        ///
+        /// 为什么这次可以挂（对比被删除的 Print 补丁）：
+        ///   `UITextPrinter.AddMessage` 的返回类型是 **void**（ilspycmd 实查），
+        ///   Harmony 原生 detour 不需要搬非 blittable 的返回值，
+        ///   不会重演 `TextPrinterManager.Print` 返回 `UniTask` 导致 async 状态机
+        ///   `MethodAccessException`、整条剧情卡死的那个事故。
+        /// </summary>
+        [HarmonyPatch(typeof(Naninovel.UITextPrinter), "AddMessage")]
+        [HarmonyPatch(new Type[] { typeof(Naninovel.PrintedMessage) })]
+        internal static class Patch_PrinterAddMessage
+        {
+            [HarmonyPostfix]
+            internal static void Postfix(Naninovel.UITextPrinter __instance,
+                                        [HarmonyArgument(0)] Naninovel.PrintedMessage message)
+            {
+                try { Reader.OnPrinterAddMessage(message); }
+                catch (Exception e) { A11yHost.Diag("Patches.PrinterAddMessage: " + e.Message); }
+            }
+        }
+
+        [HarmonyPatch(typeof(Naninovel.UITextPrinter), "SetMessages")]
+        [HarmonyPatch(new Type[] { typeof(Il2CppSystem.Collections.Generic.IReadOnlyList<Naninovel.PrintedMessage>) })]
+        internal static class Patch_PrinterSetMessages
+        {
+            [HarmonyPostfix]
+            internal static void Postfix(Naninovel.UITextPrinter __instance,
+                                        [HarmonyArgument(0)] Il2CppSystem.Collections.Generic.IReadOnlyList<Naninovel.PrintedMessage> messages)
+            {
+                try { Reader.OnPrinterSetMessages(messages); }
+                catch (Exception e) { A11yHost.Diag("Patches.PrinterSetMessages: " + e.Message); }
+            }
+        }
+
         // ==================== ADV：逐字渲染点（兜底 + 拿最终显示串）====================
 
         /// <summary>
@@ -366,5 +409,6 @@ namespace ManosabaA11y
         }
     }
 }
+
 
 
