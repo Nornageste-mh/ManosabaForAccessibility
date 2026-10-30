@@ -1,0 +1,39 @@
+=== GigaCreation.Tools.Debugging.Core ===
+Class <Module>
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1
+Class GigaCreation.Tools.Debugging.Core.DebugManager
+Class GigaCreation.Tools.Debugging.Core.DebugPresenter
+Class GigaCreation.Tools.Debugging.Core.IDebugManager
+Class _PrivateImplementationDetails_
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData
+Class GigaCreation.Tools.Debugging.Core.DebugPresenter.__c__DisplayClass5_0
+You are not using the latest version of the tool, please update.
+Latest version is '11.2.0.10050' (yours is '9.1.0.7988')
+=== GigaCreation.Tools.Debugging.General ===
+Class <Module>
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1
+Class GigaCreation.Tools.Debugging.General.DebugOptionsBase
+Class GigaCreation.Tools.Debugging.General.DestroySelfIfReleaseBuild
+Class GigaCreation.Tools.Debugging.General.FireOnDebugModeChanged
+Class GigaCreation.Tools.Debugging.General.TimeDebugCommands
+Class _PrivateImplementationDetails_
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData
+Class GigaCreation.Tools.Debugging.General.DebugOptionsBase._InitializeAsync_d__6
+Class GigaCreation.Tools.Debugging.General.TimeDebugCommands.__c
+You are not using the latest version of the tool, please update.
+Latest version is '11.2.0.10050' (yours is '9.1.0.7988')
+=== GigaCreation.Tools.Debugging.UI ===
+Class <Module>
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1
+Class GigaCreation.Tools.Debugging.Ui.DebugDisplay
+Class GigaCreation.Tools.Debugging.Ui.DebugPanel
+Class GigaCreation.Tools.Debugging.Ui.DebugPanelExclusive
+Class GigaCreation.Tools.Debugging.Ui.DisableDebugModeButton
+Class GigaCreation.Tools.Debugging.Ui.EnableDebugModeButton
+Class _PrivateImplementationDetails_
+Class UnitySourceGeneratedAssemblyMonoScriptTypes_v1.MonoScriptData
+Class GigaCreation.Tools.Debugging.Ui.DebugPanel.__c
+Class GigaCreation.Tools.Debugging.Ui.DebugPanelExclusive.__c
+Class GigaCreation.Tools.Debugging.Ui.EnableDebugModeButton.__c__DisplayClass6_0
+You are not using the latest version of the tool, please update.
+Latest version is '11.2.0.10050' (yours is '9.1.0.7988')

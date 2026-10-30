@@ -418,3 +418,26 @@ run61 播报：`导航模式。第 1 / 10 组：记录页签，1 项。全部 10
 用户要求「有配音文字朗读角色名需要默认关闭」——默认值改 `false`（`CfgAnnounceOnVoiced`）。
 注意 BepInEx 的 `ConfigEntry` **不会迁移老配置**：玩家已有的 cfg 里仍是 `true`，
 文档必须写「升级后自己确认这一行」。
+
+## 15. 第八轮：开发者面板（Ctrl+Alt+Shift+F3）——发行版根本没有（0.0.0.6）
+
+玩家希望用游戏内置开发者面板减少测试负担。结论：**发行版里不存在可用面板**。
+
+- `DebugOptionsBase.s_isInitialized == true`，但 `s_debugManager == null`：游戏在发行构建里
+  不创建调试管理器（`DebugManager(bool initialMode)` 从未被 new 出来）。
+- `Resources.FindObjectsOfTypeAll<Ui.DebugPanel>()` 只拿到 1 个 **prefab 资产**
+  （`gameObject.scene.IsValid() == false`、`parent=Wrapper`、`activeInHierarchy=false`），
+  面板里的 `DebugPanel._contents=[Content]`、`_showButton=ShowButton`、`_hideButton=HideButton`
+  都是 prefab 内部引用；`EnableDebugModeButton` 同理（`_debugManager` 也是 null）。
+- 场景根上那个叫 `Debug` 的对象（`Transform + 5 components`）实测 **没有任何子物体**，
+  不是面板挂载点。
+- 组合键读取本身可以打通：`Plugin.SpecDown("Ctrl+Alt+Shift+F3")`（Win32 `GetAsyncKeyState` 兜底）
+  在 run77–run82 稳定打印 `DevPanel: IsDebugMode -> true/false`；但无论补建管理器、翻转
+  `IsDebugMode`、还是把 prefab 实例化挂到场景 Canvas（`MovieUI`，sortingOrder=9999），
+  画面上都不出现面板 —— 因为这只 prefab 依赖开发构建里的完整层级/画布。
+- 因此：配置「允许激活开发者选项」保留但**默认关闭**（玩家明确要求），发行版按了也不会
+  出面板；文档里写明「这是开发构建功能」。
+
+**教训**：看到「游戏自带调试工具 + 有 prefab」不等于发行版能用；先查
+`DebugOptionsBase.s_debugManager` 是否被创建、prefab 是否真的实例化（`scene.IsValid()`），
+再决定要不要投入做入口。别把「实例化 prefab」当成万能钥匙——UI 层级缺画布时它照样不可见。

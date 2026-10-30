@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.5";
+        public const string Version = "0.0.0.6";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -78,6 +78,11 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgDiagLog;
         /// <summary>隐藏 BepInEx 的控制台窗口（默认开）。</summary>
         internal static ConfigEntry<bool> CfgHideConsole;
+        /// <summary>
+        /// 允许激活游戏内置开发者面板（Ctrl+Alt+Shift+F3）。
+        /// ★ 调试功能，会扩大可达范围：正式发布默认关闭，只有玩家自己打开才响应组合键。
+        /// </summary>
+        internal static ConfigEntry<bool> CfgAllowDevPanel;
 
         private Harmony _harmony;
 
@@ -307,6 +312,15 @@ namespace ManosabaA11y
             }
 
             L.LogInfo("[a11y] loaded v" + Version + " (IL2CPP, BepInEx 6)");
+            // 开发者面板开关的配置值要打出来：BepInEx 的 cfg 里如果缺项/拼错，症状是
+            // 「按了组合键完全没反应」，正是 0.0.0.5 功能键失效时的排查成本。
+            try
+            {
+                L.LogInfo("[a11y] DevPanel 配置: allow=" + (CfgAllowDevPanel != null && CfgAllowDevPanel.Value)
+                          + " isys=" + InputSysKeys.Available);
+            }
+            catch (Exception e) { L.LogWarning("[a11y] DevPanel 配置读取失败: " + e.Message); }
+
 
             // 功能键配置在启动时**解析一次并写日志**：Hotkey.Down 对认不出的键名静默返回 false，
             // 症状是「按了没反应、日志什么都没有」——正是 0.0.0.3 第一次实机退格失效的排查成本。
@@ -488,8 +502,18 @@ namespace ManosabaA11y
                 "  所以在这里直接指定要朗读哪种语言的文本。实机默认是「日本語」。");
             CfgDiagLog = Config.Bind("其它", "界面诊断日志", false,
                 "把导航/文本提取的诊断信息写进 BepInEx 日志，只在排查时打开。");
+            CfgAllowDevPanel = Config.Bind("其它", "允许激活开发者选项", false,
+                "开启后按 Ctrl+Alt+Shift+F3 可以显示/收起游戏内置的开发者面板\n" +
+                "（暂停、慢放、快放、回调试首页、解锁全部 CG、强制时间到等）。\n" +
+                "★ 这是**测试功能**，会扩大可达范围、可能剧透或破坏存档体验：\n" +
+                "  正式游玩请保持关闭（默认关闭）；测试需要时再打开。\n" +
+                "★ 面板来自游戏自带的 GigaCreation 调试工具，不是本补丁伪造的。\n" +
+                "★ 实测（v0.0.0.6）：正式发行版里游戏自己**没有**创建调试管理器\n" +
+                "  （DebugOptionsBase.s_debugManager 为 null），调试面板只是内存里的\n" +
+                "  预制体（从未被实例化），所以这个开关在发行版里按了也不会有面板；\n" +
+                "  开发构建（Editor/Dev Build）才有完整面板。保留开关是为了开发构建可用。");
 
-            // 无人值守实机测试开关：��环境变量 MANOSABA_A11Y_TEST=1 时强制打开诊断日志，
+            // 无人值守实机测试开关：只有环境变量 MANOSABA_A11Y_TEST=1 时强制打开诊断日志，
             // 让自动化脚本能从 LogOutput.log 里核对「哪一句被念了 / 哪条补丁没接上」。
             try
             {
@@ -578,6 +602,10 @@ namespace ManosabaA11y
             // 目的：验证「新 Input System 读取功能键」这条链路（真实玩家按键一定在这里）。
             try { TestKeyInjectTick(); }
             catch (Exception e) { A11yHost.Diag("TestKeyInject: " + e.Message); }
+
+            // 开发者面板开关（Ctrl+Alt+Shift+F3；配置「允许激活开发者选项」默认关闭）
+            try { DevPanel.Update(); }
+            catch (Exception e) { A11yHost.Diag("DevPanel: " + e.Message); }
 
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }

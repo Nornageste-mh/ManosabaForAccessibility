@@ -50,7 +50,7 @@
 本作是 Naninovel，`Ctrl` 快进、`Enter`/`Space`/鼠标左键推进、`Esc` 菜单。
 补丁只在**界面导航模式**和**选项编号键**上接管输入，其余按键原样交给游戏。
 
-## 当前进度（v0.0.0.5）
+## 当前进度（v0.0.0.6）
 
 | 功能 | 状态 |
 |---|---|
@@ -59,7 +59,7 @@
 | 对话朗读（含旁白与对白） | ✅ 实机验证（单轮连续 82 句无异常） |
 | 说话人朗读（`樱羽艾玛：……`） | ✅ 实机验证（旁白不报名字） |
 | 文本清洗（`<br>`/`<ruby>`/`<link>`/`<color>` 等） | ✅ 实机验证 |
-| **有配音的行不自动朗读**（默认完全安静，`Backspace` 可 TTS 重读） | ✅ 实机验证（run58：22 条配音行跳过，退格念回原文；v0.0.0.5 起默认连名字也不报） |
+| **有配音的行不自动朗读**（默认完全安静，`Backspace` 可 TTS 重读） | ✅ 实机验证（run58：22 条配音行跳过，退格念回原文；v0.0.0.6 起默认连名字也不报） |
 | **`Backspace` 退格重读上一句剧情/选项** | ✅ 实机验证（run57/run58；导航播报不会被退回） |
 | **隐藏 BepInEx 控制台窗口** | ✅ 实机验证（有 `ConsoleWindowClass` 校验，不会误隐藏游戏窗口） |
 | 选项朗读 / 数字键选择 | ✅ 实机验证（第 1 章第 5 幕，2 个选项，数字键选中后走对应分支） |
@@ -171,6 +171,11 @@ mod/
    ADV 真入口是 actor 级的 `Naninovel.UITextPrinter.AddMessage`，行 id 只能从这里拿。
 8. **`ShowWindow(GetConsoleWindow(), SW_HIDE)` 必须先校验窗口类名**：实测本作里
    `GetConsoleWindow()` 返回的句柄可能就是游戏主窗口，直接隐藏会把游戏窗口一起藏掉。
+9. **发行版里没有可用的开发者面板**：`DebugOptionsBase.s_debugManager` 实测是 null
+   （`s_isInitialized` 却是 true），`DebugPanel` / `EnableDebugModeButton` /
+   `DebugCommandButtons` 只有内存里的 prefab 资产、从未实例化 → 发行版按
+   `Ctrl+Alt+Shift+F3` 没有面板可开（这是开发构建功能）。配置「允许激活开发者选项」
+   因此默认关闭，只对开发构建有意义。
 
 ## 如何复现分析
 

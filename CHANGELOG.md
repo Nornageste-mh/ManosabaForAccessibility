@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.5`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.6`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -18,6 +18,25 @@
 - 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
+
+### v0.0.0.6（开发者面板：查清发行版里没有，开关默认关）
+
+**现象**：玩家希望用游戏内置开发者面板（Ctrl+Alt+Shift+F3）减少测试负担。
+
+**实机查证（run76–run82，`MANOSABA_A11Y_DEBUGUI=1` 一次性侦察）**：
+- `DebugOptionsBase.s_isInitialized=true`，但 `s_debugManager=null` —— 发行版里游戏自己**没有创建**调试管理器。
+- `DebugPanel` 只有 **1 个 prefab 资产**（`scene=<prefab/无场景>`、`parent=Wrapper`、`activeInHierarchy=False`），
+  从未被实例化；`EnableDebugModeButton` 与 `DebugCommandButtons` 同样只有 prefab / 未激活。
+- 因此 Ctrl+Alt+Shift+F3 在**发行版**里没有面板可开；这是开发构建（Editor / Dev Build）的功能。
+
+**做了什么**：
+- 新增配置「其它 / 允许激活开发者选项」（**默认关闭**，按玩家要求）：打开后补建 `DebugManager(true)`、
+  翻转 `IsDebugMode`，并把 `DebugPanel` prefab 实例化后挂到场景 Canvas 上（尽力而为）。
+- 组合键读取改走 `Plugin.SpecDown`（Win32 `GetAsyncKeyState` 全局兜底 ∪ 新 Input System）：
+  run77 起日志稳定出现 `DevPanel: IsDebugMode -> true/false`，说明**组合键本身可用**，
+  只是发行版没有面板可显示（面板对象 activeInHierarchy 仍为 False / 画面上看不到）。
+
+**结论**：开关保留给开发构建；发行版里按了也不会出现面板，默认关闭，避免玩家误以为游戏坏了。
 
 ### v0.0.0.5（功能键读取接上「新 Input System」+ 全局键预热）
 
