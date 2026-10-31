@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.6";
+        public const string Version = "0.0.0.7";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -100,6 +100,13 @@ namespace ManosabaA11y
         /// 合成它不会碰游戏逻辑，只影响本进程的测试。
         /// </summary>
         internal static bool TestNavMode;
+        /// <summary>
+        /// 选项验收模式：只有环境变量 MANOSABA_A11Y_TEST_CHOICE=1 时打开。
+        /// 本机键盘注入被系统挡掉（SendInput 返回 0，见 docs\framework-notes.md §17），
+        /// 所以改由插件在选项播报后自己走一次「选中第 1 项」的代码路径，
+        /// 验证「编号 → 按钮 → onClick」这段。生产用户不会设置该变量。
+        /// </summary>
+        internal static bool TestChoiceOnce;
         private static float _nextSyntheticNavAt;
         private static int _syntheticNavCount;
 
@@ -235,6 +242,12 @@ namespace ManosabaA11y
             catch (Exception e)
             {
                 L.LogWarning("[a11y] 全局键预热失败: " + e.Message);
+            }
+            // 选项验收：播报后由插件自己选一次第 1 项（仅 MANOSABA_A11Y_TEST_CHOICE=1）
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_CHOICE") == "1")
+            {
+                TestChoiceOnce = true;
+                L.LogInfo("[a11y] TEST CHOICE MODE: 选项播报后自动选择第 1 项");
             }
             // 导航验收：合成 Tab（仅 MANOSABA_A11Y_TEST_NAV=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_NAV") == "1")
@@ -571,6 +584,10 @@ namespace ManosabaA11y
                 }
             }
 
+            // 自动化测试：纯逻辑单元自测（MANOSABA_A11Y_SELFTEST=1）。
+            // 只在启动时跑一次，把 PASS/FAIL 写进日志，供 tests\Suite.ps1 断言。
+            try { SelfTest.Tick(); } catch (Exception e) { A11yHost.Diag("SelfTest: " + e.Message); }
+
             // 键盘链路诊断（仅 MANOSABA_A11Y_KEYDIAG=1）：每 0.5 秒把「平台层到底能不能读到
             // 方向键/回车」打出来。为什么需要：本作只启用新 Input System，裸 Input 恒抛异常，
             // 所有键盘读取都靠 GlobalKeys（GetAsyncKeyState）兜底；一旦兜底失效，
@@ -617,6 +634,11 @@ namespace ManosabaA11y
             // 加载播报（本作点「新游戏」后有明显的黑屏加载段）
             try { LoadingWatch.Update(); }
             catch (Exception e) { A11yHost.Diag("LoadingWatch: " + e.Message); }
+
+            // 整页界面辅助（魔女手册 / 对话记录）：平台导航扫不到关闭按钮与地图地点，
+            // 这里自动播报页面内容 + Esc 直接调 CloseButton（详见 ScreenAssist.cs 注释）。
+            try { ScreenAssist.Update(); }
+            catch (Exception e) { A11yHost.Diag("ScreenAssist: " + e.Message); }
 
             // 界面取证探针（仅 MANOSABA_A11Y_PROBE_UI=1）：转储控件对象名，供别名表取证
             try { UiProbe.Update(); }
@@ -687,8 +709,44 @@ namespace ManosabaA11y
         private static float _nextKeyInjectAt = -1f;
         private static int _keyInjects;
 
+        // 另一个测试钩子：MANOSABA_A11Y_TEST_REPEAT=1 → 40s 时按一次「重读」的代码路径
+        // （不经过读键，只验证 Reader.LastLine → Repeat.Say 这一段）。
+        // 为什么需要：自动化环境里 Win32/InputSystem 两条注入都进不来（实测），
+        // 而读键链路已经由单元用例（Hotkey.Parse）与 KEYDIAG（reading=true）覆盖。
+        private static bool _testRepeatRead;
+        private static bool _testRepeatOn;
+        private static float _nextTestRepeatAt = -1f;
+        private static int _testRepeats;
+
+        // 整页界面 Esc 关闭的测试钩子（MANOSABA_A11Y_TEST_ESC=1）
+        private static bool _testEscRead;
+        private static bool _testEscOn;
+        private static float _nextTestEscAt = -1f;
+        private static int _testEscs;
+
         private static void TestKeyInjectTick()
         {
+            if (!_testRepeatRead)
+            {
+                _testRepeatRead = true;
+                _testRepeatOn = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_REPEAT") == "1";
+                if (_testRepeatOn)
+                {
+                    Plugin.L.LogInfo("[a11y] TEST REPEAT MODE: 40s 起每 25s 触发一次重读（验证 LastLine → Repeat.Say）");
+                    _nextTestRepeatAt = Time.realtimeSinceStartup + 40f;
+                }
+            }
+            if (_testRepeatOn && Time.realtimeSinceStartup >= _nextTestRepeatAt)
+            {
+                _nextTestRepeatAt = Time.realtimeSinceStartup + 25f;
+                _testRepeats++;
+                string last = Reader.LastLine;
+                Plugin.L.LogInfo("[a11y] TEST REPEAT #" + _testRepeats + ": 触发重读 t=" + Time.realtimeSinceStartup.ToString("F1")
+                               + " last=" + (string.IsNullOrEmpty(last) ? "<null>" : "len" + last.Length));
+                if (string.IsNullOrEmpty(last)) Repeat.Say("还没有朗读过内容。", true);
+                else { A11yHost.Diag("重读: " + last); Repeat.Say(last, true); }
+            }
+
             if (!_keyInjectRead)
             {
                 _keyInjectRead = true;
@@ -699,6 +757,27 @@ namespace ManosabaA11y
                     _nextKeyInjectAt = Time.realtimeSinceStartup + 30f;
                 }
             }
+
+            // 整页界面的 Esc 关闭测试钩子（自动化环境键盘注入被系统挡掉，见 ScreenAssist.SimulateEscape 注释）
+            if (!_testEscRead)
+            {
+                _testEscRead = true;
+                _testEscOn = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_ESC") == "1";
+                if (_testEscOn)
+                {
+                    Plugin.L.LogInfo("[a11y] TEST ESC MODE: 45s 起每 20s 尝试关闭整页界面（魔女手册/记录）");
+                    _nextTestEscAt = Time.realtimeSinceStartup + 45f;
+                }
+            }
+            if (_testEscOn && Time.realtimeSinceStartup >= _nextTestEscAt)
+            {
+                _nextTestEscAt = Time.realtimeSinceStartup + 20f;
+                _testEscs++;
+                bool handled = ScreenAssist.SimulateEscape();
+                Plugin.L.LogInfo("[a11y] TEST ESC #" + _testEscs + ": 触发关闭 t=" + Time.realtimeSinceStartup.ToString("F1")
+                               + " handled=" + handled);
+            }
+
             if (!_keyInjectOn) return;
 
             InputInject.Tick(); // 到点抬起（不 Tick 的话键会一直处于按下状态）
@@ -745,6 +824,8 @@ namespace ManosabaA11y
                     + " alt=" + GlobalKeys.Held(KeyCode.LeftAlt)
                     + " shift=" + GlobalKeys.Held(KeyCode.LeftShift)
                     + " back=" + GlobalKeys.Held(KeyCode.Backspace)
+                    + " esc=" + GlobalKeys.Held(KeyCode.Escape)
+                    + " escIsys=" + InputSysKeys.Held(KeyCode.Escape)
                     + " backspaceVk=" + (GlobalKeys.Reading ? "on" : "off")
                     + " repeat=" + (Plugin.CfgRepeatKey == null ? "<null>" : "[" + Plugin.CfgRepeatKey.Value + "]")
                     + " last=" + (Reader.LastLine == null ? "<null>" : "len" + Reader.LastLine.Length)

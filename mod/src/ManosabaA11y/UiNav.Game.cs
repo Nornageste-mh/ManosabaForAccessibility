@@ -361,6 +361,18 @@ namespace ManosabaA11y
             { "EngineInitializationUI", "引擎初始化" },
         };
 
+        /// <summary>
+        /// 页签对象名（Tab_*）→ 中文页签名。ScreenAssist 在整页界面播报里用，
+        /// 依据是 run31 转储里的 Tab_Clues/Tab_Profiles/Tab_Maps/Tab_Rules/Tab_Notes 五个页签。
+        /// </summary>
+        internal static string TabTitleOf(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            if (!name.StartsWith("Tab_", StringComparison.OrdinalIgnoreCase)) return "";
+            if (NameAlias.TryGetValue(name, out string v)) return v + "页签";
+            return "";
+        }
+
         internal static string GameGroupName(Transform root)
         {
             if (root == null) return "";

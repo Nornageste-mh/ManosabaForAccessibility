@@ -120,6 +120,11 @@ namespace ManosabaA11y
                 }
                 catch (Exception e) { A11yHost.Diag("Reader.author: " + e.Message); }
 
+                // 说话人取证：测试 story.speaker 需要「这条消息到底带没带 author」。
+                // （名字框钩子可能是空串，而消息级 author 是同源且非空的，二者要能对比。）
+                if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
+                    A11yHost.Diag("HOOK print author id=[" + authorId + "] label=[" + authorLabel + "]");
+
                 // ★ 辩论台词的 printerId 是 WitchTrials.Views.PrintDebateText.DebatePrinterId（实读 == "Debate"）
                 Register(raw, authorId, authorLabel, "print:" + printerId, LineKeyOf(msg));
             }
@@ -482,13 +487,26 @@ namespace ManosabaA11y
                 return;
             }
 
-            // —— 说话人：优先 Naninovel 的 MessageAuthor，其次文本里的 `Ema: ` 前缀
+            // —— 说话人：优先 Naninovel 的 MessageAuthor，其次文本里的 `Ema: ` 前缀，
+            //    最后查静态表 LineSpeakers（行 id → 作者 id）。
+            //    为什么需要最后这一层：本作运行时 PrintedMessage.author 的 id/label 与名字框
+            //    钩子实测都是空串（probe-speaker 日志），只有剧本注释里的行 id 是可靠的。
             string speaker = "";
             try
             {
                 speaker = TextProc.Speaker(authorId);
                 if (string.IsNullOrEmpty(speaker)) speaker = TextProc.Speaker(authorLabel);
                 if (string.IsNullOrEmpty(speaker)) speaker = TextProc.Speaker(TextProc.ExtractAuthorId(raw));
+                if (string.IsNullOrEmpty(speaker))
+                {
+                    string fromLine = LineSpeakers.AuthorOf(lineKey);
+                    if (!string.IsNullOrEmpty(fromLine))
+                    {
+                        speaker = TextProc.Speaker(fromLine);
+                        if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
+                            A11yHost.Diag("Reader.speaker: 行 id " + lineKey + " -> " + fromLine + " -> " + speaker);
+                    }
+                }
             }
             catch (Exception e) { A11yHost.Diag("Reader.speaker: " + e.Message); }
 

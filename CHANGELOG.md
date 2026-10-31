@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.6`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.7`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -18,6 +18,43 @@
 - 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
+
+### v0.0.0.7（魔女手册/记录整页界面：自动播报 + Esc 关闭）
+
+**现象**（用户 2026-10-31 反馈 + 三张截图）：进魔女手册「记录」页后**出不来**；「地图」页
+按导航走不到地点，只会念「未命名开关」。日志实测：
+`[画面外或点不到] …/WitchBookUI/Wrapper/CloseButton`、
+`[画面外或点不到] …/Page_Maps/ItemButtonPool/WitchBookItemButton(Clone)`、
+`[画面外或点不到] …/ItemList/Pagination/MovingArrows/ButtonNext`。
+
+**后果**：读屏玩家一旦打开手册就可能被关在里面（只能 Alt+F4），地图页等于不可用。
+
+**根因**：平台层的可达性判定（`UiNav.VisiblyClickable`：CanvasRect 相交 + 从控件中心打
+UI 射线，只认打到自己/子物体）被**书本打开动画的全屏 CanvasGroup** 骗了——射线先打到那层
+遮罩，于是真实的关闭按钮/地点按钮全被判成「点不到」。地图地点本身还不是 Selectable
+（`WitchTrials.Views.MapAreaLabel` 只是 TMP 标签），平台层根本不扫。
+
+**怎么修**（新增逐作层 `ScreenAssist.cs`，不动平台层）：
+1. **自动播报**：`WitchBookUI` / `LogUI` 可见时，每 0.5s 扫一次，念「界面名，页签。内容：…」；
+   内容只取**当前页**（`Page_<页签>` 子树），避免把别的页也念出来。
+2. **地图页专用**：取当前楼层容器（`F1_1`/`F2_1`/`F2_2`/`B1_1`）下的 `MapAreaLabel._label`
+   文字，念成「1F：会客厅、玄关大厅、…」。这些标签的 CanvasGroup 平时 alpha=0，
+   所以这一条**故意不看可见性**（文字齐全，只是没显示）。
+3. **Esc 关闭**：每帧查 Esc（本作 6 FPS，0.5s 节流会漏掉快速按键），找到
+   `WitchBookUI/Wrapper/CloseButton` 直接 `onClick.Invoke()`，念「已关闭魔女手册。」。
+4. 内容过滤：跳过 `Description` 这类本地化键名（`LooksLikeKey`）。
+
+**实机证据（run86–run91，`probe\run86-book-assist.ps1`：读取→存档槽 1→手册→地图页）**：
+- `ScreenAssist: 播报 魔女手册，线索页签。内容：二阶堂希罗原本持有的钢笔。`
+- `ScreenAssist: 播报 魔女手册，地图页签。内容：1F：会客厅、玄关大厅、审判庭入口过道、食堂、厨房、审判庭、接客室、医务室、杂物处、女厕、日光房、淋浴房、中庭、监牢入口、招待所、火精之室、水精之室、地精之室、仓库、围墙、往湖方向、往花田方向。`
+- `ScreenAssist: Esc 关闭 魔女手册（path=Naninovel<Runtime>/UI/WitchBookUI/Wrapper/CloseButton）`
+
+**尚未实机复测**：真实键盘 Esc（本机自动化环境的键盘注入被系统挡掉，`SendInput` 返回 0；
+关闭逻辑用 `MANOSABA_A11Y_TEST_ESC=1` 钩子验证）、`LogUI`（对话记录）页的实际念法。
+
+**测试**：`tests\Suite.ps1` 新增 `book.assist` 用例（读取存档槽 1 → 点书本 → 断言播报 →
+`TEST_ESC` 钩子断言关闭），并把整套用例的点击改成「相对坐标 + ClientToScreen」；全量
+`full5` 跑出 **11/11 通过**（此前因坐标/键盘注入问题会集体红）。
 
 ### v0.0.0.6（开发者面板：查清发行版里没有，开关默认关）
 

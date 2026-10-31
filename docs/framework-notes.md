@@ -441,3 +441,73 @@ run61 播报：`导航模式。第 1 / 10 组：记录页签，1 项。全部 10
 **教训**：看到「游戏自带调试工具 + 有 prefab」不等于发行版能用；先查
 `DebugOptionsBase.s_debugManager` 是否被创建、prefab 是否真的实例化（`scene.IsValid()`），
 再决定要不要投入做入口。别把「实例化 prefab」当成万能钥匙——UI 层级缺画布时它照样不可见。
+
+## 16. 第九轮：自动化测试套件（不随发布包）
+
+用户需求（m04662）：「剧本百万级，手动完整测试不现实，希望只测试不同界面/剧情阶段/场景/模块
+是否符合预期。」据此建立两层测试：
+
+1. **单元层（插件内进程自测）**：`mod\src\ManosabaA11y\SelfTest.cs`，`MANOSABA_A11Y_SELFTEST=1`
+   时启动 30 帧后跑 22 条断言（TextProc 清洗/行 id/指纹、SpeakerNames、VoiceLineIds、Hotkey 解析），
+   输出 `SELFTEST PASS/FAIL <名字>` 与 `SELFTEST SUMMARY total=.. pass=.. fail=..`。
+   为什么放插件里：IL2CPP 下这些类型进程外引用不到，用真实运行时 + 真实数据跑才可信。
+2. **集成层（每个用例一次游戏生命周期）**：`tests\Suite.ps1` + `tests\lib\Harness.ps1`，
+   真点标题「新游戏」进正片 → `MANOSABA_A11Y_JUMP` 跳到目标剧本 → `Advance-Until` 边点边等 →
+   断言日志证据行 → 出 `tests\reports\<Tag>-report.md` / `-result.json` / `shots\*.png`；
+   退出码 = 失败数。
+
+四条新教训（都已写进 Harness 注释）：
+
+- **`MainWindowHandle` 会拿到 BepInEx 控制台窗口**（同进程）→ 必须 `EnumWindows` + 排除
+  `ConsoleWindowClass`，否则点击全打在控制台、用例集体假失败。
+- **`LogOutput.log` 不能直接 `ReadAllText`**（BepInEx 句柄不允许默认共享）→ 必须
+  `[IO.File]::Open(..., FileShare.ReadWrite|Delete)`。第一版「游戏在写、套件读空」就是这个。
+- **单元素数组会被 PowerShell 拆成标量**：`Get-LogMatches` 只命中一条时 `$Matches[0]` 变成取第一个
+  字符（证据行显示成 `C`）→ 一律 `@()` 包住。
+- `pwsh -File ... -Only a,b` 传进来是**一个**字符串，要自己按逗号拆。
+
+其它落地细节：
+
+- 用例级临时改 cfg：`Cfg = @{ '有配音时也报说话人' = 'true' }`，runner 启动前改、跑完还原
+  （`Config.Bind` 在启动时读，进程内改 cfg 不生效）。
+- 测试**不需要先开 Steam**（用户指正）：游戏目录有 `steam_appid.txt`，直接 `manosaba.exe`。
+- 新增功能时顺手加一行带前缀的诊断日志，就等于给测试留了观测点 —— 这是本项目可测性的做法。
+
+`tests\README.md` 里有用例清单、运行命令、新增用例模板与已知局限（不验证真实音频输出、
+时序强场景只做证据行级断言、坐标依赖 1920×1080）。
+
+## 17. 第十轮：整页界面——平台层判「点不到」时逐作层怎么办（0.0.0.7）
+
+用户反馈（m05392）：魔女手册「记录」页**进去出不来**；「地图」页导航走不到地点。
+
+根因不在我们的钩子，而在**平台层的可达性判定**：`UiNav.VisiblyClickable` 用「控件中心打一条
+UI 射线、只认打到自己/子物体」来判断能不能点。手册打开时有一层全屏 CanvasGroup 盖在上面
+（玩家实际能点，因为它只吃不拦），射线先打到遮罩 → `CloseButton`、地图按钮全判
+`[画面外或点不到]`。另外地图地点 `WitchTrials.Views.MapAreaLabel` 只是 TMP 标签，
+不是 `Selectable`，平台层根本不会扫。
+
+平台层按「三条铁律」不能改，所以逐作层补一个 `ScreenAssist.cs`：
+
+- **整页自动播报**：0.5s 扫一次「可见的界面根」（`WitchBookUI` / `LogUI`），换根或换页签
+  才念，格式「界面名，页签。内容：…」。内容按 `Page_<页签>` 子树过滤，避免念到别的页。
+- **地图页专用取法**：当前楼层容器（`F1_1`/`F2_1`/`F2_2`/`B1_1`）下的
+  `MapAreaLabel._label`，**故意不看 CanvasGroup alpha** —— 实测 33 个标签全是
+  `active=True visible=False`，alpha 为 0 只是没悬停，文字是齐的。
+- **`Esc` 关闭**：每帧查一次（本作 6 FPS，0.5s 节流会漏按键），找到 `CloseButton` 直接
+  `onClick.Invoke()`，念「已关闭魔女手册。」。
+- 给自动化留钩子：`MANOSABA_A11Y_TEST_ESC=1` 走 `SimulateEscape()`（纯逻辑，不冒充按键）。
+
+三条可复用的教训：
+
+1. **「玩家能点，但平台判定点不到」是逐作层的活**：不要为了这个改平台层，也不要让玩家
+   依赖导航——自己给一个直达入口（自动播报 + 专用关闭键）。
+2. **可见性判定要按场景分开写**：同一页里有的文字靠 alpha 隐藏（`MapAreaLabel`，要忽略
+   alpha）、有的靠 `SetActive`（楼层容器，要看 active），一刀切一定会念错或漏念。
+3. **本机键盘注入不可用**（`SendInput` 返回 0）：所以按键类功能必须留进程内钩子，
+   否则自动化永远只能验证「逻辑」，不能验证「按键→逻辑」这一段。
+4. **客户区坐标 ≠ 屏幕坐标**：`SetCursorPos` 要屏幕坐标，改成相对点击时必须
+   `GetClientRect` + `ClientToScreen`，否则窗口不在 (0,0) 时整套用例静默点空
+   （本次 full1–full3 集体红就是这么来的）。同时给用例加「点一次→看日志→不行再点」
+   的重试，别指望一次点中。
+5. **`Wait-Log` 返回的是正则命中片段**，不是整行：断言要吃整行就得把 pattern 写成
+   `'前缀[^\r\n]*'`，否则证据只剩前缀（`ScreenAssist: 播报 魔女手册` 看不到页签）。

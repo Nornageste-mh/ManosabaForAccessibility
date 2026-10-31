@@ -34,6 +34,8 @@ namespace ManosabaA11y
         private static float _announcedAt = -999f;
         private static float _notLiveAt = 0f;
         private static int _lastChildCount = -1;
+        // 测试钩子只用一次（MANOSABA_A11Y_TEST_CHOICE），避免每帧重复点选项
+        private static bool _testChoiceDone;
 
         /// <summary>由 Harmony 在 AddChoiceButton 之后调用：只记下面板，不做朗读。</summary>
         internal static void OnButtonAdded(Naninovel.UI.ChoiceHandlerPanel panel)
@@ -201,6 +203,7 @@ namespace ManosabaA11y
             {
                 _announcedKey = key;
                 _announcedAt = Time.unscaledTime;
+                string announcement = null;
                 if (wantRead)
                 {
                     // 整组选项拼成一段念出去（而不是逐条），理由：
@@ -211,13 +214,17 @@ namespace ManosabaA11y
                     for (int i = 0; i < _labels.Count; i++)
                         sb.Append("选项 ").Append(i + 1).Append("：").Append(_labels[i]).Append("。");
                     if (hotkeys) sb.Append("按数字键选择。");
+                    announcement = sb.ToString();
 
-                    Repeat.Say(sb.ToString());   // Note + Speak，退格能重读整组选项
+                    Repeat.Say(announcement);   // Note + Speak，退格能重读整组选项
                     // 选项播报也进「剧情专用重读缓冲」：玩家按重读键要能重听选项，
                     // 但界面导航播报（「系统设置，按钮。2 / 5」）不会进这条缓冲。
-                    Reader.Remember(sb.ToString());
+                    Reader.Remember(announcement);
                 }
-                A11yHost.Diag("CHOICE 播报 " + _labels.Count + " 项: " + key);
+                // 诊断里带上**实际要念的整组文案**：自动化测试直接断言这一行，
+                // 不用去猜语音层吐了什么（对比只看 key 的老版本，这里能看到编号与按键提示）。
+                A11yHost.Diag("CHOICE 播报 " + _labels.Count + " 项: " + key
+                              + (announcement == null ? "" : " => " + announcement));
             }
 
             // ---- 数字键直选 ----
@@ -239,7 +246,18 @@ namespace ManosabaA11y
                     }
                 }
             }
-            catch { return; }
+            catch { pick = 0; }
+
+            // ---- 测试钩子：本机键盘注入被系统挡掉（SendInput 返回 0），
+            //      所以用 MANOSABA_A11Y_TEST_CHOICE=1 走同一条「选中第 1 项」的代码路径，
+            //      验证的是「编号 → 按钮 → onClick」这段，而不是按键采样（那部分由单元自测覆盖）。
+            if (pick == 0 && Plugin.TestChoiceOnce && _announcedKey.Length > 0 && !_testChoiceDone)
+            {
+                _testChoiceDone = true;
+                pick = 1;
+                A11yHost.Diag("CHOICE 测试钩子：自动选择第 1 项");
+            }
+
             if (pick == 0) return;
             A11yHost.Diag("CHOICE 数字键按下 " + pick);
 

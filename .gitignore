@@ -45,6 +45,9 @@ LogOutput.log
 !docs/**/*.log
 probe/installed_manifest.txt
 
+# 自动化测试的产物（报告与截图每次运行都变，不入库；用例与 harness 入库）
+tests/reports/
+
 # 玩家配置与存档样本
 BepInEx/config/
 save_backup*/
@@ -60,3 +63,6 @@ save_backup*/
 probe/_stash_out/
 *.dll
 !mod/licenses/*.dll
+# 自动化测试产物（报告/截图/临时 json）
+tests/reports/
+tests/tests/

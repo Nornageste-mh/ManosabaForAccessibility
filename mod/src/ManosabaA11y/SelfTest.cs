@@ -1,0 +1,177 @@
+using System;
+using System.Text.RegularExpressions;
+using UnityEngine;
+
+namespace ManosabaA11y
+{
+    /// <summary>
+    /// 纯逻辑单元自测（自动化测试套件的第一层）。
+    ///
+    /// 为什么放在插件里而不是单独的测试工程：
+    ///   本作是 IL2CPP，`TextProc` / `SpeakerNames` / `VoiceLineIds` 这些类型在
+    ///   进程外没法引用（interop 程序集只在游戏运行时可用）。放在插件里跑，
+    ///   等于「用真实的运行时跑真实的数据」，比另建 net6.0 测试工程更可信。
+    ///
+    /// 断言方式：只看**不变量**，不写死具体台词（台词是游戏 IP，不能进仓库；
+    ///   而且换语言/改文案会误报）。例如「清洗后不许残留 TMP 标签」「指纹忽略标点」
+    ///   「有配音表里必须有这句」「快捷键解析必须认出修饰键」。
+    ///
+    /// 输出：`SELFTEST PASS/FAIL &lt;名字&gt;[: 细节]`，最后一行
+    ///   `SELFTEST SUMMARY total=N pass=N fail=N`，由 `tests\Suite.ps1` 解析。
+    /// 开关：环境变量 `MANOSABA_A11Y_SELFTEST=1`（默认关闭，不打扰玩家）。
+    /// </summary>
+    internal static class SelfTest
+    {
+        private static int _pass;
+        private static int _fail;
+        private static int _frames;
+        private static bool _done;
+
+        internal static void Tick()
+        {
+            if (_done) return;
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_SELFTEST") != "1") return;
+
+            // 等 30 帧：日志系统与 interop 都就绪（实测第 1 帧读静态字段偶发 NRE）。
+            if (++_frames < 30) return;
+            _done = true;
+            try { Run(); }
+            catch (Exception e)
+            {
+                Fail("selftest.异常", "自测本身崩了: " + e.GetType().Name + ": " + e.Message);
+                Summary();
+            }
+        }
+
+        private static void Pass(string name)
+        {
+            _pass++;
+            Plugin.L.LogInfo("SELFTEST PASS " + name);
+        }
+
+        private static void Fail(string name, string detail)
+        {
+            _fail++;
+            Plugin.L.LogWarning("SELFTEST FAIL " + name + (string.IsNullOrEmpty(detail) ? "" : " : " + detail));
+        }
+
+        private static void Check(string name, bool ok, string detail = "")
+        {
+            if (ok) Pass(name);
+            else Fail(name, detail);
+        }
+
+        private static void Run()
+        {
+            TextProcTests();
+            SpeakerTests();
+            VoiceTests();
+            HotkeyTests();
+            Summary();
+        }
+
+        // ---------------------------------------------------------------- TextProc
+        private static void TextProcTests()
+        {
+            // 1) 清洗后绝不允许残留 TMP 标签、行 id 标记
+            string raw = "Ema: <color=#ff0000>你好</color><br>世界<ruby=\"せかい\">世界</ruby>|#0101Adv02_Ema001|";
+            string clean = TextProc.Clean(raw);
+            Check("textproc.无残留标签",
+                  clean.IndexOf('<') < 0 && clean.IndexOf('>') < 0 && clean.IndexOf("|#") < 0,
+                  "clean=" + clean);
+
+            // 2) <br> 必须变成停顿（逗号或换行），不能原样留着
+            string br = TextProc.Clean("对。<br>请大家仔细观察。");
+            Check("textproc.br转停顿", br.IndexOf("<br>", StringComparison.Ordinal) < 0 && br.Length > 0, "br=" + br);
+
+            // 3) 行 id 提取
+            Check("textproc.行id提取",
+                  TextProc.ExtractLineKey("; > Ema: |#0101Adv02_Ema001|") == "0101Adv02_Ema001");
+
+            // 4) 作者前缀提取
+            Check("textproc.作者提取", TextProc.ExtractAuthorId("Ema: 你好") == "Ema",
+                  "实际=" + TextProc.ExtractAuthorId("Ema: 你好"));
+
+            // 5) 注释行不该朗读
+            Check("textproc.注释行不读", !TextProc.ShouldRead("; 日文原文"));
+            Check("textproc.正常行要读", TextProc.ShouldRead("——这里是囚牢。"));
+
+            // 6) 指纹忽略空白与标点（同一句经不同入口到达时必须能去重）
+            Check("textproc.指纹去重",
+                  TextProc.Fingerprint("你好，世界！") == TextProc.Fingerprint("你好 世界"),
+                  "a=" + TextProc.Fingerprint("你好，世界！") + " b=" + TextProc.Fingerprint("你好 世界"));
+
+            // 7) 纯标点/省略号视为噪声（不要念「点点点」）
+            Check("textproc.纯标点算噪声", TextProc.IsTrivial("……") && !TextProc.IsTrivial("你好"));
+
+            // 8) 方块替身（□■█）要念成「方块」，不能消失
+            string blocks = TextProc.Clean("■■■");
+            Check("textproc.方块处理", blocks.IndexOf("方", StringComparison.Ordinal) >= 0, "blocks=" + blocks);
+
+            // 9) 空输入不崩
+            Check("textproc.空输入", TextProc.Clean("") == "" && TextProc.Clean(null) == "");
+        }
+
+        // ------------------------------------------------------------- SpeakerNames
+        private static void SpeakerTests()
+        {
+            Check("speaker.Ema映射", SpeakerNames.Resolve("Ema") == "樱羽艾玛",
+                  "实际=" + SpeakerNames.Resolve("Ema"));
+            Check("speaker.未知名不变", SpeakerNames.Resolve("NoSuchAuthorXyz") == "NoSuchAuthorXyz");
+            Check("speaker.问号名念未知", TextProc.Speaker("? ? ?") == "未知",
+                  "实际=" + TextProc.Speaker("? ? ?"));
+        }
+
+        // ------------------------------------------------------------- VoiceLineIds
+        private static void VoiceTests()
+        {
+            // 26,083 条（textassets\voice-index.tsv），少于 2 万说明生成器或压缩坏了
+            Check("voice.表规模", VoiceLineIds.Count > 20000, "Count=" + VoiceLineIds.Count);
+            Check("voice.命中已知行", VoiceLineIds.Has("0101Adv02_Ema001"));
+            Check("voice.不误判", !VoiceLineIds.Has("__not_a_real_line_id__"));
+
+            // 大小写/空白不该误命中
+            Check("voice.区分大小写", !VoiceLineIds.Has("0101adv02_ema001"));
+
+            // --------------------------------------------------------- LineSpeakers
+            // 24,492 条（对白行数，text-extract 统计一致）；少于 2 万说明生成器或压缩坏了
+            Check("speaker.表规模", LineSpeakers.Count > 20000, "Count=" + LineSpeakers.Count);
+            Check("speaker.命中已知行", LineSpeakers.AuthorOf("0101Adv02_Ema001") == "Ema",
+                  "实际=" + LineSpeakers.AuthorOf("0101Adv02_Ema001"));
+            Check("speaker.旁白无作者", LineSpeakers.AuthorOf("0101Adv01_Narrative001") == "",
+                  "实际=" + LineSpeakers.AuthorOf("0101Adv01_Narrative001"));
+            Check("speaker.不误判", LineSpeakers.AuthorOf("__not_a_real_line_id__") == "");
+        }
+
+        // ----------------------------------------------------------------- Hotkey
+        private static void HotkeyTests()
+        {
+            Hotkey.Spec sp;
+            string why;
+
+            bool ok = Hotkey.Parse("Alt+Shift+F1", out sp, out why);
+            Check("hotkey.组合键", ok && sp.Key == KeyCode.F1 && sp.Alt && sp.Shift && !sp.Ctrl,
+                  "ok=" + ok + " why=" + why);
+
+            ok = Hotkey.Parse("Ctrl+Alt+Shift+F3", out sp, out why);
+            Check("hotkey.三修饰键", ok && sp.Key == KeyCode.F3 && sp.Ctrl && sp.Alt && sp.Shift,
+                  "ok=" + ok + " why=" + why);
+
+            ok = Hotkey.Parse("F7", out sp, out why);
+            Check("hotkey.单键", ok && sp.Key == KeyCode.F7 && !sp.Ctrl && !sp.Alt && !sp.Shift,
+                  "ok=" + ok + " why=" + why);
+
+            ok = Hotkey.Parse("Backspace", out sp, out why);
+            Check("hotkey.退格", ok && sp.Key == KeyCode.Backspace, "ok=" + ok + " why=" + why);
+
+            // 认不出来的键必须「返回 false 且有原因」，不能静默当成功
+            ok = Hotkey.Parse("Ctrl+NotAKeyXyz", out sp, out why);
+            Check("hotkey.坏键报错", !ok && !string.IsNullOrEmpty(why), "ok=" + ok + " why=" + why);
+        }
+
+        private static void Summary()
+        {
+            Plugin.L.LogInfo("SELFTEST SUMMARY total=" + (_pass + _fail) + " pass=" + _pass + " fail=" + _fail);
+        }
+    }
+}
