@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.7";
+        public const string Version = "0.0.0.8";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -107,6 +107,20 @@ namespace ManosabaA11y
         /// 验证「编号 → 按钮 → onClick」这段。生产用户不会设置该变量。
         /// </summary>
         internal static bool TestChoiceOnce;
+        /// <summary>
+        /// 地图地点选择验收：只有 MANOSABA_A11Y_TEST_MAPCHOICE=1 时打开。
+        /// 由 MapChoice 在地图页可见时把前 5 个地点「置为可点」（游戏自己的
+        /// ChangeFocusButtonActivity），复现剧情要求选地点的状态，再自动选第 1 个。
+        /// </summary>
+        internal static bool TestMapChoiceOnce;
+        /// <summary>MANOSABA_A11Y_TEST_MAPFLOOR=1：播报后自动切一次楼层，验证切换后判据变准。</summary>
+        internal static int TestMapFloorCount;
+        /// <summary>MANOSABA_A11Y_TEST_MAPPICK_KIND：按 AreaKind 直接点某个地点（不受楼层过滤）。</summary>
+        internal static string TestMapPickKind;
+        /// <summary>TEST_MAPCHOICE 用：自动选第几个地点（1 起）。</summary>
+        internal static int TestMapChoicePick = 1;
+        /// <summary>地图页扫描诊断（MANOSABA_A11Y_MAPDIAG=1）：打印每个 MapArea 的可点状态。</summary>
+        internal static bool CfgMapDiag;
         private static float _nextSyntheticNavAt;
         private static int _syntheticNavCount;
 
@@ -248,6 +262,26 @@ namespace ManosabaA11y
             {
                 TestChoiceOnce = true;
                 L.LogInfo("[a11y] TEST CHOICE MODE: 选项播报后自动选择第 1 项");
+            }
+            // 地图地点选择验收（仅 MANOSABA_A11Y_TEST_MAPCHOICE=N，N=要选第几个地点）。
+            // 本机键盘注入被系统挡掉（见 framework-notes 键盘一节），所以用代码路径验收
+            // 「编号 → 按钮 → onClick → 游戏分支」整段；正式版没有这个环境变量。
+            int mapPick;
+            if (int.TryParse(Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_MAPCHOICE"), out mapPick) && mapPick > 0)
+            {
+                TestMapChoiceOnce = true;
+                TestMapChoicePick = mapPick;
+                L.LogInfo("[a11y] TEST MAPCHOICE MODE: 播报后自动选择第 " + mapPick + " 个地点");
+            }
+            TestMapPickKind = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_MAPPICK_KIND");
+            // 地图扫描诊断（仅 MANOSABA_A11Y_MAPDIAG=1）
+            CfgMapDiag = Environment.GetEnvironmentVariable("MANOSABA_A11Y_MAPDIAG") == "1";
+            // 楼层切换验收：播报后自动切一次楼层（仅 MANOSABA_A11Y_TEST_MAPFLOOR=1）
+            int mapFloor;
+            if (int.TryParse(Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_MAPFLOOR"), out mapFloor) && mapFloor > 0)
+            {
+                TestMapFloorCount = mapFloor;
+                L.LogInfo("[a11y] TEST MAPFLOOR MODE: 播报后自动切换 " + mapFloor + " 次楼层");
             }
             // 导航验收：合成 Tab（仅 MANOSABA_A11Y_TEST_NAV=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_NAV") == "1")
@@ -563,6 +597,10 @@ namespace ManosabaA11y
         {
             _ticks++;
 
+            // 地图页数字键选择要靠 InputSystem 事件队列注一次真实点击（run117/run118：
+            // 合成指针事件游戏不认），所以 Tick 必须每帧都走，不能只在测试注入模式下开。
+            try { InputInject.Tick(); } catch { }
+
             if (!_speechInited)
             {
                 _speechInited = true;
@@ -723,6 +761,7 @@ namespace ManosabaA11y
         private static bool _testEscOn;
         private static float _nextTestEscAt = -1f;
         private static int _testEscs;
+        private static bool _testMapSimulated;
 
         private static void TestKeyInjectTick()
         {
@@ -776,6 +815,18 @@ namespace ManosabaA11y
                 bool handled = ScreenAssist.SimulateEscape();
                 Plugin.L.LogInfo("[a11y] TEST ESC #" + _testEscs + ": 触发关闭 t=" + Time.realtimeSinceStartup.ToString("F1")
                                + " handled=" + handled);
+            }
+
+            // 地图地点选择验收：地图页一出现就把前 5 个地点置为可点（只做一次）
+            if (Plugin.TestMapChoiceOnce && !_testMapSimulated)
+            {
+                if (ScreenAssist.MapVisible)
+                {
+                    _testMapSimulated = true;
+                    // 不再用 SimulateChoice 强行 Show 标签：那会把「游戏没允许去的地点」
+                    // 也弄成可见，污染判据。这里保持游戏原生状态，只看我们认不认得出来。
+                    Plugin.L.LogInfo("[a11y] TEST MAPCHOICE: 地图页已出现（保持游戏原生状态）");
+                }
             }
 
             if (!_keyInjectOn) return;

@@ -1,4 +1,4 @@
-# 自动化测试套件（《魔法少女ノ魔女裁判》A11Y 模组）
+﻿# 自动化测试套件（《魔法少女ノ魔女裁判》A11Y 模组）
 
 > 剧本规模：**34,836 个文本块 / 793,608 字 / 34,611 个唯一 lineId**。
 > 人工全流程回放、或者「把每一句都跑一遍」都不现实，所以这套测试只回答一个问题：
@@ -28,11 +28,16 @@
 | `screen.loading` | 界面/加载 | 加载播报 | 点「新游戏」出现 `加载播报（…）`；`HOOK loadingUi visible=True` |
 | `locale.ja` | 模块/本地化 | 文本语言 | 指定 `MANOSABA_A11Y_LOCALE=ja` 后台词是日文假名 |
 | `book.assist` | 界面/整页 | 魔女手册整页界面 | 读取存档槽 1 → 点书本 → `ScreenAssist: 播报 魔女手册，<页签>页签。内容：…`；`TEST_ESC` 钩子触发 `ScreenAssist: Esc 关闭 魔女手册` |
+| `map.choice` | 界面/地图 | 地图页选择地点（默认批次跳过） | `MAPCHOICE 播报 \d+ 个地点` 且含 `在2F：`；`chosenAreaId=[String:RecreationRoom]`；台词念到「娱乐室」 |
 
 > 整页界面用例用「读取存档」而不是「新游戏」：存档槽 1 直接落在第 1 章 Adv18，手册里已有内容，
 > 打开就能取证（用户提示的办法）；新游戏要推进到有线索的位置太慢。
 > 键盘类断言（`Esc` / `Backspace`）走插件内钩子 `MANOSABA_A11Y_TEST_ESC` / `MANOSABA_A11Y_TEST_REPEAT`，
 > 因为本机自动化环境的键盘注入被系统挡掉（`SendInput` 返回 0），鼠标注入可用。
+
+> `map.choice` 目前 `Skip = $true`：从存档槽 1 到地图选择态要跨过「3 选 1 选项 → 剧情连开 3 次线索页」，
+> 本机 6 FPS + 鼠标点击不稳定会让它在线索页卡住（run map3–map7）。地图选择本身已由
+> `probe\run93-mapreal.ps1`（run122）实机验收；用 `-Only map.choice` 仍可手动触发。
 
 > 魔女手册（页签/29 个地点）在 v0.0.0.4 用一次性 `UIPROBE` 转储人工核对过；它的自动化用例需要「先开手册再等 UIPROBE」（约 3 分钟）。
 > 快捷入口：`tests\Suite.ps1 -Only <id前缀>` 只跑单个用例。

@@ -327,6 +327,76 @@ $Cases = @(
                 $Result.Shots += (Shot $Game.Hwnd 'locale-ja')
             }
         }
+    },
+
+    # ---------------------------------------------------------------- 地图层
+    @{
+        # 为什么用「读取存档 + JUMP」：`@choiceMapArea` 出现在 Act01_Chapter01_Adv25 这类
+        # 中段脚本里，从新游戏一路推进太慢；读第 1 格存档后 JUMP 直接落到 Adv25。
+        # 自动选择用进程内测试钩子（MANOSABA_A11Y_TEST_MAPCHOICE=7）：本机自动化没法按数字键
+        # （键盘注入被系统挡掉），钩子走的是同一条 `MapChoice.Activate` 代码路径。
+        Id = 'map.choice'; Title = '地图页选择地点（限制名单 + 数字键 + 分支跳转）'; Group = '界面/地图'
+        Env = @{ MANOSABA_A11Y_DIAG = '1'; MANOSABA_A11Y_JUMP = 'Act01_Chapter01/Act01_Chapter01_Adv25';
+                 MANOSABA_A11Y_TEST_MAPCHOICE = '7'; MANOSABA_A11Y_TEST_ESC = '1' }
+        Timeout = 340
+        # 默认批次不跑：从存档槽 1 一路点到 @choiceMapArea 要跨过「3 选 1 选项 → 剧情自己连开
+        # 3 次魔女手册线索页」这段，鼠标点击在 6 FPS 下不稳定（run map3–map7 实测都卡在线索页）。
+        # 地图选择本身已由 probe\run93-mapreal.ps1（run122）实机验收；等以后能用剧本跳转直达
+        # 地图选择态时再把它加回默认批次。
+        Skip = $true
+        Body = {
+            param($Game, $Result)
+            $ready = Wait-Log -Pattern 'loaded v[0-9.]+ \(IL2CPP' -TimeoutSec 60
+            Add-Check $Result '插件加载' $ready.Ok $ready.Line
+            Start-Sleep -Seconds 20
+
+            # 标题 → 读取界面 → 第 1 格存档（和 book.assist 同一条路，点空要重试）
+            $load = $null
+            for ($i = 1; $i -le 4; $i++) {
+                $null = Click-Rel $Game.Hwnd 0.0875 0.832
+                Start-Sleep -Seconds 3
+                $null = Click-Rel $Game.Hwnd 0.179 0.233
+                $load = Wait-Log -Pattern 'Reader\.say\[' -TimeoutSec 25
+                if ($load.Ok) { break }
+                Write-Host "    （第 $i 次读取没进剧情，重试）"
+                $null = Click-Rel $Game.Hwnd 0.5 0.5
+                Start-Sleep -Seconds 2
+            }
+            Add-Check $Result '读取存档后开始朗读' $load.Ok $load.Line
+            if (-not $load.Ok) { return }
+
+            # JUMP 落到 Adv25 → 剧情自己打开魔女手册并要求在地图上选地点。
+            # 注意：不能只干等——Adv19 还有几行要玩家点过才到 Adv25；
+            # 也不能点屏幕中央/底部（中央会抢先点中地图地点、底部是楼层卡会挂断 await），
+            # 所以固定点左上角「图鉴」标题那块空白来推进。
+            $ann = @{ Ok = $false; Line = '' }
+            $answered = $false
+            for ($i = 1; $i -le 26; $i++) {
+                $ann = Wait-Log -Pattern 'MAPCHOICE 播报 \d+ 个地点' -TimeoutSec 12
+                if ($ann.Ok) { break }
+                # Adv18 有一个 3 选 1 的选项挡在路上（截图 map-choice.png 实证：三张纸卷
+                # 「回答：逃往招待所/逃往监牢/总之先逃吧」）。左上角点击推不动选项，
+                # 必须点选项按钮本身；第 1 个选项按钮中心 ≈ 相对 (0.5, 0.365)。
+                if (-not $answered -and @(Get-LogMatches '共 3 个选项').Count -gt 0) {
+                    $null = Click-Rel $Game.Hwnd 0.5 0.365
+                    $answered = $true
+                    Start-Sleep -Seconds 2
+                }
+                $null = Click-Rel $Game.Hwnd 0.5 0.06   # 顶部中间：不是按钮（(0.06,0.06) 是「图鉴」按钮，会把手册反复点开成死循环）
+            }
+            Add-Check $Result '识别出地图选择态并播报' $ann.Ok $ann.Line
+            if ($ann.Ok) {
+                Add-Check $Result '播报按楼层分组' ($ann.Line -match '在2F：') $ann.Line
+                $Result.Evidence += $ann.Line.Trim()
+            }
+            $pick = Wait-Log -Pattern 'MAPCHOICE 变量: chosenAreaId=\[String:RecreationRoom\]' -TimeoutSec 90
+            Add-Check $Result '选中娱乐室（游戏变量已写入）' $pick.Ok $pick.Line
+            if ($pick.Ok) { $Result.Evidence += $pick.Line.Trim() }
+            $story = Wait-Log -Pattern 'Reader\.say\[[^\]]+\][^\r\n]*娱乐室' -TimeoutSec 90
+            Add-Check $Result '剧情进入娱乐室分支' $story.Ok $story.Line
+            if ($story.Ok) { $Result.Evidence += $story.Line.Trim() }
+            $Result.Shots += (Shot $Game.Hwnd 'map-choice')
+        }
     }
 )
 
@@ -336,6 +406,8 @@ $Cases = @(
 $selected = $Cases
 if ($Only.Count -gt 0) {
     $selected = @($Cases | Where-Object { $c = $_; @($Only | Where-Object { $c.Id -like "$_*" -or $c.Group -like "*$_*" }).Count -gt 0 })
+    # Skip = $true 的用例不进默认批次（显式 -Only 指定时仍然会跑，方便排查）。
+    if (-not $Only -or $Only.Length -eq 0) { $selected = @($selected | Where-Object { -not ($_.ContainsKey('Skip') -and $_.Skip) }) }
     if ($selected.Count -eq 0) { Write-Host "没有匹配的用例：$($Only -join ', ')"; exit 2 }
 }
 

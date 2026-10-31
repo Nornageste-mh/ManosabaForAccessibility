@@ -373,8 +373,37 @@ namespace ManosabaA11y
             return "";
         }
 
-        internal static string GameGroupName(Transform root)
+        /// <summary>
+        /// 地图地点的中文名（`MapAreaKind` 枚举名 → 中文）。
+        /// 正常情况下 MapChoice 直接读标签上的本地化文字，这里只是兜底
+        /// （标签被隐藏/文字还没写时用）。表的来源与 PathAlias 里那 29 条地点相同
+        /// （游戏自己的 `WitchBook.Map.*` 本地化键）。
+        /// </summary>
+        internal static string AreaNameOf(string kind)
         {
+            if (string.IsNullOrEmpty(kind)) return "";
+            string hit;
+            if (PathAlias.TryGetValue(kind, out hit)) return hit;
+            return kind;
+        }
+
+        /// <summary>
+        /// 魔女手册地图的楼层容器名 → 人话（实机路径 `…/Page_Maps/F1_1/Lounge`）。
+        /// 地图页把每层做成独立容器：F1_1=1F、F2_1/F2_2=2F、B1_1=地下1F，
+        /// `Blueprint` 是地图底图不念楼层名。
+        /// </summary>
+        internal static string FloorNameOf(string containerName)
+        {
+            if (string.IsNullOrEmpty(containerName)) return "";
+            string n = containerName;
+            if (n == "F1_1") return "1F";
+            if (n == "F2_1" || n == "F2_2") return "2F";
+            if (n == "B1_1") return "地下1F";
+            if (n.StartsWith("Blueprint")) return "";
+            return "";
+        }
+
+        internal static string GameGroupName(Transform root)        {
             if (root == null) return "";
             try
             {

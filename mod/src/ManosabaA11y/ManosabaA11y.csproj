@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!--
     逐作 csproj：IL2CPP 路线（BepInEx 6.0.0-be.788 / net6.0）。
@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyName>ManosabaA11y</AssemblyName>
     <RootNamespace>ManosabaA11y</RootNamespace>
-    <Version>0.0.0.7</Version>
+    <Version>0.0.0.8</Version>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -163,6 +163,13 @@
     <!-- GigaCreation.NaninovelExtender.Core：基类 NaninovelManager（StartGameScenarioName 在它身上） -->
     <Reference Include="GigaCreation.NaninovelExtender.Core">
       <HintPath>$(InteropDir)\GigaCreation.NaninovelExtender.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <!-- GigaCreation.NaninovelExtender.UI：WitchBookScreen 的基类 NaninovelScreen 在这里。
+         不引用它会报 CS0012「类型 NaninovelScreen 在未引用的程序集中定义」（读
+         WitchBookScreen.PresentationMode 时） -->
+    <Reference Include="GigaCreation.NaninovelExtender.UI">
+      <HintPath>$(InteropDir)\GigaCreation.NaninovelExtender.UI.dll</HintPath>
       <Private>false</Private>
     </Reference>
 

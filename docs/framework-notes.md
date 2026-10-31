@@ -1,4 +1,4 @@
-# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
+﻿# Framework 施工笔记（ManosabaA11y / fw-skeleton 交付）
 
 > 给 Lead 与后续逐作开发用。**只留可执行事实**，不抄 Framework 文档原文。
 > 仓库：`D:\DSHWorkSpace\Framework`（只读，未做任何修改）。
@@ -511,3 +511,24 @@ UI 射线、只认打到自己/子物体」来判断能不能点。手册打开�
    的重试，别指望一次点中。
 5. **`Wait-Log` 返回的是正则命中片段**，不是整行：断言要吃整行就得把 pattern 写成
    `'前缀[^\r\n]*'`，否则证据只剩前缀（`ScreenAssist: 播报 魔女手册` 看不到页签）。
+
+## 18. 第十一轮：地图页选择地点（0.0.0.8）
+
+本轮要解决的问题是「剧情让玩家在地图上选一个地点，读屏用户做不了」。四条经验：
+
+1. **优先读游戏自己的数据，别自己猜规则**。一开始按「当前楼层 + 名牌 alpha」猜，run97 就把命令没允许的
+   「图书室」念了出来，选它游戏会静默落回默认项。改读 `MapPage._restrictionAreas` 后，8 条与剧本
+   `@choiceMapArea MapAreaNames:…` 完全一致。凡是「游戏已经知道答案」的判定，都先找它的字段/属性。
+2. **interop 的 `IReadOnlyCollection<T>` / `IReadOnlyList<T>` 没有 `Count`**：与 `PrintedMessage` 同一个坑，
+   要 `TryCast<Il2CppSystem.Collections.Generic.List<T>>()` 再取 `Count`/索引。
+3. **合成 UI 事件不等于真实输入**。`onClick.Invoke()`、`ExecuteEvents.pointerClickHandler` 都返回成功，
+   但本作（只启用新 Input System）不认，`OnChoiceMapAreaAsync` 永远不返回。必须
+   `InputSystem.QueueStateEvent<MouseState>` 注入按下 + 抬起（`InputInject.Click`，且每帧 `Tick()` 补抬起）。
+   这条经验同样适用于以后任何「点了没反应」的按钮。
+4. **等待玩家输入的界面不要乱动**：选择等待期间点手册底部楼层卡会把 await 挂断，加载界面永久卡死。
+   凡是「游戏在 await 我们的操作」的状态，只允许做「完成这次操作」的动作，其它快捷键一律禁用或拦截
+   （本轮把 `Esc` 与楼层切换都拦了）。
+
+自动化方面：`MANOSABA_A11Y_TEST_MAPCHOICE=<序号>` 与 `MANOSABA_A11Y_TEST_ESC=1` 让用例能稳定走到地图选择态
+（本机键盘/鼠标注入在自动化里不可靠，但插件内部的注入点击是可复现的）。用例 `map.choice` 断言四件事：
+认出了选择态 + 播报含跨楼层分组 + `chosenAreaId` 写成 `String:RecreationRoom` + 剧情念到「娱乐室」。

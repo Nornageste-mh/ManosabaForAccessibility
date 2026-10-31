@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -35,6 +35,9 @@ namespace ManosabaA11y
         private static string _lastKey;
         private static float _lastAnnounceAt;
 
+        /// <summary>魔女手册的「地图」页当前是否在画面上（给地图地点选择测试钩子用）。</summary>
+        internal static bool MapVisible { get; private set; }
+
         // 界面根对象名 → 播报名。全部来自 run31/run59 的运行时转储。
         private static readonly Dictionary<string, string> ScreenTitles =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -47,7 +50,8 @@ namespace ManosabaA11y
         {
             try
             {
-                // Esc 每帧都查：本作只有 6 FPS 左右，0.5s 节流会漏掉「快速按一下」的键。
+                // Esc / 数字键每帧都查：本作只有 6 FPS 左右，0.5s 节流会漏掉「快速按一下」的键。
+                MapChoice.Tick();
                 if (_active != null) HandleCloseKey(_active, _activeTitle);
 
                 if (Time.unscaledTime < _nextScanAt) return;
@@ -59,6 +63,8 @@ namespace ManosabaA11y
                     _active = null;
                     _activeTitle = null;
                     _lastKey = null;
+                    MapVisible = false;
+                    MapChoice.Clear();
                     return;
                 }
 
@@ -83,6 +89,14 @@ namespace ManosabaA11y
         internal static bool SimulateEscape()
         {
             if (_active == null) return false;
+            // 和真实 Esc 一样要有「正在选地点就不许关」的保护：
+            // MapPage.OnChoiceMapAreaAsync 正在 await 点击，关掉手册会让剧情永远等不到结果。
+            if (MapChoice.HasChoice)
+            {
+                A11yHost.Diag("ScreenAssist: 模拟 Esc 被拦住（正在选择地点）");
+                Repeat.Say("请先选择一个地点。");
+                return false;
+            }
             CloseScreen(_active, _activeTitle);
             return true;
         }
@@ -119,6 +133,16 @@ namespace ManosabaA11y
             bool esc = false;
             try { esc = Plugin.SpecDown("Escape"); } catch { }
             if (!esc) return;
+
+            // 地图正在等玩家选地点时**绝对不能关**：游戏在 `OnChoiceMapAreaAsync` 里
+            // await 玩家的点击，关掉手册会让剧情永远等不到结果（软锁）。实机路径：
+            //   @choiceMapArea → WitchBookScreen.ChoiceAreaAsync → MapPage.OnChoiceMapAreaAsync
+            if (MapChoice.HasChoice)
+            {
+                Repeat.Say("请先选择一个地点。");
+                A11yHost.Diag("ScreenAssist: 地图在等选择，Esc 已忽略");
+                return;
+            }
             CloseScreen(root, title);
         }
 
@@ -157,8 +181,24 @@ namespace ManosabaA11y
                 Transform pageRoot = FindDescendant(root, "Page_" + tabName.Substring(4), 4);
                 if (pageRoot != null) scope = pageRoot;
             }
+
+            bool isMap = page.StartsWith("地图", StringComparison.Ordinal);
+            MapVisible = isMap;
+
+            if (isMap)
+            {
+                // 地图在剧情要求「去哪里」时是可点的（见 MapChoice.cs 注释）。
+                // 有可点地点时由 MapChoice 负责播报，这里不要再念一遍静态地点表。
+                MapChoice.Observe(scope, root);
+                if (MapChoice.HasChoice) return;
+            }
+            else
+            {
+                MapChoice.Clear();
+            }
+
             string body;
-            if (page.StartsWith("地图", StringComparison.Ordinal))
+            if (isMap)
             {
                 // 地图页只念「当前楼层的地点名」：Page_Maps 下还挂着角色名标签，
                 // 混在一起会让玩家以为在念人物的位置（run90 实测）。
@@ -192,6 +232,29 @@ namespace ManosabaA11y
             tabName = "";
             try
             {
+                // 第一优先：真正「显示出来」的页面。
+                // 依据 run124：剧情用 @choiceMapArea 打开手册时是**限制态**——只显示地图页、
+                // 右侧 5 个页签被隐藏（用户截图里只有一块红色「地图」横幅），但 Tab_Clues 的
+                // Toggle.isOn 仍是 true。只看 Toggle 会把地图错认成线索页，MapChoice 就永远
+                // 不会被调用（日志里一条 MAPCHOICE 扫描都没有）。
+                Transform pages = FindDescendant(root, "Pages", 4);
+                if (pages != null)
+                {
+                    for (int i = 0; i < pages.childCount; i++)
+                    {
+                        Transform c = pages.GetChild(i);
+                        if (c == null || !c.name.StartsWith("Page_", StringComparison.Ordinal)) continue;
+                        if (!c.gameObject.activeInHierarchy) continue;
+                        if (!UiVis.Visible(c)) continue;
+                        string nm = c.name.Substring(5);
+                        string al = UiNav.TabTitleOf("Tab_" + nm);
+                        if (string.IsNullOrEmpty(al)) continue;
+                        tabName = "Tab_" + nm;
+                        return al;
+                    }
+                }
+
+                // 兜底：页签 Toggle 的状态（正常浏览态下两者一致）。
                 Toggle[] toggles = root.GetComponentsInChildren<Toggle>(true);
                 if (toggles == null) return "";
                 for (int i = 0; i < toggles.Length; i++)
