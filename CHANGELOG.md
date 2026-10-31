@@ -6,7 +6,7 @@
 
 ## 版本方案
 
-- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.8`。带字母的版本号会让
+- 版本号是**纯数字四段**（`System.Version`）：当前 `0.0.0.9`。带字母的版本号会让
   BepInEx **静默跳过整个插件**（日志只有一行 Warning）。
 - **升版克制**（按项目要求）：只有「玩家能感知的新功能」或「实机事故修复」才 +1 最后一段；
   纯文档、纯打包、纯内部重构一律不动版本号。`0.0.0.1 → 0.0.0.2` 这种小步走是正常节奏，
@@ -18,6 +18,48 @@
 - 发布 tag 写 `v<版本>`，例如 `v0.0.0.1`。
 
 ## 版本清单
+
+### v0.0.0.9（审判「出示证据 / 选证物」：纯图标的证物卡也能听懂）
+
+**现象**
+审判到了要出示证据时，游戏会打开魔女手册并限制成只剩「证物」页，底部胶片条是一排
+**纯图标**的证物卡（`WitchBookItemButton` 的 `_label` 是空串、子树里也没有 TMP 文本），
+读屏用户既听不到有哪些证物，也没有任何可聚焦的文字。
+
+**三层根因**
+1. **`IsPresentEvidenceMode` 在真正的选证物界面里也是 `false`**（实机 ev1 日志：手册确实被
+   限制成只剩证物页、`PresentEvidenceButton` 已亮，但 `mode=False`）。所以「盯着这个标志」
+   永远不会触发。
+2. 证物卡没有文字，名字只出现在「选中之后页面右侧的标题」里，必须点一下才知道叫什么。
+3. 「出示证据」按钮挂在 **WorldSpace Canvas** 上，`canvas.worldCamera` 为 null，用
+   `WorldToScreenPoint(null, …)` 算出来是负坐标（实机 `screen=-7,-2`），点击落到屏幕外，
+   表现就是「念了『已出示证据』但游戏毫无反应」。
+
+**怎么修**
+1. 门控改成读游戏自己的限制：`WitchBookScreen.RestrictionCategories` 里**必须含 `Clue`**，
+   且 `RestrictionAreas` 为空（地图选择时 areas 非空，交给 `MapChoice`，两边不抢）。
+2. 名字枚举：一张一张真实点击证物卡 → 读页面标题 → 缓存到 `Dictionary<int,string>`
+   （不缓存会每 0.5 秒重扫、反复枚举，实机 ev2 撞到过）。枚举结束回点第一张，恢复选中态。
+3. 注入点击前先算屏幕坐标并做**边界检查**：越界只记日志、不点击（避免点到别的按钮）。
+   WorldSpace 画布回退 `Camera.main` 取事件相机。
+4. 交互按「不替玩家做决策」设计：**数字键 = 选中并播报名字**，
+   **回车/空格 = 出示**（随后进游戏自己的确认框）；确认框照读文案与按钮，数字键选「返回/是」。
+   我们**永不**自动回答「是」。
+
+**实机证据（0.0.0.9，`probe\run124-evdialog.ps1`）**
+- `EVIDENCE 名字枚举完成: 1=二阶堂希罗原本持有的钢笔`
+- `EVIDENCE 播报: 请出示证据。可选的证物共 1 件：1、二阶堂希罗原本持有的钢笔。按数字键选择。`
+- `EVIDENCE 数字键 1 -> 二阶堂希罗原本持有的钢笔` → `EVIDENCE 注入点击 name=Button screen=309,250 canvas=WorldSpace`
+- `EVIDENCE 对话框: 确定要提交此项证据吗？。1、返回。2、是。按数字键选择。`
+- `EVIDENCE 对话框数字键 2` → `EVIDENCE dump … idx=191` → **`idx=197`**（剧本真的过了
+  `@choiceEvidence` 那一行，证据提交成功）。
+
+**尚未实机复测**
+- 多件证物的列表播报（本次这一处只有 1 件）。
+- 确认框选「返回」之后的返回路径。
+- 全部 61 个含 `@choiceEvidence` 的审判脚本只抽了 `Act01_Chapter01_Trial04` 第 327 行验证。
+- 自动化用例目前仍默认跳过（见 `tests\README.md`）：要跨「3 选 1 → 剧情连开线索页」才到
+  这一步，6 FPS 下点击不稳；靠 `MANOSABA_A11Y_JUMP_LINE` 跳行复现。
 
 ### v0.0.0.8（地图页选择地点：读游戏自己的允许名单 + 数字键 + 真实输入注入）
 
@@ -47,7 +89,9 @@
   不在名单内时才是浏览态的楼层切换；选择等待期间禁用楼层切换（见事故 2）。
 - `ScreenAssist.SimulateEscape()` 补上「正在选地点就不许关手册」的保护（和真实 Esc 一致）。
 
-**实机证据**（`probe\logsun11x-summary.txt`、`testseports\map*.md`）
+**实机证据**（`probe\logs
+un11x-summary.txt`、`tests
+eports\map*.md`）
 - `MAPCHOICE 扫描 areas=33 page=ok dispLen=29 restr=名单(8) choiceMode=True`，
   8 条与剧本 `@choiceMapArea MapAreaNames:BasementHallway,Lake,Lounge,EntranceHall,Infirmary,MessHall,RecreationRoom,Showers` 完全一致。
 - 数字键 3 → `chosenAreaId=String:MessHall` → `Adv31「艾玛她们为了调查，来到了食堂」`

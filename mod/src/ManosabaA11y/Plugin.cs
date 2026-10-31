@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.8";
+        public const string Version = "0.0.0.9";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -113,6 +113,24 @@ namespace ManosabaA11y
         /// ChangeFocusButtonActivity），复现剧情要求选地点的状态，再自动选第 1 个。
         /// </summary>
         internal static bool TestMapChoiceOnce;
+        /// <summary>取证转储（仅 MANOSABA_A11Y_EVDIAG=1）："出示证据/选证物"这一步的界面状态。</summary>
+        internal static bool CfgEvDiag;
+        /// <summary>取证用（仅 MANOSABA_A11Y_TEST_EVMODE=1）：对当前手册页调用游戏自己的
+        /// <c>WitchBookPageBase.Show(asPresentEvidenceMode: true)</c>，把「出示证据」按钮点亮，
+        /// 好让我们看清它在界面上叫什么、能不能点。**只在自动化取证里用**，正式游玩不开。</summary>
+        internal static bool TestEvModeOnce;
+        /// <summary>取证用（仅 MANOSABA_A11Y_TEST_EVCMD=1）：调游戏自己的
+        /// <c>WitchBookUi.ChoiceEvidenceAsync(Clue)</c> 进入「选证物 / 出示证据」模式。</summary>
+        internal static bool TestEvCmdOnce;
+        /// <summary>取证用（MANOSABA_A11Y_TEST_EVFORCE=1）：手册打开时就当作「要出示证据」，
+        /// 用来在没有真实剧情状态时验收交互层（念列表 / 数字键 / 点出示 / 对话框）。</summary>
+        internal static bool TestEvForce;
+    // 只在自动化验收里用：确认对话框自动按「是」。正式游玩绝不能打开。
+    internal static bool TestEvYes;
+        /// <summary>取证用（MANOSABA_A11Y_TEST_EVPICK=1）：播报后自动选第 1 件。</summary>
+        internal static bool TestEvPick;
+        /// <summary>MANOSABA_A11Y_TEST_EVCMD 的值：1=直接调 UI 的 ChoiceEvidenceAsync，2=执行 ChoiceEvidence 命令。</summary>
+        internal static string TestEvCmdMode;
         /// <summary>MANOSABA_A11Y_TEST_MAPFLOOR=1：播报后自动切一次楼层，验证切换后判据变准。</summary>
         internal static int TestMapFloorCount;
         /// <summary>MANOSABA_A11Y_TEST_MAPPICK_KIND：按 AreaKind 直接点某个地点（不受楼层过滤）。</summary>
@@ -282,6 +300,34 @@ namespace ManosabaA11y
             {
                 TestMapFloorCount = mapFloor;
                 L.LogInfo("[a11y] TEST MAPFLOOR MODE: 播报后自动切换 " + mapFloor + " 次楼层");
+            }
+
+            // 「出示证据 / 选证物」取证（仅 MANOSABA_A11Y_EVDIAG=1）：转储这一步的界面状态
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_EVDIAG") == "1")
+            {
+                CfgEvDiag = true;
+                L.LogInfo("[a11y] EVDIAG=1（取证：出示证据这一步的界面状态）");
+            }
+            // 取证：对当前手册页调 Show(asPresentEvidenceMode: true)（仅 MANOSABA_A11Y_TEST_EVMODE=1）
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVMODE") == "1")
+            {
+                TestEvModeOnce = true;
+                CfgEvDiag = true;
+                L.LogInfo("[a11y] TEST EVMODE: 手册页出现后点亮「出示证据」按钮（取证用）");
+            }
+            // 取证：直接发起游戏自己的 ChoiceEvidenceAsync(Clue)（仅 MANOSABA_A11Y_TEST_EVCMD=1）
+            TestEvForce = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVFORCE") == "1";
+        TestEvYes = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVYES") == "1";
+            TestEvPick = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVPICK") == "1";
+            if (TestEvForce || TestEvPick) { CfgEvDiag = true; L.LogInfo("[a11y] TEST EVFORCE=" + TestEvForce + " EVPICK=" + TestEvPick); }
+
+            string evCmd = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVCMD");
+            if (evCmd == "1" || evCmd == "2")
+            {
+                TestEvCmdOnce = true;
+                CfgEvDiag = true;
+                TestEvCmdMode = evCmd;
+                L.LogInfo("[a11y] TEST EVCMD=" + evCmd + ": 进入「选证物 / 出示证据」模式（取证用）");
             }
             // 导航验收：合成 Tab（仅 MANOSABA_A11Y_TEST_NAV=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_NAV") == "1")
@@ -670,6 +716,7 @@ namespace ManosabaA11y
             catch (Exception e) { A11yHost.Diag("Reader.Tick: " + e.Message); }
 
             // 加载播报（本作点「新游戏」后有明显的黑屏加载段）
+            try { Evidence.Tick(); } catch (Exception e) { A11yHost.Diag("Evidence: " + e.Message); }
             try { LoadingWatch.Update(); }
             catch (Exception e) { A11yHost.Diag("LoadingWatch: " + e.Message); }
 
@@ -762,6 +809,9 @@ namespace ManosabaA11y
         private static float _nextTestEscAt = -1f;
         private static int _testEscs;
         private static bool _testMapSimulated;
+        private static bool _testEvModeDone;
+
+        private static float _nextEvProbeAt;
 
         private static void TestKeyInjectTick()
         {
@@ -829,6 +879,29 @@ namespace ManosabaA11y
                 }
             }
 
+            // 出示证据取证（MANOSABA_A11Y_TEST_EVMODE=1 / TEST_EVCMD=1）：
+            // 手册打开后，走一次游戏自己的「进入选证物模式」入口，看真实界面长什么样。
+            // - EVCMD：调 WitchBookUi.ChoiceEvidenceAsync(Clue)，等价于 @choiceEvidence 打开界面那一步（首选）
+            // - EVMODE：退而求其次，只点亮当前页的「出示证据」按钮（实测基类页会 NRE，仅备用）
+            if ((Plugin.TestEvModeOnce || Plugin.TestEvCmdOnce) && !_testEvModeDone)
+            {
+                if (Time.realtimeSinceStartup >= _nextEvProbeAt)
+                {
+                    _nextEvProbeAt = Time.realtimeSinceStartup + 5f;
+                    bool hb = false; string err = "";
+                    try { hb = Evidence.HasBookUi; } catch (Exception e2) { err = e2.GetType().Name + ":" + e2.Message; }
+                    A11yHost.Diag("EVIDENCE 钩子等待中: hasBook=" + hb + " mode=" + Plugin.TestEvCmdMode
+                                  + " t=" + Time.realtimeSinceStartup.ToString("F1") + (err.Length > 0 ? " err=" + err : ""));
+                }
+                if (Plugin.TestEvCmdOnce && Plugin.TestEvCmdMode == "2")
+                {
+                    // 等手册真的打开再跑命令：命令本身会打开手册，但我们希望先有 UI 实例
+                    if (Evidence.HasBookUi) _testEvModeDone = Evidence.TryRunChoiceEvidenceCommand("1-10");
+                }
+                else if (Plugin.TestEvCmdOnce) _testEvModeDone = Evidence.TryStartChoiceEvidence();
+                else _testEvModeDone = Evidence.TryShowPresentMode();
+            }
+
             if (!_keyInjectOn) return;
 
             InputInject.Tick(); // 到点抬起（不 Tick 的话键会一直处于按下状态）
@@ -887,6 +960,7 @@ namespace ManosabaA11y
         }
 
         private static string _jumpPath;
+        private static int _jumpLine = -1;
         private static bool _jumpPathRead;
         private static bool _jumped;
         private static float _jumpAt = -1f;
@@ -898,6 +972,24 @@ namespace ManosabaA11y
             {
                 _jumpPathRead = true;
                 _jumpPath = Environment.GetEnvironmentVariable("MANOSABA_A11Y_JUMP");
+                // MANOSABA_A11Y_JUMP_LINE="<scriptPath>|<lineIndex>"：跳到剧本的**指定行**。
+                // 为什么需要它：`LoadAndPlay` 只把脚本装进播放列表，遇到 `@choiceEvidence`
+                // 这种要等玩家操作的命令就走不到（试过调 UI 方法、单独执行 Command 都不行）。
+                // `ScriptPlayerExtensions.LoadAndPlayAtLine(script, line, inline)` 是官方给的
+                // 「从第 N 行开始播」，能精确落到那一行，见 0.0.0.9 取证记录。
+                string jumpLineSpec = Environment.GetEnvironmentVariable("MANOSABA_A11Y_JUMP_LINE");
+                if (!string.IsNullOrEmpty(jumpLineSpec))
+                {
+                    int bar = jumpLineSpec.LastIndexOf('|');
+                    if (bar > 0)
+                    {
+                        _jumpPath = jumpLineSpec.Substring(0, bar);
+                        int parsed;
+                        if (int.TryParse(jumpLineSpec.Substring(bar + 1), out parsed)) _jumpLine = parsed;
+                    }
+                    Plugin.L.LogInfo("[a11y] JUMP_LINE=" + _jumpPath + " line=" + _jumpLine
+                                     + "（诊断用：跳到剧本指定行）");
+                }
                 if (!string.IsNullOrEmpty(_jumpPath))
                     Plugin.L.LogInfo("[a11y] JUMP=" + _jumpPath + "（诊断用：跳过游戏流程直接加载剧本）");
             }
@@ -932,8 +1024,17 @@ namespace ManosabaA11y
             {
                 Naninovel.IScriptPlayer sp = Naninovel.Engine.GetService<Naninovel.IScriptPlayer>();
                 if (sp == null) { Plugin.L.LogWarning("[a11y] JUMP 失败：拿不到 IScriptPlayer"); return; }
-                Naninovel.UniTaskExtensions.Forget(Naninovel.ScriptPlayerExtensions.LoadAndPlay(sp, _jumpPath, 0));
-                Plugin.L.LogInfo("[a11y] JUMP LoadAndPlay 已发出: " + _jumpPath);
+                if (_jumpLine >= 0)
+                {
+                    Naninovel.UniTaskExtensions.Forget(
+                        Naninovel.ScriptPlayerExtensions.LoadAndPlayAtLine(sp, _jumpPath, _jumpLine, 0));
+                    Plugin.L.LogInfo("[a11y] JUMP LoadAndPlayAtLine 已发出: " + _jumpPath + " line=" + _jumpLine);
+                }
+                else
+                {
+                    Naninovel.UniTaskExtensions.Forget(Naninovel.ScriptPlayerExtensions.LoadAndPlay(sp, _jumpPath, 0));
+                    Plugin.L.LogInfo("[a11y] JUMP LoadAndPlay 已发出: " + _jumpPath);
+                }
             }
             catch (Exception e) { Plugin.L.LogWarning("[a11y] JUMP 异常: " + e.Message); }
         }

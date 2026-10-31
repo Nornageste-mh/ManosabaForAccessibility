@@ -329,6 +329,53 @@ $Cases = @(
         }
     },
 
+    # ---------------------------------------------------------------- 审判层
+    @{
+        # 为什么默认跳过：要跨「读档 → 进正片」才轮到 JUMP_LINE 跳行（Plugin.JumpTick 只在
+        # sp.Playing && path.StartsWith("Act") 之后跳），而这段在本机 6 FPS 下鼠标点击不稳；
+        # 证物出示链路本身已由 probe\run124-evdialog.ps1 实机验收（ev14：idx=191 -> 197）。
+        # 显式跑：pwsh -File Suite.ps1 -Only evidence.present -Tag ev-suite
+        Id = 'evidence.present'; Title = '审判出示证据（跳行直达 + 证物名枚举 + 确认框）'; Group = '审判/出示证据'
+        Env = @{ MANOSABA_A11Y_DIAG = '1'
+                 MANOSABA_A11Y_JUMP_LINE = 'Act01_Chapter01/Act01_Chapter01_Trial04|327'
+                 MANOSABA_A11Y_TEST_EVPICK = '1'; MANOSABA_A11Y_TEST_EVYES = '1' }
+        Timeout = 300
+        Skip = $true
+        Body = {
+            param($Game, $Result)
+            $ready = Wait-Log -Pattern 'loaded v[0-9.]+ \(IL2CPP' -TimeoutSec 60
+            Add-Check $Result '插件加载' $ready.Ok $ready.Line
+            Start-Sleep -Seconds 20
+
+            # 标题 → 读取界面 → 第 1 格存档（进正片后 JumpTick 才能跳行）
+            $null = Focus-Game $Game.Hwnd
+            $entered = $false
+            for ($i = 1; $i -le 10 -and -not $entered; $i++) {
+                Click-Rel $Game.Hwnd 0.0875 0.832
+                Start-Sleep -Milliseconds 2500
+                Click-Rel $Game.Hwnd 0.179 0.233
+                $w = Wait-Log -Pattern 'Reader\.say\[|JUMP LoadAndPlayAtLine' -TimeoutSec 22
+                $entered = $w.Ok
+            }
+            Add-Check $Result '读档并跳行' $entered '读第 1 格存档后由 JUMP_LINE 直达 @choiceEvidence 行'
+
+            # 证物名枚举（证物卡是纯图标，靠「点一张 → 读右侧标题」得到名字）
+            $enum = Wait-Log -Pattern 'EVIDENCE 名字枚举完成: 1=' -TimeoutSec 120
+            Add-Check $Result '枚举出证物名字' $enum.Ok $enum.Line
+
+            $ann = Wait-Log -Pattern 'EVIDENCE 播报: 请出示证据。可选的证物共 \d+ 件' -TimeoutSec 60
+            Add-Check $Result '播报可选证物' $ann.Ok $ann.Line
+
+            # 数字键选中 → 回车出示 → 游戏确认框 → 选「是」→ 剧本越过 @choiceEvidence
+            $dlg = Wait-Log -Pattern 'EVIDENCE 对话框: ' -TimeoutSec 90
+            Add-Check $Result '念出确认对话框' $dlg.Ok $dlg.Line
+
+            $passed = Wait-Log -Pattern 'EVIDENCE dump .* idx=(19[8-9]|2\d\d) ' -TimeoutSec 60
+            Add-Check $Result '剧本越过 choiceEvidence 行' $passed.Ok $passed.Line
+            $Result.Shots += (Shot $Game.Hwnd 'evidence-present')
+        }
+    },
+
     # ---------------------------------------------------------------- 地图层
     @{
         # 为什么用「读取存档 + JUMP」：`@choiceMapArea` 出现在 Act01_Chapter01_Adv25 这类

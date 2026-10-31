@@ -28,6 +28,7 @@
 | `screen.loading` | 界面/加载 | 加载播报 | 点「新游戏」出现 `加载播报（…）`；`HOOK loadingUi visible=True` |
 | `locale.ja` | 模块/本地化 | 文本语言 | 指定 `MANOSABA_A11Y_LOCALE=ja` 后台词是日文假名 |
 | `book.assist` | 界面/整页 | 魔女手册整页界面 | 读取存档槽 1 → 点书本 → `ScreenAssist: 播报 魔女手册，<页签>页签。内容：…`；`TEST_ESC` 钩子触发 `ScreenAssist: Esc 关闭 魔女手册` |
+| `evidence.present` | 审判/出示证据 | 否（默认跳过） | 跳行直达 `@choiceEvidence`：证物名枚举 → 播报 → 选卡 → 出示 → 确认框 → 剧本越过该行 |
 | `map.choice` | 界面/地图 | 地图页选择地点（默认批次跳过） | `MAPCHOICE 播报 \d+ 个地点` 且含 `在2F：`；`chosenAreaId=[String:RecreationRoom]`；台词念到「娱乐室」 |
 
 > 整页界面用例用「读取存档」而不是「新游戏」：存档槽 1 直接落在第 1 章 Adv18，手册里已有内容，
@@ -112,3 +113,8 @@ pwsh -File tests\Suite.ps1 -Only story.adv -KeepGame
 - 时序强、依赖随机分支的场景（辩论中途的证据提交、UI 动画中间态）只做「证据行存在」级断言。
 - 截图不参与断言，视觉回归需要人工看 `tests\reports\shots`。
 - 测试脚本本身依赖本机坐标（1920×1080 全屏），换分辨率需要调整 `438,871` / `960,540` / `84,62` 这几个点。
+
+> **为什么 `evidence.present` 默认跳过**：它要先「读档进正片」才轮到 `MANOSABA_A11Y_JUMP_LINE`
+> 跳行（跳转只在剧本已在播 `Act*` 时生效），而读档→正片这段在本机 6 FPS 下点击不稳。
+> 链条本身已用 `probe\run124-evdialog.ps1` 实机验收（ev14：`idx=191 → 197`）。
+> 需要复查时显式跑：`pwsh -File Suite.ps1 -Only evidence.present -Tag ev-suite`。

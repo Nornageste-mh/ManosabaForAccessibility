@@ -532,3 +532,36 @@ UI 射线、只认打到自己/子物体」来判断能不能点。手册打开�
 自动化方面：`MANOSABA_A11Y_TEST_MAPCHOICE=<序号>` 与 `MANOSABA_A11Y_TEST_ESC=1` 让用例能稳定走到地图选择态
 （本机键盘/鼠标注入在自动化里不可靠，但插件内部的注入点击是可复现的）。用例 `map.choice` 断言四件事：
 认出了选择态 + 播报含跨楼层分组 + `chosenAreaId` 写成 `String:RecreationRoom` + 剧情念到「娱乐室」。
+
+## 19. 第十二轮：审判「出示证据 / 选证物」（0.0.0.9）
+
+**怎么到达那一步**（这是本轮最大的收获）：不要想办法造存档，直接跳行。
+`Naninovel.ScriptPlayerExtensions.LoadAndPlayAtLine(sp, path, lineIndex, 0)` 会把剧本真正落到
+指定行；行号可以自己算出来 —— `Script.lines` 是 **public 字段**
+`Il2CppReferenceArray<ScriptLine>`（`Lines` 属性返回的 `IReadOnlyList` 在 interop 里不是 `List`，
+`TryCast` 不成功），每条命令行是 `CommandScriptLine`，其 `command` 字段是唯一一个命令：
+```csharp
+var lines = script.lines;                      // Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<Naninovel.ScriptLine>
+var csl = lines[i].TryCast<Naninovel.CommandScriptLine>();
+if (csl?.command.TryCast<WitchTrials.Views.ChoiceEvidence>() != null) { /* 就是这一行 */ }
+```
+本例 `Act01_Chapter01_Trial04` → 第 **327** 行（688 行里只有 1 处）。然后用
+`MANOSABA_A11Y_JUMP_LINE="Act01_Chapter01/Act01_Chapter01_Trial04|327"` 复现，五秒内到位。
+
+**四条教训**
+1. **`IsPresentEvidenceMode` 是假的**：真正的选证物界面里它也是 `false`。判据要读游戏自己的限制
+   状态（手册可见 + `RestrictionCategories` 非空 + `Page_Clues` 激活），别信名字好听的布尔量。
+2. **纯图标卡片的文字只能「点一下再看」**：`WitchBookItemButton` 的 `_label` 空、子树无 TMP，
+   名字出现在选中后的页面标题里。点完必须**缓存**（否则每 0.5 秒重扫会反复枚举，日志刷屏）。
+3. **WorldSpace 画布的事件相机要回退 `Camera.main`**：`WorldToScreenPoint(null, …)` 会算出负坐标
+   （实测 `screen=-7,-2`），点击落到屏幕外，界面毫无反馈 —— 看起来像「按钮没生效」。
+   注入前一定做屏幕范围检查，并把算出来的坐标写进日志（截图可能全黑，日志是唯一落点证据）。
+4. **门控条件别写死成一种**：先用「类别里有 Clue」判，结果真正的选证物反而被挡掉（ev12 卡住）；
+   改成看 `Page_Clues` 是否激活才稳。
+
+**验收证据**：`probe\run124-evdialog.ps1` → 播报「请出示证据。可选的证物共 1 件：1、…」→
+`数字键 1` → `注入点击 name=Button screen=309,250 canvas=WorldSpace` → 对话框播报 →
+`对话框数字键 2` → `EVIDENCE dump … idx=191` → **`idx=197`**。
+
+**交互设计（评审结论）**：数字键只负责选中，**出示由玩家按回车**，确认框的「是」永远玩家自己按 ——
+无障碍层不允许替玩家做游戏内决策，也不允许扩大可达范围。
