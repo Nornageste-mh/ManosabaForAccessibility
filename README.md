@@ -37,6 +37,7 @@
 | `↑` `↓` | 上一项 / 下一项 |
 | `←` `→` | 调整滑条 |
 | `回车` / `空格` | 导航模式下激活控件；否则交给游戏推进剧情 |
+| `Ctrl`+`Alt`+`Shift`+`F3` | **剧情跳转菜单**（开发者功能，默认关闭，需先在 cfg 里打开「允许剧情跳转（开发者）」） |
 | `Home` / `End` | 第一项 / 最后一项 |
 | `PageUp` / `PageDown` | 切换面板组；**地图选择时**翻页（名单超过 9 项）；地图浏览时切楼层 |
 | `Esc` | 关闭魔女手册 / 对话记录这类整页界面（并念「已关闭…」） |
@@ -73,6 +74,7 @@
 | 审判辩论（`@printDebate`）朗读 | ✅ 实机验证（run59 完整审判段落：16 句朗读、34 条辩论日志；辩论不报名字） |
 | 审判画面 HUD（跳过按钮） | ✅ `DebateUI/Wrapper/SkipButton/Button → 跳过辩论` |
 | 审判倒计时 / HP（0.0.0.10 新增） | ⚠️ 已挂三个 void 补丁（`Timer.SetTime` / `Timer.ForceRemainingTimeToNearlyZero` / `DebateUi.OnCurrentHpChanged`），只在跨过 5分/2分/1分/30秒/10秒阈值时报一句；**未实机复测**（需打到审判战斗段） |
+| **剧情跳转菜单（开发者）** | ✅ 实机验证（0.0.0.12）：`SCRIPTJUMP 打开菜单 index=17 共 440 个剧本` → 下移两项 → `SCRIPTJUMP 选中 index=19 path=Act01_Chapter01/Act01_Chapter01_Adv20` → `SCRIPTJUMP 跳转 path=…Adv20 line=0`；真实按键未复测（本机键盘注入被系统挡掉） |
 | **魔女手册 / 对话记录整页界面** | ✅ 实机验证（run91）：打开即念「魔女手册，线索页签。内容：…」，地图页念「1F：会客厅、玄关大厅、…」；`Esc` 直接关闭并念「已关闭魔女手册。」（平台层射线被遮罩挡住，改由逐作层自己处理） |
 | 魔女手册（图鉴）控件命名 | ✅ 实机验证（run61：10 个组 = 记录页签/规定页签/地图页签/人物页签/魔女手册 14 项/线索页签；地图 29 个地点全部念中文名） |
 | 魔女手册方向键逐项移动 | ⚠️ 代码路径与标题菜单相同，但自动化合成扩展键不稳定，**未复测**（请实机按方向键确认） |
@@ -209,8 +211,11 @@ mod/
 9. **发行版里没有可用的开发者面板**：`DebugOptionsBase.s_debugManager` 实测是 null
    （`s_isInitialized` 却是 true），`DebugPanel` / `EnableDebugModeButton` /
    `DebugCommandButtons` 只有内存里的 prefab 资产、从未实例化 → 发行版按
-   `Ctrl+Alt+Shift+F3` 没有面板可开（这是开发构建功能）。配置「允许激活开发者选项」
-   因此默认关闭，只对开发构建有意义。
+   `Ctrl+Alt+Shift+F3` 没有面板可开（这是开发构建功能）。
+   **0.0.0.12 起改成「跳转到指定剧情」**（`ScriptJump.cs` + 生成的 `ScriptIndex.cs`）：
+   组合键打开菜单，上下键换剧本、数字键输入起始行、回车跳转，走
+   `ScriptPlayerExtensions.LoadAndPlayAtLine`（0.0.0.9 已实机验证过这条 API）。
+   配置项相应改名「允许剧情跳转（开发者）」，仍默认关闭。
 10. **整页界面不要指望平台层的可达性判定**：魔女手册打开时有一层全屏 CanvasGroup 挡在
     关闭按钮上面，`UiNav.VisiblyClickable` 的 UI 射线会判「点不到」（玩家实际能点）——
     平台层按约定不能改，逐作层的做法是 `ScreenAssist.cs`：自己播报页面内容 + `Esc` 直接

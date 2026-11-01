@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.11";
+        public const string Version = "0.0.0.12";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -79,7 +79,7 @@ namespace ManosabaA11y
         /// 允许激活游戏内置开发者面板（Ctrl+Alt+Shift+F3）。
         /// ★ 调试功能，会扩大可达范围：正式发布默认关闭，只有玩家自己打开才响应组合键。
         /// </summary>
-        internal static ConfigEntry<bool> CfgAllowDevPanel;
+        internal static ConfigEntry<bool> CfgAllowScriptJump;
 
         private Harmony _harmony;
 
@@ -128,6 +128,9 @@ namespace ManosabaA11y
         internal static bool TestEvPick;
         /// <summary>MANOSABA_A11Y_TEST_EVCMD 的值：1=直接调 UI 的 ChoiceEvidenceAsync，2=执行 ChoiceEvidence 命令。</summary>
         internal static string TestEvCmdMode;
+
+        /// <summary>自动化用（仅 MANOSABA_A11Y_TEST_SCRIPTJUMP=1）：从插件内部驱动剧情跳转菜单。</summary>
+        internal static bool TestScriptJump;
         /// <summary>MANOSABA_A11Y_TEST_MAPFLOOR=1：播报后自动切一次楼层，验证切换后判据变准。</summary>
         internal static int TestMapFloorCount;
         /// <summary>MANOSABA_A11Y_TEST_MAPPICK_KIND：按 AreaKind 直接点某个地点（不受楼层过滤）。</summary>
@@ -282,6 +285,7 @@ namespace ManosabaA11y
                 TestNavMode = false; TestChoiceOnce = false; TestMapChoicePick = 0;
                 TestMapPickKind = null; TestMapFloorCount = 0; TestEvModeOnce = false;
                 TestEvForce = false; TestEvYes = false; TestEvPick = false; TestEvCmdMode = "";
+            TestScriptJump = false;
                 // TEST_REPEAT / TEST_ESC 的开关在 PluginBehaviour 里（同一帧驱动），
                 // 这里够不到；它们的触发还依赖 UI 场景，且只重复「重读/关闭」这类只读动作，风险可接受。
             }
@@ -330,6 +334,13 @@ namespace ManosabaA11y
         TestEvYes = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVYES") == "1";
             TestEvPick = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVPICK") == "1";
             if (TestEvForce || TestEvPick) { CfgEvDiag = true; L.LogInfo("[a11y] TEST EVFORCE=" + TestEvForce + " EVPICK=" + TestEvPick); }
+
+            // 自动化：从插件内部驱动「剧情跳转」菜单（仅 MANOSABA_A11Y_TEST_SCRIPTJUMP=1）
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_SCRIPTJUMP") == "1")
+            {
+                TestScriptJump = true;
+                L.LogInfo("[a11y] TEST SCRIPTJUMP: 45s 后自动打开跳转菜单并跳转（自动化用）");
+            }
 
             string evCmd = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVCMD");
             if (evCmd == "1" || evCmd == "2")
@@ -420,10 +431,10 @@ namespace ManosabaA11y
             // 「按了组合键完全没反应」，正是 0.0.0.5 功能键失效时的排查成本。
             try
             {
-                L.LogInfo("[a11y] DevPanel 配置: allow=" + (CfgAllowDevPanel != null && CfgAllowDevPanel.Value)
-                          + " isys=" + InputSysKeys.Available);
+                L.LogInfo("[a11y] 剧情跳转（开发者）: allow=" + (CfgAllowScriptJump != null && CfgAllowScriptJump.Value)
+                          + " isys=" + InputSysKeys.Available + " 剧本数=" + ScriptIndex.Count);
             }
-            catch (Exception e) { L.LogWarning("[a11y] DevPanel 配置读取失败: " + e.Message); }
+            catch (Exception e) { L.LogWarning("[a11y] 剧情跳转配置读取失败: " + e.Message); }
 
 
             // 功能键配置在启动时**解析一次并写日志**：Hotkey.Down 对认不出的键名静默返回 false，
@@ -611,16 +622,16 @@ namespace ManosabaA11y
                 "  所以在这里直接指定要朗读哪种语言的文本。实机默认是「日本語」。");
             CfgDiagLog = Config.Bind("其它", "界面诊断日志", false,
                 "把导航/文本提取的诊断信息写进 BepInEx 日志，只在排查时打开。");
-            CfgAllowDevPanel = Config.Bind("其它", "允许激活开发者选项", false,
-                "开启后按 Ctrl+Alt+Shift+F3 可以显示/收起游戏内置的开发者面板\n" +
-                "（暂停、慢放、快放、回调试首页、解锁全部 CG、强制时间到等）。\n" +
-                "★ 这是**测试功能**，会扩大可达范围、可能剧透或破坏存档体验：\n" +
-                "  正式游玩请保持关闭（默认关闭）；测试需要时再打开。\n" +
-                "★ 面板来自游戏自带的 GigaCreation 调试工具，不是本补丁伪造的。\n" +
-                "★ 实测（v0.0.0.6）：正式发行版里游戏自己**没有**创建调试管理器\n" +
-                "  （DebugOptionsBase.s_debugManager 为 null），调试面板只是内存里的\n" +
-                "  预制体（从未被实例化），所以这个开关在发行版里按了也不会有面板；\n" +
-                "  开发构建（Editor/Dev Build）才有完整面板。保留开关是为了开发构建可用。");
+            CfgAllowScriptJump = Config.Bind("其它", "允许剧情跳转（开发者）", false,
+                "开启后按 Ctrl+Alt+Shift+F3 打开「剧情跳转」菜单：上下键换剧本、翻页键跳十个、\n" +
+                "数字键输入起始行、回车跳到该剧本指定行、Esc 退出。\n" +
+                "★ 这是**开发者/测试功能**：会直接跳到没读过的剧情、破坏存档进度、可能剧透。\n" +
+                "  正式游玩请保持关闭（默认关闭）。\n" +
+                "★ 为什么不是「打开游戏内置开发者面板」（v0.0.0.6 的旧承诺）：实测正式发行版里\n" +
+                "  游戏自己没创建调试管理器（DebugOptionsBase.s_debugManager 为 null），\n" +
+                "  DebugPanel 只是内存里从未实例化的预制体，那条路在发行版里走不通。\n" +
+                "★ 跳转能力来自 Naninovel 的 ScriptPlayerExtensions.LoadAndPlayAtLine，\n" +
+                "  0.0.0.9 起已在实机验证过（当时用环境变量 MANOSABA_A11Y_JUMP_LINE 直达 Trial04 第 327 行）。");
 
             // 旧 cfg 迁移：只做“一定知道用户意图”的两件事。
             // 1) 沉默按键旧默认值 "0" 不是合法键名（Hotkey.cs 拒绝纯数字），
@@ -691,6 +702,9 @@ namespace ManosabaA11y
                 bool ok;
                 try { ok = UnityEngine.Application.isFocused; }
                 catch { ok = true; }
+                // 剧情跳转菜单（开发者功能）打开时，0-9 是「输入起始行」，
+                // 不允许同时被选项/地图/证物层读走。
+                if (ok && ScriptJump.Active) ok = false;
                 _hasKey = true; _cached = ok; _at = now;
                 return ok;
             }
@@ -775,9 +789,11 @@ namespace ManosabaA11y
             try { TestKeyInjectTick(); }
             catch (Exception e) { A11yHost.Diag("TestKeyInject: " + e.Message); }
 
-            // 开发者面板开关（Ctrl+Alt+Shift+F3；配置「允许激活开发者选项」默认关闭）
-            try { DevPanel.Update(); }
-            catch (Exception e) { A11yHost.Diag("DevPanel: " + e.Message); }
+            // 开发者功能：剧情跳转菜单（Ctrl+Alt+Shift+F3；配置「允许剧情跳转（开发者）」默认关闭）
+            try { ScriptJump.Update(); }
+            catch (Exception e) { A11yHost.Diag("ScriptJump: " + e.Message); }
+            try { ScriptJump.TestTick(); }
+            catch (Exception e) { A11yHost.Diag("ScriptJump.Test: " + e.Message); }
 
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }

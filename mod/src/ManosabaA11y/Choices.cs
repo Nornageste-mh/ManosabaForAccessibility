@@ -38,6 +38,9 @@ namespace ManosabaA11y
         private static bool _testChoiceDone;
 
         /// <summary>由 Harmony 在 AddChoiceButton 之后调用：只记下面板，不做朗读。</summary>
+        /// <summary>当前画面上是否有正在等待选择的选项（剧情跳转等开发者功能据此提醒）。</summary>
+        internal static bool HasChoice => _buttons.Count > 0;
+
         internal static void OnButtonAdded(Naninovel.UI.ChoiceHandlerPanel panel)
         {
             // 为什么要 try/catch：这个回调挂在 AddChoiceButton 的 Postfix 上，

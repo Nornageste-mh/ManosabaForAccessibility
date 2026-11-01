@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyName>ManosabaA11y</AssemblyName>
     <RootNamespace>ManosabaA11y</RootNamespace>
-    <Version>0.0.0.11</Version>
+    <Version>0.0.0.12</Version>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -126,22 +126,6 @@
     </Reference>
     <!-- 游戏内置开发者面板（DevPanel.cs）：GigaCreation 调试工具 + UniRx 的 ReactiveProperty。
          只读/翻 `DebugManager.IsDebugMode`，面板本身是游戏自带的。 -->
-    <Reference Include="GigaCreation.Tools.Debugging.Core">
-      <HintPath>$(InteropDir)\GigaCreation.Tools.Debugging.Core.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="GigaCreation.Tools.Debugging.General">
-      <HintPath>$(InteropDir)\GigaCreation.Tools.Debugging.General.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="GigaCreation.Tools.Debugging.UI">
-      <HintPath>$(InteropDir)\GigaCreation.Tools.Debugging.UI.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UniRx">
-      <HintPath>$(InteropDir)\UniRx.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 
   <!--
@@ -181,5 +165,6 @@
   -->
 
 </Project>
+
 
 
