@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.17";
+        public const string Version = "0.1.0.0";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 

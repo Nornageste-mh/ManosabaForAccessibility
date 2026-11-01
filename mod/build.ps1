@@ -288,6 +288,24 @@ $chg = Join-Path $repoRoot "CHANGELOG.md"
 if (Test-Path -LiteralPath $chg) { Copy-Item -LiteralPath $chg -Destination (Join-Path $pkg "更新日志.md") -Force }
 Ok "已附 LICENSE / NOTICE.md / 更新日志.md"
 
+# 关掉 BepInEx 自带控制台（否则开局会闪一下黑窗口；插件是加载后才隐藏，挡不住那一下）
+$bepCfgTpl = Join-Path $mod "templates\BepInEx.cfg"
+if (Test-Path -LiteralPath $bepCfgTpl) {
+    $bepCfgDir = Join-Path $pkg "BepInEx\config"
+    New-Item -ItemType Directory -Force -Path $bepCfgDir | Out-Null
+    Copy-Item -LiteralPath $bepCfgTpl -Destination (Join-Path $bepCfgDir "BepInEx.cfg") -Force
+    Ok "已放入 BepInEx\config\BepInEx.cfg（关闭控制台窗口，避免开局闪黑窗）"
+    # 开发机上也补一份（只在缺失时写，绝不覆盖玩家已有配置）
+    $gameCfg = Join-Path $GameDir "BepInEx\config\BepInEx.cfg"
+    if ((Test-Path -LiteralPath $GameDir) -and -not (Test-Path -LiteralPath $gameCfg)) {
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $gameCfg) | Out-Null
+        Copy-Item -LiteralPath $bepCfgTpl -Destination $gameCfg -Force
+        Ok "游戏目录原本没有 BepInEx.cfg，已补一份（控制台关闭）"
+    }
+} else {
+    Write-Host "    警告：找不到 templates\BepInEx.cfg，开局仍会闪一下控制台窗口" -ForegroundColor Yellow
+}
+
 # 第三方许可证与来源说明（随二进制分发的合规要求）
 $licDir = Join-Path $mod "licenses"
 if (Test-Path -LiteralPath $licDir) {

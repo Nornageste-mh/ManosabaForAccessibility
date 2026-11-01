@@ -84,15 +84,19 @@ Ok "说明文档：$($md.Name -join '、')"
 
 # 发布红线改成“黑名单路径 + 黑名单扩展名”：只查几个精确路径做不住
 # （把 interop 目录改个名就能渗进包里）。
-$forbidden = @("BepInEx\interop", "BepInEx\unity-libs", "BepInEx\config\", "ManosabaProbe", "NaninovelReProbe")
-$forbiddenExt = @('.pdb', '.cs', '.ps1', '.py', '.bin', '.nson', '.log', '.cfg', '.bundle', '.assets')
+$forbidden = @("BepInEx\interop", "BepInEx\unity-libs", "ManosabaProbe", "NaninovelReProbe")
+$forbiddenExt = @('.pdb', '.cs', '.ps1', '.py', '.bin', '.nson', '.log', '.bundle', '.assets')
+$allowedCfg = @('BepInEx\config\BepInEx.cfg')
 $bad = @()
 foreach ($f in $forbidden) {
     if (Test-Path -LiteralPath (Join-Path $pkg $f)) { $bad += $f }
 }
 foreach ($f in (Get-ChildItem -LiteralPath $pkg -Recurse -File)) {
     $ext = [System.IO.Path]::GetExtension($f.Name).ToLower()
-    if ($forbiddenExt -contains $ext) { $bad += ($f.FullName.Substring($pkg.Length).TrimStart('\')) }
+    $rel = $f.FullName.Substring($pkg.Length).TrimStart('\')
+    if ($forbiddenExt -contains $ext) { $bad += $rel }
+    # 包里只允许一个 cfg：关控制台用的 BepInEx\config\BepInEx.cfg（玩家自己的 cfg 绝不能进包）
+    if ($ext -eq '.cfg' -and -not ($allowedCfg -contains $rel)) { $bad += $rel }
 }
 if ($bad.Count -gt 0) {
     Fail "安装包混入了不该分发的内容：`n  $($bad -join "`n  ")`n（interop 是机器相关的、config 是用户数据、probe/源码/日志不进包）"
