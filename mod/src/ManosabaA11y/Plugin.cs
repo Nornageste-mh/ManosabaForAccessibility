@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.10";
+        public const string Version = "0.0.0.11";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -51,6 +51,7 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgChoiceHotkeys;
         internal static ConfigEntry<string> CfgSilenceKey;
         internal static ConfigEntry<string> CfgRepeatKey;
+        internal static ConfigEntry<bool> CfgReadDebate;
         internal static ConfigEntry<string> CfgSpeechBackend;
         internal static ConfigEntry<string> CfgTextLocale;
         internal static ConfigEntry<bool> CfgAnnounceLoading;
@@ -556,8 +557,15 @@ namespace ManosabaA11y
                 "按 1-9 直接选对应选项。");
             CfgSilenceKey = Config.Bind("朗读", "沉默按键", "0",
                 "按一下立刻停止朗读（不改变游戏状态）。");
-            CfgRepeatKey = Config.Bind("朗读", "重读按键", "Backspace",
-                "重读上一句剧情/选项。本作只启用新 Input System，键名照 Unity KeyCode 写。");
+            // 默认 `=`：Backspace 会和本作自带的“返回上一句”键冲突（玩家实测），
+            //   `=` 在这作里没有原生用途，也就不会被游戏抢。
+            CfgRepeatKey = Config.Bind("朗读", "重读按键", "=",
+                "重读上一句剧情/选项。本作只启用新 Input System，键名照 Unity KeyCode 写；\n"
+                + "`=` 直接写等号，也可以写 `Equals`。默认不是 Backspace 的原因：\n"
+                + "它会和本作自带的“返回上一句”冲突（玩家实测）。");
+            CfgReadDebate = Config.Bind("朗读", "朗读审判议论", false,
+                "审判时的论战台词几乎全部带语音，默认不自动朗读（避免与语音叠在一起）；\n"
+                + "无论这一项开还是关，**都会进重读缓冲**，按重读键可以再听。");
             CfgSpeechBackend = Config.Bind("朗读", "语音后端", "自动",
                 "自动 / NVDA / SAPI / 争渡（具体取值见 Speech.CycleAvailable 支持的列表）。");
             CfgAnnounceLoading = Config.Bind("朗读", "播报加载中", true,
@@ -624,6 +632,13 @@ namespace ManosabaA11y
                 {
                     CfgSilenceKey.Value = "";
                     L.LogInfo("[a11y] cfg 迁移：沉默按键\"0\" -> \"（留空 = 停用）");
+                }
+                // 3) 重读键旧默认 Backspace 与游戏自带键冲突（0.0.0.11 改为 `=`）。
+                //    只迁移“完全等于旧默认值”的情形，不碰玩家自己改过的键。
+                if (CfgRepeatKey != null && string.Equals((CfgRepeatKey.Value ?? "").Trim(), "Backspace", StringComparison.OrdinalIgnoreCase))
+                {
+                    CfgRepeatKey.Value = "=";
+                    L.LogInfo("[a11y] cfg 迁移：重读按键 Backspace -> = （避让游戏自带键）");
                 }
                 if (CfgQuitNames != null && (CfgQuitNames.Value ?? "").IndexOf("TODO", StringComparison.OrdinalIgnoreCase) >= 0)
                 {

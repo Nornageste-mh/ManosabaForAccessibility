@@ -619,6 +619,20 @@ namespace ManosabaA11y
             // （《不存在》Plugin.cs:387-433 同一做法；这也是各个仓库的标配）。
             Remember(line);
 
+            // —— 审判论轩闸门（玩家指定，0.0.0.11）：
+            //    论战台词几乎全部带语音（语料 2,003 条里 99.4%），自动 TTS 会和语音
+            //    叠在一起互相盖；但**必须进可重读缓冲**（上面 Remember 已经做了），
+            //    玩家按重读键仍能听到中文台词。
+            //    不能用配音闸门代替：议论路径拿不到行 id（`debate:add` 不走 PrintedMessage）。
+            if (src.StartsWith("debate", StringComparison.Ordinal)
+                && (Plugin.CfgReadDebate == null || !Plugin.CfgReadDebate.Value))
+            {
+                try { Speech.Stop(); } catch { }
+                if (Plugin.CfgDiagLog != null && Plugin.CfgDiagLog.Value)
+                    A11yHost.Diag("Reader.skipped[debate] 只进重读缓冲: " + line);
+                return;
+            }
+
             // —— 配音闸门：这一行有游戏配音时不自动朗读（否则语音和 TTS 会叠在一起互相盖住）
             bool voiced = VoiceLineIds.Has(lineKey);
             if (voiced)

@@ -167,6 +167,15 @@ namespace ManosabaA11y
             ok = Hotkey.Parse("Backspace", out sp, out why);
             Check("hotkey.退格", ok && sp.Key == KeyCode.Backspace, "ok=" + ok + " why=" + why);
 
+            // 0.0.0.11：重读键默认改成 `=`。Enum.TryParse 不认这个符号，
+            //   所以必须有这条断言守着——否则玩家会得到一个“永远不触发”的重读键。
+            ok = Hotkey.Parse("=", out sp, out why);
+            Check("hotkey.等号", ok && sp.Key == KeyCode.Equals && !sp.Alt && !sp.Ctrl && !sp.Shift,
+                  "ok=" + ok + " why=" + why);
+
+            ok = Hotkey.Parse("Equals", out sp, out why);
+            Check("hotkey.Equals别名", ok && sp.Key == KeyCode.Equals, "ok=" + ok + " why=" + why);
+
             // 认不出来的键必须「返回 false 且有原因」，不能静默当成功
             ok = Hotkey.Parse("Ctrl+NotAKeyXyz", out sp, out why);
             Check("hotkey.坏键报错", !ok && !string.IsNullOrEmpty(why), "ok=" + ok + " why=" + why);

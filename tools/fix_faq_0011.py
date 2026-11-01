@@ -1,0 +1,17 @@
+import io
+p = "D:/DSHWorkSpace/manosaba_a11y/mod/package/常见问题.md"
+s = io.open(p, encoding="utf-8-sig").read()
+s = s.replace("想听文本按 Backspace，会正常念出来。", "想听文本按 `=`，会正常念出来。", 1)
+s = s.replace("用 Backspace 可以随时用 TTS 重读上一句", "用 `=` 可以随时用 TTS 重读上一句", 1)
+# \u65b0\u589e\u4e00\u6761\u95ee\u7b54\uff1a\u5ba1\u5224\u8bae\u8bba\u4e3a\u4ec0\u4e48\u4e0d\u8bfb
+anchor = "\n## "
+add = """## \u9b54\u5973\u5ba1\u5224\u65f6\u7684\u53f0\u8bcd\u4e3a\u4ec0\u4e48\u4e0d\u81ea\u52a8\u6717\u8bfb\u4e86\uff08v0.0.0.11\uff09
+
+\u56e0\u4e3a\u90a3\u4e9b\u53f0\u8bcd\u51e0\u4e4e\u5168\u90e8\u5e26\u6e38\u620f\u8bed\u97f3\uff0cTTS \u540c\u65f6\u54cd\u4f1a\u628a\u8bed\u97f3\u76d6\u4f4f\u3002
+\u53f0\u8bcd\u4ecd\u7136\u4f1a\u8fdb\u91cd\u8bfb\u7f13\u51b2\uff1a**\u6309 `=` \u53ef\u4ee5\u518d\u542c\u4e00\u904d\u4e2d\u6587**\u3002
+\u5982\u679c\u4f60\u5e0c\u671b\u5b83\u50cf\u666e\u901a\u5bf9\u8bdd\u4e00\u6837\u81ea\u52a8\u8bfb\uff0c\u628a cfg \u91cc\u7684\u300c\u6717\u8bfb\u5ba1\u5224\u8bae\u8bba\u300d\u6539\u6210 `true`\u3002
+
+"""
+s = s.replace(anchor, "\n" + add + "## ", 1)
+io.open(p, "w", encoding="utf-8-sig", newline="\n").write(s)
+print("FAQ updated")

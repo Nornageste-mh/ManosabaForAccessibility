@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,6 +30,7 @@ namespace ManosabaA11y
             { KeyCode.Backspace, Key.Backspace },
             { KeyCode.Tab, Key.Tab },
             { KeyCode.Return, Key.Enter },
+            { KeyCode.Equals, Key.Equals },
             { KeyCode.KeypadEnter, Key.NumpadEnter },
             { KeyCode.Escape, Key.Escape },
             { KeyCode.Space, Key.Space },

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 namespace ManosabaA11y
@@ -95,6 +95,11 @@ namespace ManosabaA11y
                 // 主键盘加号（0.2.3）：用户要求「仅限大键盘的加号」。
                 // 中文键盘上打 + 就是 Shift+Equals；小键盘 +（KeypadPlus）是另一个键。
                 if (u == "PLUS" || t == "加号") { plusToken = true; keyName = "Plus"; continue; }
+
+                // 等号（0.0.0.11）：玩家要求「审慎避让游戏自带键」，重读键默认从 Backspace 改成 `=`。
+                // 为什么必须显式映射：`Enum.TryParse("=")` 不认这个符号，会报「Unity 不认识这个键名」；
+                // 而 KeyCode.Equals 才是主键盘那个 `=` 键（小键盘回车旁边的不算）。
+                if (t == "=" || t == "＝" || u == "EQUALS") { keyName = "Equals"; continue; }
 
                 if (keyName != null) { why = "有多个主键（" + keyName + " 和 " + t + "）"; return false; }
                 keyName = t;

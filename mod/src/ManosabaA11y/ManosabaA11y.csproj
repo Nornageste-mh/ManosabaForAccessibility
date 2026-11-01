@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyName>ManosabaA11y</AssemblyName>
     <RootNamespace>ManosabaA11y</RootNamespace>
-    <Version>0.0.0.10</Version>
+    <Version>0.0.0.11</Version>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>

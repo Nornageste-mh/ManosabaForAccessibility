@@ -230,12 +230,14 @@ $Cases = @(
             $e = Enter-Story $Game
             Add-Check $Result '进入正片' $e.Ok "尝试 $($e.Attempts) 次"
             if ($e.Ok) {
-                $db = Advance-Until $Game -Pattern 'Reader\.say\[debate:add\][^\r\n]*' -MinCount 3 -TimeoutSec 240
+                # 0.0.0.11：议论台词默认**不朗读**（带配音），只进重读缓冲，
+                #   所以断言要看 `Reader.skipped[debate]`（而不是 `Reader.say[debate:add]`）。
+                $db = Advance-Until $Game -Pattern 'Reader\.skipped\[debate\][^\r\n]*' -MinCount 3 -TimeoutSec 240
                 $hit = if ($db.Ok) { @($db.Matches) } else { $null }
-                Add-Check $Result '辩论台词走 debate 通道 ≥3 句' ($null -ne $hit) ("句数 " + ($hit | Measure-Object).Count)
+                Add-Check $Result '议论台词进重读缓冲且不朗读 ≥3 句' ($null -ne $hit) ("句数 " + ($hit | Measure-Object).Count)
+                $spoke = @(Get-LogMatches 'Reader\.say\[debate')
+                Add-Check $Result '议论台词没有被自动朗读（反向）' ($spoke.Count -eq 0) ("命中 " + $spoke.Count)
                 if ($hit) {
-                    $clean = @($hit | Where-Object { $_ -match '=> ' })
-                    Add-Check $Result '辩论文本已清洗（有 => 输出）' ($clean.Count -ge 1) ("清洗 " + $clean.Count)
                     $Result.Evidence += ($hit | Select-Object -First 3 | ForEach-Object { $_.Trim() })
                 }
                 $Result.Shots += (Shot $Game.Hwnd 'trial-debate')
