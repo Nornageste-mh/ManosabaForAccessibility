@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.13";
+        public const string Version = "0.0.0.14";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -84,8 +84,10 @@ namespace ManosabaA11y
         internal static bool TestLowPerf;
         internal static int _testLowPerfStage;   // MANOSABA_A11Y_TEST_LOWPERF=1：自动开关一次，供自动化取证
         // 低性能模式（0.0.0.13）：默认关闭；开关组合键运行中可切；四档各自可以单独关。
-        internal static ConfigEntry<bool> CfgLowPerf;
+        internal static ConfigEntry<string> CfgLowPerfMode;
         internal static ConfigEntry<string> CfgLowPerfToggleKey;
+        internal static ConfigEntry<bool> CfgLowPerfQuality;
+        internal static ConfigEntry<bool> CfgLowPerfAggressive;
         internal static ConfigEntry<bool> CfgLowPerfDegradeUrp;
         internal static ConfigEntry<bool> CfgLowPerfNoShadow;
         internal static ConfigEntry<bool> CfgLowPerfLowerResolution;
@@ -665,13 +667,18 @@ namespace ManosabaA11y
                 "★ 跳转能力来自 Naninovel 的 ScriptPlayerExtensions.LoadAndPlayAtLine，\n" +
                 "  0.0.0.9 起已在实机验证过（当时用环境变量 MANOSABA_A11Y_JUMP_LINE 直达 Trial04 第 327 行）。");
 
-            CfgLowPerf = Config.Bind("性能", "低性能模式", false,
-                "默认关闭。开启后：降低插件自身的每帧开销（无视觉代价）+ 降低画面设置。\n" +
-                "★ 实测（0.0.0.12 的性能探针，详见 docs/framework-notes.md §22）：\n" +
-                "  · 插件自己原来每帧要花 10~13ms，限频后 2.5~5ms，这部分是纯收益；\n" +
-                "  · 画面降级（URP 画质/柔边阴影/分辨率）在测试机上**没有测出帧率提升**——\n" +
-                "    那台机器是主线程瓶颈，不是显卡瓶颈。所以画面三档做成了可以单独关掉。\n" +
-                "★ 什么时候值得开：显存/内存小、显卡弱、或者画面卡顿明显时。");
+            CfgLowPerfMode = Config.Bind("性能", "低性能模式档位", "关闭",
+                new ConfigDescription(
+                    "默认「关闭」。可选：关闭 / 保守 / 普通 / 激进。\n" +
+                    "运行时按开关键可以在四档之间循环切换（关闭 → 保守 → 普通 → 激进 → 关闭）。\n" +
+                    "★ 实测（0.0.0.12/0.0.0.13 性能探针，详见 docs/framework-notes.md §22、§24）：\n" +
+                    "  · 插件自己原来每帧要花 10~13ms，限频后 2.5~5ms——这部分是纯收益、无视觉代价，\n" +
+                    "    而且它在四档里都恒开（档位只决定画面降多少）；\n" +
+                    "  · 测试机（兆芯 KX-U6780A + 核显）是**主线程瓶颈**，画面降级在那个环境里没有测出\n" +
+                    "    帧率提升；换到显卡弱、显存小的机器上，保守/普通/激进才有可能看出差别。\n" +
+                    "★ 保守：URP 画质降级 + 关柔边阴影。普通：再降分辨率、关抗锯齿/阴影/LOD。\n" +
+                    "  激进：再降到 0.5 渲染缩放、四分之一纹理、关各向异性与实时反射、锁 30 帧、停粒子。",
+                    new AcceptableValueList<string>("关闭", "保守", "普通", "激进")));
             CfgLowPerfToggleKey = Config.Bind("性能", "低性能模式开关键", "Alt+Shift+F2",
                 "运行中开关「低性能模式」的组合键。改成空串 = 只能用配置项开启。\n" +
                 "★ 和本作自带按键不冲突（游戏用的是回车/空格/左键/Esc/Ctrl）。");
@@ -681,6 +688,14 @@ namespace ManosabaA11y
             CfgLowPerfNoShadow = Config.Bind("性能", "关闭柔边阴影（TrueShadow）", true,
                 "低性能模式开启时生效：把本作 800 多个柔边阴影组件全部临时关掉。\n" +
                 "★ 文字与立绘的阴影会消失、对比度会变，看不清时请关掉这一项。");
+            CfgLowPerfQuality = Config.Bind("性能", "允许质量/纹理降级（普通档起）", true,
+                "低性能模式到「普通」档时生效：质量等级压到最低、纹理半分辨率、抗锯齿关、\n" +
+                "阴影整体关、LOD 偏移 0.7。\n" +
+                "★ 画面会明显变糊（立绘与背景都受影响），看不清时请关掉这一项。");
+            CfgLowPerfAggressive = Config.Bind("性能", "允许激进档专属手段", true,
+                "低性能模式到「激进」档时生效：纹理四分之一、关各向异性过滤、关实时反射探针、\n" +
+                "关 VSync 并把帧率上限设到 30、停掉场景里所有粒子。\n" +
+                "★ 这是最狠的一档：画面最糊，但帧时间更稳、输入更跟手。");
             CfgLowPerfLowerResolution = Config.Bind("性能", "降低渲染分辨率", false,
                 "低性能模式开启时生效：把窗口分辨率降到 75%（例如 1920x1080 → 1440x810）。\n" +
                 "★ 默认关闭：这一档最容易被看出来（窗口变小/画面变糊），而且它会改变窗口大小，\n" +
@@ -984,26 +999,29 @@ namespace ManosabaA11y
         private static float _nextEvProbeAt;
 
         /// <summary>
-        /// 自动化取证：40 秒开启低性能模式、75 秒关闭（MANOSABA_A11Y_TEST_LOWPERF=1）。
+        /// 自动化取证：低性能模式四档阶梯（MANOSABA_A11Y_TEST_LOWPERF=1）。
+        /// 时间表：40s 保守 → 70s 普通 → 100s 激进 → 130s 关闭。
         /// 为什么需要：本机自动化环境的键盘注入进不了游戏（keybd_event/SendInput 都被挡），
-        /// 组合键的真实链路只能靠单元断言（Hotkey.Parse）覆盖，实机行为用这个钩子取证。
+        /// 组合键的真实链路只能靠单元断言（Hotkey.Parse/TryParseMode）覆盖，
+        /// 档位行为与还原用这个钩子取证（每档之间留 30 秒，性能探针才能算出平均帧率）。
         /// </summary>
         private static void TestLowPerfTick()
         {
             if (!Plugin.TestLowPerf) return;
             float now = Time.realtimeSinceStartup;
-            if (Plugin._testLowPerfStage == 0 && now >= 40f)
-            {
-                Plugin._testLowPerfStage = 1;
-                Plugin.L.LogInfo("[a11y] TEST LOWPERF: 开启 (t=" + now.ToString("F1") + ")");
-                LowPerf.Enable("自动化测试");
-            }
-            else if (Plugin._testLowPerfStage == 1 && now >= 75f)
-            {
-                Plugin._testLowPerfStage = 2;
-                Plugin.L.LogInfo("[a11y] TEST LOWPERF: 关闭 (t=" + now.ToString("F1") + ")");
-                LowPerf.Disable("自动化测试");
-            }
+            int stage = Plugin._testLowPerfStage;
+
+            if (stage == 0 && now >= 40f) { Step(LowPerf.Mode.Conservative, now); }
+            else if (stage == 1 && now >= 70f) { Step(LowPerf.Mode.Normal, now); }
+            else if (stage == 2 && now >= 100f) { Step(LowPerf.Mode.Aggressive, now); }
+            else if (stage == 3 && now >= 130f) { Step(LowPerf.Mode.Off, now); }
+        }
+
+        private static void Step(LowPerf.Mode mode, float now)
+        {
+            Plugin._testLowPerfStage++;
+            Plugin.L.LogInfo("[a11y] TEST LOWPERF: 切到 " + LowPerf.Name(mode) + " 档 (t=" + now.ToString("F1") + ")");
+            LowPerf.SetMode(mode, "自动化测试");
         }
 
         private static void TestKeyInjectTick()

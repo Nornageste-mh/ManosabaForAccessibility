@@ -269,30 +269,41 @@ $Cases = @(
     @{
         # 低性能模式不需要点鼠标：插件内部按 TEST_LOWPERF=1 在 40s 自动开启、75s 自动关闭，
         # 我们只验三件事——开启了、改的确实是 URP/TrueShadow、关闭后全部还原。
-        Id = 'perf.lowmode'; Title = '低性能模式（开启 → 画面降级 → 关闭还原）'; Group = '模块/性能'
+        Id = 'perf.lowmode'; Title = '低性能模式四档阶梯（保守 → 普通 → 激进 → 关闭还原）'; Group = '模块/性能'
         Env = @{ MANOSABA_A11Y_DIAG = '1'; MANOSABA_A11Y_PERFDIAG = '1'; MANOSABA_A11Y_TEST_LOWPERF = '1' }
-        Timeout = 180
+        Timeout = 220
         Body = {
             param($Game, $Result)
             $ready = Wait-Log -Pattern 'loaded v[0-9.]+ \(IL2CPP' -TimeoutSec 60
             Add-Check $Result '插件加载' $ready.Ok $ready.Line
 
-            $on = Wait-Log -Pattern 'LOWPERF 已开启' -TimeoutSec 90
-            Add-Check $Result '低性能模式已开启' $on.Ok $on.Line
+            # 四档阶梯：40s 保守 → 70s 普通 → 100s 激进 → 130s 关闭（每档 30 秒，够性能探针取均值）
+            $s1 = Wait-Log -Pattern 'LOWPERF 档位: 关闭 -> 保守' -TimeoutSec 90
+            Add-Check $Result '切到保守档（关闭 -> 保守）' $s1.Ok $s1.Line
             $urp = @(Get-LogMatches 'LOWPERF URP: renderScale=0\.80')
-            Add-Check $Result 'URP 画质已降级' ($urp.Count -ge 1) ("命中 " + $urp.Count)
+            Add-Check $Result '保守档：URP renderScale 0.80' ($urp.Count -ge 1) ("命中 " + $urp.Count)
             $shadow = @(Get-LogMatches 'LOWPERF TrueShadow: 关闭 \d+ 个')
-            Add-Check $Result '柔边阴影已关闭' ($shadow.Count -ge 1) ("命中 " + $shadow.Count)
+            Add-Check $Result '保守档：柔边阴影已关闭' ($shadow.Count -ge 1) ("命中 " + $shadow.Count)
 
-            $off = Wait-Log -Pattern 'LOWPERF 已关闭' -TimeoutSec 90
-            Add-Check $Result '低性能模式已关闭' $off.Ok $off.Line
+            $s2 = Wait-Log -Pattern 'LOWPERF 档位: 保守 -> 普通' -TimeoutSec 90
+            Add-Check $Result '切到普通档（保守 -> 普通）' $s2.Ok $s2.Line
+            $q = @(Get-LogMatches 'LOWPERF 质量: level=\d+')
+            Add-Check $Result '普通档：质量/纹理降级已生效' ($q.Count -ge 1) ("命中 " + $q.Count)
+
+            $s3 = Wait-Log -Pattern 'LOWPERF 档位: 普通 -> 激进' -TimeoutSec 90
+            Add-Check $Result '切到激进档（普通 -> 激进）' $s3.Ok $s3.Line
+            $agr = @(Get-LogMatches 'LOWPERF 激进: vSync=\d targetFps=\d')
+            Add-Check $Result '激进档：VSync/帧率上限已调整' ($agr.Count -ge 1) ("命中 " + $agr.Count)
+
+            $s4 = Wait-Log -Pattern 'LOWPERF 档位: 激进 -> 关闭' -TimeoutSec 90
+            Add-Check $Result '回到关闭档（激进 -> 关闭）' $s4.Ok $s4.Line
             $back = @(Get-LogMatches 'LOWPERF URP: 已还原画质设置')
-            Add-Check $Result '画质设置已还原' ($back.Count -ge 1) ("命中 " + $back.Count)
-            $restoreShadow = @(Get-LogMatches 'LOWPERF TrueShadow: 还原 \d+ 个')
-            Add-Check $Result '柔边阴影已还原' ($restoreShadow.Count -ge 1) ("命中 " + $restoreShadow.Count)
+            Add-Check $Result '关闭后画质已还原' ($back.Count -ge 1) ("命中 " + $back.Count)
+            $qback = @(Get-LogMatches 'LOWPERF 质量: 已还原质量设置')
+            Add-Check $Result '关闭后质量设置已还原' ($qback.Count -ge 1) ("命中 " + $qback.Count)
 
-            $err = @(Get-LogMatches 'LOWPERF 开启失败|LOWPERF 关闭失败')
-            Add-Check $Result '没有开启/关闭失败（反向）' ($err.Count -eq 0) ("命中 " + $err.Count)
+            $err = @(Get-LogMatches 'LOWPERF 换档失败|LOWPERF 已开启失败')
+            Add-Check $Result '没有换档失败（反向）' ($err.Count -eq 0) ("命中 " + $err.Count)
 
             if ($on.Ok) { $Result.Evidence += $on.Line.Trim() }
             if ($off.Ok) { $Result.Evidence += $off.Line.Trim() }
