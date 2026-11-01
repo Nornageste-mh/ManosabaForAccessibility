@@ -106,6 +106,18 @@ namespace ManosabaA11y
             Check("lowperf.分辨率-均衡0.85", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Balanced) - 0.85f) < 0.001f, "0.85");
             Check("lowperf.分辨率-强力0.70", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong) - 0.70f) < 0.001f, "0.70");
             Check("lowperf.分辨率-极限0.50", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Extreme) - 0.50f) < 0.001f, "0.50");
+            // 0.0.17：停动画是个「可选实验」，只保证「有开关、说明里写了风险」。
+            // 不断言它的值：玩家自己的 cfg 可能已经改过（旧版本默认是 true），
+            // 断言现值只会变成「换个存档就红」的假失败。
+            Check("lowperf.停动画有开关",
+                Plugin.CfgLowPerfStopAnim != null,
+                "CfgLowPerfStopAnim 存在");
+            Check("lowperf.停动画说明写了风险",
+                Plugin.CfgLowPerfStopAnim != null
+                && Plugin.CfgLowPerfStopAnim.Description != null
+                && Plugin.CfgLowPerfStopAnim.Description.Description != null
+                && Plugin.CfgLowPerfStopAnim.Description.Description.Contains("过场"),
+                "说明里提到过场");
             Check("lowperf.分辨率随档位单调下降",
                 LowPerf.ResolutionScaleFor(LowPerf.Mode.Balanced) > LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong)
                 && LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong) > LowPerf.ResolutionScaleFor(LowPerf.Mode.Extreme),

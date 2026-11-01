@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.16";
+        public const string Version = "0.0.0.17";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -91,6 +91,7 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgLowPerfQuality;
         internal static ConfigEntry<bool> CfgLowPerfAggressive;
         internal static ConfigEntry<bool> CfgLowPerfExtreme;
+        internal static ConfigEntry<bool> CfgLowPerfStopAnim;
         internal static ConfigEntry<bool> CfgLowPerfDegradeUrp;
         internal static ConfigEntry<bool> CfgLowPerfNoShadow;
         internal static ConfigEntry<bool> CfgLowPerfLowerResolution;
@@ -378,6 +379,10 @@ namespace ManosabaA11y
             // 低性能模式取证（仅 MANOSABA_A11Y_TEST_LOWPERF=1）：25/55/85/115/145 秒逐档上升。
             TestLowPerf = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_LOWPERF") == "1";
             if (TestLowPerf) L.LogInfo("[a11y] TEST LOWPERF MODE: 25/55/85/115/145 秒逐档上升（轻度→均衡→强力→极限→关闭）");
+            Evidence.ScanCmd = Environment.GetEnvironmentVariable("MANOSABA_A11Y_SCAN_CMD") ?? "";
+            if (Evidence.ScanCmd.Length > 0) L.LogInfo("[a11y] SCAN_CMD=" + Evidence.ScanCmd + "（扫描剧本命令行号）");
+            LowPerf.TestStopAnimators = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_STOPANIM") == "1";
+            if (LowPerf.TestStopAnimators) L.LogInfo("[a11y] TEST STOPANIM: 只停动画（用于量界面动画对卡顿的贡献）");
             TestExtreme = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EXTREME") == "1";
             if (TestExtreme) L.LogInfo("[a11y] TEST EXTREME MODE: 70s 切极限档、150s 还原（验证黑屏后点击/朗读仍可用）");
 
@@ -707,6 +712,14 @@ namespace ManosabaA11y
                 "低性能模式到「激进」档时生效：纹理四分之一、关各向异性过滤、关实时反射探针、\n" +
                 "关 VSync 并把帧率上限设到 30、停掉场景里所有粒子。\n" +
                 "★ 这是最狠的一档：画面最糊，但帧时间更稳、输入更跟手。");
+
+            CfgLowPerfStopAnim = Config.Bind("性能", "停止界面动画（强力档起）", false,
+                "从「强力」档起停掉场景里所有 Animator（界面动画、立绘抖动、过场动画）。默认**关闭**。\n" +
+                "★ 为什么默认关：我们量过，但**没有拿到可靠证据**证明它稳定有用——\n" +
+                "  同一段剧情推进：停动画 15.5 帧（+28%），但换一轮同样的设置只有 8.1 帧；\n" +
+                "  固定静止场景对照的第二轮又因为跳行没生效而作废。噪声很大，不敢默认开。\n" +
+                "★ 风险：极少数过场靠 AnimationEvent 回调推进，停动画会让它卡住。\n" +
+                "  想省一点主线程可以打开试试；遇到过场不动，立刻关掉本项。");
             CfgLowPerfExtreme = Config.Bind("性能", "允许极限档（画面全黑）", true,
                 "「极限」档会把画面整个丢掉：相机不画、Renderer 停用、UI 刷成黑色，屏幕上只剩黑窗口。\n" +
                 "★ 不会影响点击与朗读（隐藏 UI 用的是刷颜色，射线判定还在），剧情照样能推进。\n" +

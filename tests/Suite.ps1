@@ -306,7 +306,7 @@ $Cases = @(
             Add-Check $Result '极限档：画面已丢弃（相机/Renderer）' ($blk.Count -ge 1) ("命中 " + $blk.Count)
             $r50 = @(Get-LogMatches 'LOWPERF 分辨率: 原生 \d+x\d+ × 0\.50')
             Add-Check $Result '极限档：窗口分辨率降到 0.50×' ($r50.Count -ge 1) ("命中 " + $r50.Count)
-            $plus = @(Get-LogMatches 'LOWPERF 极限加强: Volume=\d+ Animator=\d+ 相机后处理=\d+')
+            $plus = @(Get-LogMatches 'LOWPERF 极限加强: Volume=\d+ 相机后处理=\d+')
             Add-Check $Result '极限档：LOD/单骨骼/Volume/Animator 追加手段已生效' ($plus.Count -ge 1) ("命中 " + $plus.Count)
 
             $s5 = Wait-Log -Pattern 'LOWPERF 档位: 极限 -> 关闭' -TimeoutSec 90

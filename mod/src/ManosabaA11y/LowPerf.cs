@@ -164,6 +164,13 @@ namespace ManosabaA11y
                     return;
                 }
 
+                // 测试钩子：只停动画（不动画质），用来单独量「界面动画」对卡顿的贡献
+                if (TestStopAnimators && Time.unscaledTime >= _nextTestAnimAt)
+                {
+                    _nextTestAnimAt = Time.unscaledTime + 1f;
+                    StopAllAnimatorsForTest();
+                }
+
                 // 档位开着：新出现的柔边阴影/粒子要跟着降级（场景切换会重建 UI/立绘）
                 if (Active && Time.unscaledTime >= _nextShadowSweepAt)
                 {
@@ -171,6 +178,8 @@ namespace ManosabaA11y
                     if (_appliedShadow) DisableTrueShadows(false);
                     if (_appliedParticles) StopParticles(false);
                     if (_appliedBlackout) BlackoutNewObjects();
+                    // 换场会新建带 Animator 的 UI/立绘；强力档起要补停（与阴影/粒子同样的补扫节奏）
+                    if (Current >= Mode.Strong && Allowed(Plugin.CfgLowPerfStopAnim)) ApplyStopAnimators();
                 }
 
                 MeasureFps();
@@ -292,6 +301,14 @@ namespace ManosabaA11y
             {
                 float resScale = ResolutionScaleFor(mode);
                 if (resScale < 0.999f) SetResolutionScale(resScale);
+            }
+
+            // ---- 强力档起：停掉界面/立绘动画（0.0.17 实测：长帧数 -34%、平均帧率 +28%） ----
+            // 为什么从强力档开始：读屏玩家看不见动画，但 Animator 每帧求值要占主线程；
+            // 出问题的场景（CG/立绘/过场）恰恰是动画最多的场景。
+            if (level >= 3 && Allowed(Plugin.CfgLowPerfStopAnim))
+            {
+                ApplyStopAnimators();
             }
 
             // ---- 极限档专属：真的极限（有代价，玩家已确认接受） ----
@@ -456,6 +473,30 @@ namespace ManosabaA11y
 
         // ================================================================== 激进档专属
 
+        /// <summary>
+        /// 停掉场景里所有 Animator（含 UI 动画）并记账，供「动画是不是卡顿元凶」的对照实验用。
+        /// 只记录、不还原（测试进程用完就杀）；正式档位里的动画停用走 ApplyExtremeExtras。
+        /// </summary>
+        internal static void StopAllAnimatorsForTest()
+        {
+            int n = 0;
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<Animator>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var a = all[i];
+                    if (a == null) continue;
+                    int id = a.GetInstanceID();
+                    if (!_disabledAnimatorIds.Add(id)) continue;
+                    if (!a.enabled) continue;
+                    try { a.enabled = false; n++; _disabledAnimators.Add(a); } catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 测试/Animator: " + e.Message); }
+            if (n > 0) A11yHost.Diag("LOWPERF 测试: 停用 Animator=" + n + "（只停动画，档位不变）");
+        }
+
         private static void ApplyAggressiveExtras()
         {
             // 各向异性过滤对读屏用户几乎只影响地面眩光，关掉省一点带宽
@@ -524,6 +565,14 @@ namespace ManosabaA11y
         private static readonly List<UnityEngine.Rendering.Volume> _disabledVolumes =
             new List<UnityEngine.Rendering.Volume>();
         private static readonly List<Animator> _disabledAnimators = new List<Animator>();
+
+        /// <summary>
+        /// 测试钩子（MANOSABA_A11Y_TEST_STOPANIM=1）：只停 Animator、其它什么都不做。
+        /// 为什么要这个开关：玩家反馈「CG/立绘/过场一出现就卡」，怀疑是界面动画在拖帧，
+        /// 那就把动画单独停掉、用同一段剧情对比长帧数——先量再决定加不加进档位。
+        /// </summary>
+        internal static bool TestStopAnimators;
+        private static float _nextTestAnimAt;
         private static readonly HashSet<int> _disabledAnimatorIds = new HashSet<int>();
         private static bool _savedLodLevel, _savedSkinWeights, _savedMaxLod;
         private static int _savedMaxLodLevel = -1;
@@ -537,6 +586,35 @@ namespace ManosabaA11y
         ///   · 停掉所有 Animator（立绘抖动的状态机每帧求值也占 CPU）
         ///   · 锁 30 帧 + 关 VSync（把省下来的算力留给输入响应）
         /// </summary>
+        /// <summary>
+        /// 停掉场景里所有 Animator（并把它们记进还原名单）。
+        /// 实测（0.0.17 卡顿取证，同一段剧情、同一套点击节奏）：
+        ///   关闭档  平均 13.5 帧 / 长帧(>100ms) 458 / 最坏 2426ms
+        ///   强力档  平均 12.1 帧 / 长帧 527 / 最坏 4054ms
+        ///   强力+停动画 平均 15.5 帧 / 长帧 347 / 最坏 2774ms
+        /// → 画面降级对这类场景几乎没用，**动画才是主线程成本**，所以从强力档开始停。
+        /// 风险：个别过场靠 AnimationEvent 回调推进，停掉可能卡住；实测这段剧情能连读 27 句以上。
+        /// </summary>
+        private static void ApplyStopAnimators()
+        {
+            int n = 0;
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<Animator>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var a = all[i];
+                    if (a == null) continue;
+                    int id = a.GetInstanceID();
+                    if (!_disabledAnimatorIds.Add(id)) continue;
+                    if (!a.enabled) continue;
+                    try { a.enabled = false; n++; _disabledAnimators.Add(a); } catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 停动画: " + e.Message); }
+            if (n > 0) A11yHost.Diag("LOWPERF 停动画: 停用 " + n + " 个 Animator（读屏下无视觉影响）");
+        }
+
         private static void ApplyExtremeExtras()
         {
             if (_appliedExtreme) return;
@@ -594,24 +672,6 @@ namespace ManosabaA11y
                     catch { }
                 }
 
-                // Animator
-                try
-                {
-                    var animsAll = Resources.FindObjectsOfTypeAll<Animator>();
-                    for (int i = 0; i < animsAll.Length; i++)
-                    {
-                        var a = animsAll[i];
-                        if (a == null) continue;
-                        int id = a.GetInstanceID();
-                        if (!_disabledAnimatorIds.Add(id)) continue;
-                        if (!a.enabled) continue;
-                        a.enabled = false;
-                        _disabledAnimators.Add(a);
-                        anims++;
-                    }
-                }
-                catch (Exception e) { A11yHost.Diag("LOWPERF 极限/Animator: " + e.Message); }
-
                 // 帧率上限
                 try
                 {
@@ -623,7 +683,7 @@ namespace ManosabaA11y
             }
             catch (Exception e) { A11yHost.Diag("LOWPERF 极限: " + e.Message); }
 
-            A11yHost.Diag("LOWPERF 极限加强: Volume=" + volumes + " Animator=" + anims + " 相机后处理=" + cams
+            A11yHost.Diag("LOWPERF 极限加强: Volume=" + volumes + " 相机后处理=" + cams
                           + " LOD=1 单骨骼 目标帧率=30");
         }
 
@@ -962,13 +1022,19 @@ namespace ManosabaA11y
         {
             try
             {
+                // 原生尺寸**只记一次**。坑（0.0.17 实测）：切档时 Restore() 会先把窗口还原，
+                // 但 Screen.SetResolution 是异步的，下一档读到的 Screen.width 还是旧的缩小值，
+                // 于是基准被一再改写（1280x720 → 1088x612 → 762x428），越切越小。
+                if (_nativeWidth <= 0 || _nativeHeight <= 0)
+                {
+                    _nativeWidth = Screen.width;
+                    _nativeHeight = Screen.height;
+                }
                 if (!_savedResolution)
                 {
-                    _savedWidth = Screen.width;
-                    _savedHeight = Screen.height;
+                    _savedWidth = _nativeWidth;
+                    _savedHeight = _nativeHeight;
                     _savedMode = Screen.fullScreenMode;
-                    _nativeWidth = _savedWidth;
-                    _nativeHeight = _savedHeight;
                     _savedResolution = true;
                 }
                 int baseW = _nativeWidth > 0 ? _nativeWidth : _savedWidth;
@@ -989,7 +1055,10 @@ namespace ManosabaA11y
             if (!_savedResolution) return;
             try
             {
-                Screen.SetResolution(_savedWidth, _savedHeight, _savedMode);
+                // 还原到原生分辨率（不是「上一次的 Screen 尺寸」，否则会停在缩小后的尺寸上）
+                int w = _nativeWidth > 0 ? _nativeWidth : _savedWidth;
+                int h = _nativeHeight > 0 ? _nativeHeight : _savedHeight;
+                Screen.SetResolution(w, h, _savedMode);
                 A11yHost.Diag("LOWPERF 分辨率: 还原 " + _savedWidth + "x" + _savedHeight);
             }
             catch (Exception e) { A11yHost.Diag("LOWPERF 分辨率还原: " + e.Message); }

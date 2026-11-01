@@ -27,6 +27,9 @@ namespace ManosabaA11y
         private static float _windowStart = -1f;
         private static int _frames;
         private static float _frameTimeSum;
+        // 卡顿（spike）统计：平均帧率看不出 CG/立绘出现时的顿挫，必须单独数「长帧」。
+        private static float _maxFrameMs;
+        private static int _framesOver100, _framesOver200, _gc0, _gc1, _gc2;
 
         // 各子系统累计耗时（毫秒）与本窗口样本数
         private static readonly Dictionary<string, double> _costMs = new Dictionary<string, double>();
@@ -66,7 +69,11 @@ namespace ManosabaA11y
                 float now = Time.realtimeSinceStartup;
                 if (_windowStart < 0f) _windowStart = now;
                 _frames++;
+                float dtMs = Time.unscaledDeltaTime * 1000f;
                 _frameTimeSum += Time.unscaledDeltaTime;
+                if (dtMs > _maxFrameMs) _maxFrameMs = dtMs;
+                if (dtMs > 100f) _framesOver100++;
+                if (dtMs > 200f) _framesOver200++;
 
                 if (now - _windowStart < 10f) return;
 
@@ -74,10 +81,18 @@ namespace ManosabaA11y
                 float fps = span > 0f ? _frames / span : 0f;
                 float frameMs = _frames > 0 ? (_frameTimeSum / _frames) * 1000f : 0f;
 
+                int g0 = 0, g1 = 0, g2 = 0;
+                try { g0 = GC.CollectionCount(0); g1 = GC.CollectionCount(1); g2 = GC.CollectionCount(2); } catch { }
                 A11yHost.Diag("PERF 10s fps=" + fps.ToString("F1")
                               + " frameMs=" + frameMs.ToString("F1")
+                              + " maxMs=" + _maxFrameMs.ToString("F0")
+                              + " slow>100=" + _framesOver100
+                              + " slow>200=" + _framesOver200
+                              + " gc0=+" + (g0 - _gc0) + " gc1=+" + (g1 - _gc1) + " gc2=+" + (g2 - _gc2)
                               + " costs=" + CostSummary()
                               + " focused=" + Application.isFocused);
+                _gc0 = g0; _gc1 = g1; _gc2 = g2;
+                _maxFrameMs = 0f; _framesOver100 = 0; _framesOver200 = 0;
 
                 DumpCounts();
                 DumpUrp();

@@ -34,6 +34,9 @@ namespace ManosabaA11y
         private static float _nextDump;
         private static int _scannedScript = int.MinValue;
 
+        /// <summary>MANOSABA_A11Y_SCAN_CMD：把剧本里指定类型的命令行号打出来（只记类型名/行号，不记台词）。</summary>
+        internal static string ScanCmd = "";
+
         internal static void Tick()
         {
             float now = Time.unscaledTime;
@@ -123,13 +126,27 @@ namespace ManosabaA11y
                 Naninovel.Command c = null;
                 try { c = csl.command; } catch { }
                 if (c == null) continue;
+                // 通用检索（0.0.17）：MANOSABA_A11Y_SCAN_CMD=PlayMovie 之类，用来定位过场动画/CG 的行号。
+                // 为什么需要：跳行落到「过场结束之后」再去量卡顿是没有意义的，必须跳到过场**之前**那一行。
+                string typeName = null;
+                try { typeName = c.GetType().Name; } catch { }
+                if (!string.IsNullOrEmpty(ScanCmd)
+                    && typeName != null
+                    && typeName.IndexOf(ScanCmd, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    found++;
+                    A11yHost.Diag("SCANCMD: script=" + script.Path + " line=" + i + " lineIndex=" + csl.LineIndex
+                                  + " cmd=" + typeName);
+                    continue;
+                }
                 if (c.TryCast<WitchTrials.Views.ChoiceEvidence>() != null)
                 {
                     found++;
                     A11yHost.Diag("CHOICEEV: script=" + script.Path + " line=" + i + " lineIndex=" + csl.LineIndex);
                 }
             }
-            A11yHost.Diag("CHOICEEV: 扫描完成 script=" + script.Path + " lines=" + lines.Length + " 命中=" + found);
+            A11yHost.Diag("CHOICEEV: 扫描完成 script=" + script.Path + " lines=" + lines.Length + " 命中=" + found
+                          + (string.IsNullOrEmpty(ScanCmd) ? "" : " 检索=" + ScanCmd));
         }
 
         /// <summary>一次性转储：只记类型/对象名/可见性，不记台词原文（IP 红线）。</summary>
