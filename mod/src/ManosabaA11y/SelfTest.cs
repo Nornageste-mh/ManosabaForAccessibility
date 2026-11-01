@@ -91,12 +91,14 @@ namespace ManosabaA11y
                 "CfgLowPerfMode=" + (Plugin.CfgLowPerfMode != null ? Plugin.CfgLowPerfMode.Value : "null")
                 + " parsed=" + modeParsed + " Active=" + LowPerf.Active);
 
-            // 四档解析：配置里写中文/英文/数字都要认（玩家可能手改 cfg）
-            LowPerf.Mode m1, m2, m3, m4, mBad;
-            Check("lowperf.档位解析-保守", LowPerf.TryParseMode("保守", out m1) && m1 == LowPerf.Mode.Conservative, "保守");
-            Check("lowperf.档位解析-普通", LowPerf.TryParseMode("normal", out m2) && m2 == LowPerf.Mode.Normal, "normal");
-            Check("lowperf.档位解析-激进", LowPerf.TryParseMode("3", out m3) && m3 == LowPerf.Mode.Aggressive, "3");
-            Check("lowperf.档位解析-关闭", LowPerf.TryParseMode("off", out m4) && m4 == LowPerf.Mode.Off, "off");
+            // 五档解析：配置里写中文/英文/数字都要认（玩家可能手改 cfg）
+            LowPerf.Mode m1, m2, m3, m4, m5, mOld, mBad;
+            Check("lowperf.档位解析-轻度", LowPerf.TryParseMode("轻度", out m1) && m1 == LowPerf.Mode.Light, "轻度");
+            Check("lowperf.档位解析-均衡", LowPerf.TryParseMode("balanced", out m2) && m2 == LowPerf.Mode.Balanced, "balanced");
+            Check("lowperf.档位解析-强力", LowPerf.TryParseMode("3", out m3) && m3 == LowPerf.Mode.Strong, "3");
+            Check("lowperf.档位解析-极限", LowPerf.TryParseMode("极限", out m4) && m4 == LowPerf.Mode.Extreme, "极限");
+            Check("lowperf.档位解析-关闭", LowPerf.TryParseMode("off", out m5) && m5 == LowPerf.Mode.Off, "off");
+            Check("lowperf.旧档名仍认", LowPerf.TryParseMode("激进", out mOld) && mOld == LowPerf.Mode.Strong, "激进->强力");
             Check("lowperf.档位解析-坏值不崩", !LowPerf.TryParseMode("乱写", out mBad), "乱写");
 
             bool parsed = false, ok = false;

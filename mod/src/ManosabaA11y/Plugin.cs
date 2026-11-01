@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.14";
+        public const string Version = "0.0.0.15";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -82,12 +82,15 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgAllowScriptJump;
 
         internal static bool TestLowPerf;
-        internal static int _testLowPerfStage;   // MANOSABA_A11Y_TEST_LOWPERF=1：自动开关一次，供自动化取证
+        internal static int _testLowPerfStage;
+        internal static bool TestExtreme;         // MANOSABA_A11Y_TEST_EXTREME=1：极限档黑屏下的交互安全取证
+        internal static int _testExtremeStage;   // 极限档取证进度（MANOSABA_A11Y_TEST_EXTREME=1）
         // 低性能模式（0.0.0.13）：默认关闭；开关组合键运行中可切；四档各自可以单独关。
         internal static ConfigEntry<string> CfgLowPerfMode;
         internal static ConfigEntry<string> CfgLowPerfToggleKey;
         internal static ConfigEntry<bool> CfgLowPerfQuality;
         internal static ConfigEntry<bool> CfgLowPerfAggressive;
+        internal static ConfigEntry<bool> CfgLowPerfExtreme;
         internal static ConfigEntry<bool> CfgLowPerfDegradeUrp;
         internal static ConfigEntry<bool> CfgLowPerfNoShadow;
         internal static ConfigEntry<bool> CfgLowPerfLowerResolution;
@@ -372,9 +375,11 @@ namespace ManosabaA11y
                 TestScriptJump = true;
                 L.LogInfo("[a11y] TEST SCRIPTJUMP: 45s 后自动打开跳转菜单并跳转（自动化用）");
             }
-            // 低性能模式取证（仅 MANOSABA_A11Y_TEST_LOWPERF=1）：40s 自动开启、75s 自动关闭。
+            // 低性能模式取证（仅 MANOSABA_A11Y_TEST_LOWPERF=1）：25/55/85/115/145 秒逐档上升。
             TestLowPerf = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_LOWPERF") == "1";
-            if (TestLowPerf) L.LogInfo("[a11y] TEST LOWPERF MODE: 40s 开启、75s 关闭低性能模式");
+            if (TestLowPerf) L.LogInfo("[a11y] TEST LOWPERF MODE: 25/55/85/115/145 秒逐档上升（轻度→均衡→强力→极限→关闭）");
+            TestExtreme = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EXTREME") == "1";
+            if (TestExtreme) L.LogInfo("[a11y] TEST EXTREME MODE: 70s 切极限档、150s 还原（验证黑屏后点击/朗读仍可用）");
 
             string evCmd = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVCMD");
             if (evCmd == "1" || evCmd == "2")
@@ -669,16 +674,20 @@ namespace ManosabaA11y
 
             CfgLowPerfMode = Config.Bind("性能", "低性能模式档位", "关闭",
                 new ConfigDescription(
-                    "默认「关闭」。可选：关闭 / 保守 / 普通 / 激进。\n" +
-                    "运行时按开关键可以在四档之间循环切换（关闭 → 保守 → 普通 → 激进 → 关闭）。\n" +
-                    "★ 实测（0.0.0.12/0.0.0.13 性能探针，详见 docs/framework-notes.md §22、§24）：\n" +
-                    "  · 插件自己原来每帧要花 10~13ms，限频后 2.5~5ms——这部分是纯收益、无视觉代价，\n" +
-                    "    而且它在四档里都恒开（档位只决定画面降多少）；\n" +
-                    "  · 测试机（兆芯 KX-U6780A + 核显）是**主线程瓶颈**，画面降级在那个环境里没有测出\n" +
-                    "    帧率提升；换到显卡弱、显存小的机器上，保守/普通/激进才有可能看出差别。\n" +
-                    "★ 保守：URP 画质降级 + 关柔边阴影。普通：再降分辨率、关抗锯齿/阴影/LOD。\n" +
-                    "  激进：再降到 0.5 渲染缩放、四分之一纹理、关各向异性与实时反射、锁 30 帧、停粒子。",
-                    new AcceptableValueList<string>("关闭", "保守", "普通", "激进")));
+                    "默认「关闭」。可选：关闭 / 轻度 / 均衡 / 强力 / 极限。\n" +
+                    "运行时按开关键可以在五档之间循环切换（关闭 → 轻度 → 均衡 → 强力 → 极限 → 关闭）。\n" +
+                    "★ 实测（0.0.0.15 性能探针，测试机 兆芯 KX-U6780A + 核显，标题画面）：\n" +
+                    "  关闭 ≈10.5 帧 → 轻度 ≈14.4 → 均衡 ≈17.3 → 强力 ≈20.4 → 极限（画面全黑）更高。\n" +
+                    "  ADV 对白场景渲染成本本来就低，收益会比这个表小；插件自身的每帧开销\n" +
+                    "  （原来 10~13ms，限频后 2.5~5ms）在五档里都恒开、无视觉代价。\n" +
+                    "★ 轻度：URP 画质降级（渲染缩放 0.8）+ 关柔边阴影。\n" +
+                    "  均衡：再降渲染缩放 0.65、质量等级最低、纹理半分辨率、关抗锯齿与阴影、LOD 0.7。\n" +
+                    "  强力：再降渲染缩放 0.5、纹理四分之一、关各向异性与实时反射、关 VSync 锁 30 帧、停粒子。\n" +
+                    "  极限：把画面整个丢掉——相机不画、Renderer 停用、UI 全部刷成黑色，只剩一个黑窗口。\n" +
+                    "        ★ 极限档**不影响点击与朗读**（隐藏 UI 用的是刷颜色，不是关 Canvas），\n" +
+                    "        所以读屏玩家照样能推进剧情；但屏幕真的什么都没有，误触会很吓人。\n" +
+                    "        不想要这一档，把下面的「允许极限档」关掉即可（关掉后按到极限只播报、不动手）。",
+                    new AcceptableValueList<string>("关闭", "轻度", "均衡", "强力", "极限")));
             CfgLowPerfToggleKey = Config.Bind("性能", "低性能模式开关键", "Alt+Shift+F2",
                 "运行中开关「低性能模式」的组合键。改成空串 = 只能用配置项开启。\n" +
                 "★ 和本作自带按键不冲突（游戏用的是回车/空格/左键/Esc/Ctrl）。");
@@ -696,6 +705,10 @@ namespace ManosabaA11y
                 "低性能模式到「激进」档时生效：纹理四分之一、关各向异性过滤、关实时反射探针、\n" +
                 "关 VSync 并把帧率上限设到 30、停掉场景里所有粒子。\n" +
                 "★ 这是最狠的一档：画面最糊，但帧时间更稳、输入更跟手。");
+            CfgLowPerfExtreme = Config.Bind("性能", "允许极限档（画面全黑）", true,
+                "「极限」档会把画面整个丢掉：相机不画、Renderer 停用、UI 刷成黑色，屏幕上只剩黑窗口。\n" +
+                "★ 不会影响点击与朗读（隐藏 UI 用的是刷颜色，射线判定还在），剧情照样能推进。\n" +
+                "★ 不想让这一档真的生效就关掉本项：循环到「极限」时只播报档位名、不改画面。");
             CfgLowPerfLowerResolution = Config.Bind("性能", "降低渲染分辨率", false,
                 "低性能模式开启时生效：把窗口分辨率降到 75%（例如 1920x1080 → 1440x810）。\n" +
                 "★ 默认关闭：这一档最容易被看出来（窗口变小/画面变糊），而且它会改变窗口大小，\n" +
@@ -703,6 +716,22 @@ namespace ManosabaA11y
             CfgLowPerfHint = Config.Bind("性能", "低帧率时提示开启", true,
                 "长时间低于 15 帧时，念一句「按 Alt+Shift+F2 可以开启低性能模式」。\n" +
                 "★ 只提醒、绝不自动切换：开不开由玩家决定（自动改画面属于替玩家做决策）。");
+
+            // 旧 cfg 迁移（0.0.0.15）：档位改名，旧词仍然认（TryParseMode 里有别名），
+            // 但写回新名字，避免玩家在 cfg 里看到过时的词。
+            if (CfgLowPerfMode != null)
+            {
+                string oldMode = (CfgLowPerfMode.Value ?? "").Trim();
+                string newMode = null;
+                if (oldMode == "保守") newMode = "轻度";
+                else if (oldMode == "普通") newMode = "均衡";
+                else if (oldMode == "激进") newMode = "强力";
+                if (newMode != null)
+                {
+                    CfgLowPerfMode.Value = newMode;
+                    L.LogInfo("[a11y] cfg 迁移：低性能模式档位 " + oldMode + " -> " + newMode);
+                }
+            }
 
             // 旧 cfg 迁移：只做“一定知道用户意图”的两件事。
             // 1) 沉默按键旧默认值 "0" 不是合法键名（Hotkey.cs 拒绝纯数字），
@@ -902,6 +931,7 @@ namespace ManosabaA11y
             // 低性能模式（0.0.0.13，默认关闭）：组合键开关、补扫柔边阴影、低帧率只提醒。
             try { LowPerf.Update(); } catch (Exception e) { A11yHost.Diag("LowPerf: " + e.Message); }
             try { TestLowPerfTick(); } catch (Exception e) { A11yHost.Diag("LowPerf.Test: " + e.Message); }
+            try { TestExtremeTick(); } catch (Exception e) { A11yHost.Diag("LowPerf.ExtremeTest: " + e.Message); }
             PerfProbe.EndCost("screen");
 
             // 性能取证探针（仅 MANOSABA_A11Y_PERFDIAG=1）：只测量不改设置
@@ -999,8 +1029,8 @@ namespace ManosabaA11y
         private static float _nextEvProbeAt;
 
         /// <summary>
-        /// 自动化取证：低性能模式四档阶梯（MANOSABA_A11Y_TEST_LOWPERF=1）。
-        /// 时间表：40s 保守 → 70s 普通 → 100s 激进 → 130s 关闭。
+        /// 自动化取证：低性能模式五档阶梯（MANOSABA_A11Y_TEST_LOWPERF=1）。
+        /// 时间表：25s 轻度 → 55s 均衡 → 85s 强力 → 115s 极限 → 145s 关闭。
         /// 为什么需要：本机自动化环境的键盘注入进不了游戏（keybd_event/SendInput 都被挡），
         /// 组合键的真实链路只能靠单元断言（Hotkey.Parse/TryParseMode）覆盖，
         /// 档位行为与还原用这个钩子取证（每档之间留 30 秒，性能探针才能算出平均帧率）。
@@ -1011,10 +1041,34 @@ namespace ManosabaA11y
             float now = Time.realtimeSinceStartup;
             int stage = Plugin._testLowPerfStage;
 
-            if (stage == 0 && now >= 40f) { Step(LowPerf.Mode.Conservative, now); }
-            else if (stage == 1 && now >= 70f) { Step(LowPerf.Mode.Normal, now); }
-            else if (stage == 2 && now >= 100f) { Step(LowPerf.Mode.Aggressive, now); }
-            else if (stage == 3 && now >= 130f) { Step(LowPerf.Mode.Off, now); }
+            if (stage == 0 && now >= 25f) { Step(LowPerf.Mode.Light, now); }
+            else if (stage == 1 && now >= 55f) { Step(LowPerf.Mode.Balanced, now); }
+            else if (stage == 2 && now >= 85f) { Step(LowPerf.Mode.Strong, now); }
+            else if (stage == 3 && now >= 115f) { Step(LowPerf.Mode.Extreme, now); }
+            else if (stage == 4 && now >= 145f) { Step(LowPerf.Mode.Off, now); }
+        }
+
+        /// <summary>
+        /// 极限档安全性取证（MANOSABA_A11Y_TEST_EXTREME=1）：70 秒切到「极限」，150 秒还原。
+        /// 为什么单独一个钩子：要证明「画面全黑以后点击与朗读还在」（即黑屏没有把 UGUI 射线弄废）。
+        /// 探针会在 70–150 秒之间持续点击并统计 Reader.say 是否还在增长。
+        /// </summary>
+        private static void TestExtremeTick()
+        {
+            if (!Plugin.TestExtreme) return;
+            float now = Time.realtimeSinceStartup;
+            if (Plugin._testExtremeStage == 0 && now >= 70f)
+            {
+                Plugin._testExtremeStage = 1;
+                Plugin.L.LogInfo("[a11y] TEST EXTREME: 切到极限档 (t=" + now.ToString("F1") + ")");
+                LowPerf.SetMode(LowPerf.Mode.Extreme, "自动化-极限档取证");
+            }
+            else if (Plugin._testExtremeStage == 1 && now >= 150f)
+            {
+                Plugin._testExtremeStage = 2;
+                Plugin.L.LogInfo("[a11y] TEST EXTREME: 还原到关闭档 (t=" + now.ToString("F1") + ")");
+                LowPerf.SetMode(LowPerf.Mode.Off, "自动化-极限档取证结束");
+            }
         }
 
         private static void Step(LowPerf.Mode mode, float now)

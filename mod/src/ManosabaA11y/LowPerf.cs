@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
 using UnityEngine;
@@ -33,10 +33,16 @@ namespace ManosabaA11y
     /// </summary>
     internal static class LowPerf
     {
-        /// <summary>档位。数值用于「下一档 = (+1) % 4」的循环。</summary>
-        internal enum Mode { Off = 0, Conservative = 1, Normal = 2, Aggressive = 3 }
+        /// <summary>档位。数值用于「下一档 = (+1) % ModeCount」的循环。</summary>
+        /// <remarks>
+        /// 0.0.0.15 起改成五档并重命名（用户要求「调整挡位名称、再加更多挡位、极限档只剩黑窗口」）：
+        ///   关闭 / 轻度 / 均衡 / 强力 / 极限。
+        /// 旧名字（保守/普通/激进）在 TryParseMode 里仍然认，只为了让老 cfg 不至于变成「关闭」——
+        /// 迁移时会写回新名字（见 Plugin 的 cfg 迁移块）。
+        /// </remarks>
+        internal enum Mode { Off = 0, Light = 1, Balanced = 2, Strong = 3, Extreme = 4 }
 
-        internal const int ModeCount = 4;
+        internal const int ModeCount = 5;
 
         internal static Mode Current { get; private set; } = Mode.Off;
 
@@ -47,9 +53,10 @@ namespace ManosabaA11y
         {
             switch (m)
             {
-                case Mode.Conservative: return "保守";
-                case Mode.Normal: return "普通";
-                case Mode.Aggressive: return "激进";
+                case Mode.Light: return "轻度";
+                case Mode.Balanced: return "均衡";
+                case Mode.Strong: return "强力";
+                case Mode.Extreme: return "极限";
                 default: return "关闭";
             }
         }
@@ -60,9 +67,15 @@ namespace ManosabaA11y
             if (string.IsNullOrEmpty(text)) return false;
             string t = text.Trim().ToLowerInvariant();
             if (t == "关闭" || t == "off" || t == "0" || t == "无") { mode = Mode.Off; return true; }
-            if (t == "保守" || t == "conservative" || t == "1" || t == "低") { mode = Mode.Conservative; return true; }
-            if (t == "普通" || t == "normal" || t == "2" || t == "中") { mode = Mode.Normal; return true; }
-            if (t == "激进" || t == "aggressive" || t == "3" || t == "高") { mode = Mode.Aggressive; return true; }
+            // 新名字
+            if (t == "轻度" || t == "light" || t == "1" || t == "低") { mode = Mode.Light; return true; }
+            if (t == "均衡" || t == "balanced" || t == "2" || t == "中") { mode = Mode.Balanced; return true; }
+            if (t == "强力" || t == "strong" || t == "3" || t == "高") { mode = Mode.Strong; return true; }
+            if (t == "极限" || t == "extreme" || t == "4" || t == "黑屏" || t == "全黑") { mode = Mode.Extreme; return true; }
+            // 旧名字（0.0.0.14 及更早的 cfg 里可能就是这些词）
+            if (t == "保守" || t == "conservative") { mode = Mode.Light; return true; }
+            if (t == "普通" || t == "normal") { mode = Mode.Balanced; return true; }
+            if (t == "激进" || t == "aggressive") { mode = Mode.Strong; return true; }
             return false;
         }
 
@@ -99,6 +112,29 @@ namespace ManosabaA11y
             new List<LeTai.TrueShadow.TrueShadow>();
         private static readonly List<ParticleSystem> _stoppedParticles = new List<ParticleSystem>();
 
+        // ---- 极限档（画面全黑）改过的东西 ----
+        private static bool _appliedBlackout;
+        private static readonly List<Renderer> _hiddenRenderers = new List<Renderer>();
+        // il2cpp 里每次 FindObjectsOfTypeAll 返回的都是**新的托管包装对象**，
+        // 用 ReferenceEquals 判重会全部判成“新的”，于是每轮补扫都重复追加（实测 341 涨到 2355）。
+        // 只认 GetInstanceID()。
+        private static readonly HashSet<int> _hiddenRendererIds = new HashSet<int>();
+        private static readonly HashSet<int> _blackenedGraphicIds = new HashSet<int>();
+        private static readonly HashSet<int> _disabledLightIds = new HashSet<int>();
+        private static readonly HashSet<int> _savedCameraIds = new HashSet<int>();
+        private static readonly List<Light> _disabledLights = new List<Light>();
+        // UI 不靠 CanvasRenderer.cull 来隐藏：UGUI 的 GraphicRaycaster 会把 cull 的图元跳过，
+        // 那样「黑屏」的同时鼠标点击也全废了（游戏就彻底推不动）。改成把每个 Graphic 的颜色刷黑——
+        // 颜色不影响射线判定，所以画面黑了、输入还在。
+        private static readonly List<UnityEngine.UI.Graphic> _blackenedGraphics =
+            new List<UnityEngine.UI.Graphic>();
+        private static readonly List<Color> _blackenedColors = new List<Color>();
+        // 相机：保留实例（ScreenSpaceCamera 的 UI 还要用 worldCamera），只把 cullingMask 清 0 + 纯黑清屏
+        private static readonly List<Camera> _savedCameras = new List<Camera>();
+        private static readonly List<int> _savedCullMask = new List<int>();
+        private static readonly List<CameraClearFlags> _savedClearFlags = new List<CameraClearFlags>();
+        private static readonly List<Color> _savedCamBg = new List<Color>();
+
         // ---- 低帧率提醒 ----
         private static float _fpsWindowStart = -1f;
         private static int _fpsFrames;
@@ -132,6 +168,7 @@ namespace ManosabaA11y
                     _nextShadowSweepAt = Time.unscaledTime + SweepInterval();
                     if (_appliedShadow) DisableTrueShadows(false);
                     if (_appliedParticles) StopParticles(false);
+                    if (_appliedBlackout) BlackoutNewObjects();
                 }
 
                 MeasureFps();
@@ -144,8 +181,9 @@ namespace ManosabaA11y
         {
             switch (Current)
             {
-                case Mode.Aggressive: return 6f;
-                case Mode.Normal: return 4f;
+                case Mode.Extreme: return 8f;
+                case Mode.Strong: return 6f;
+                case Mode.Balanced: return 4f;
                 default: return 3f;
             }
         }
@@ -194,7 +232,7 @@ namespace ManosabaA11y
         }
 
         /// <summary>兼容旧调用点（历史代码/测试钩子）：按档位名切换。</summary>
-        internal static void Enable(string why) { SetMode(Mode.Conservative, why); }
+        internal static void Enable(string why) { SetMode(Mode.Light, why); }
         internal static void Disable(string why) { SetMode(Mode.Off, why); }
 
         /// <summary>插件卸载时兜底还原（别把玩家的画面设置留在降级状态）。</summary>
@@ -210,10 +248,10 @@ namespace ManosabaA11y
         {
             int level = (int)mode;
 
-            // ---- 保守档就有：URP 画质 + 柔边阴影 ----
+            // ---- 轻度档就有：URP 画质 + 柔边阴影 ----
             if (Allowed(Plugin.CfgLowPerfDegradeUrp))
             {
-                float scale = level >= 3 ? 0.5f : (level >= 2 ? 0.65f : 0.8f);
+                float scale = level >= 4 ? 0.3f : (level >= 3 ? 0.5f : (level >= 2 ? 0.65f : 0.8f));
                 DegradeUrp(scale);
                 _appliedUrp = true;
             }
@@ -223,18 +261,27 @@ namespace ManosabaA11y
                 _appliedShadow = true;
             }
 
-            // ---- 普通档起：质量等级 / 纹理 / 抗锯齿 / 阴影总开关 / LOD ----
+            // ---- 均衡档起：质量等级 / 纹理 / 抗锯齿 / 阴影总开关 / LOD ----
             if (level >= 2 && Allowed(Plugin.CfgLowPerfQuality))
             {
                 ApplyQuality(level >= 3);
                 _appliedQuality = true;
             }
 
-            // ---- 激进档起：各向异性/帧率上限/粒子 ----
+            // ---- 强力档起：各向异性/帧率上限/粒子 ----
             if (level >= 3 && Allowed(Plugin.CfgLowPerfAggressive))
             {
                 ApplyAggressiveExtras();
                 _appliedParticles = true;
+            }
+
+            // ---- 极限档：把画面整个扔掉，只留黑窗口 ----
+            // 为什么单独一个开关：这是「屏幕上一个字都看不见」的档位，误触会很吓人，
+            // 所以配置里可以禁用（关掉后循环到极限档时只播报、不真的动手）。
+            if (level >= 4 && Allowed(Plugin.CfgLowPerfExtreme))
+            {
+                CullAllRendering();
+                _appliedBlackout = true;
             }
 
             // ---- 窗口分辨率：不属于档位，只有玩家自己开了这个开关才跟着生效 ----
@@ -442,6 +489,253 @@ namespace ManosabaA11y
             if (n > 0) A11yHost.Diag("LOWPERF 粒子: 恢复 " + n + " 个粒子系统");
         }
 
+        // ================================================================== 极限档：丢掉所有画面
+
+        /// <summary>
+        /// 极限档：把画面整个扔掉，只剩一个黑窗口。三件事：
+        ///   1. 所有相机 cullingMask 清 0、清屏色改纯黑 → 3D 场景一张都不画；
+        ///   2. 所有 Renderer 停用（立绘/背景/特效的绘制入口）；
+        ///   3. 所有 UI Graphic 的颜色刷成黑色 → 对话框、按钮、标题全部变成黑块，屏幕整体是黑的。
+        ///
+        /// 为什么不干脆把 Canvas / CanvasRenderer 关掉：UGUI 的 GraphicRaycaster 只对
+        /// 「已注册到 GraphicRegistry 且未被 cull」的图元做射线检测。一旦关掉 Canvas 或
+        /// 设 CanvasRenderer.cull，**鼠标点击也一起失效** —— 游戏就彻底推不动了（软锁）。
+        /// 刷颜色不影响射线判定，所以这是唯一能「全黑但还能玩」的做法。
+        /// </summary>
+        private static void CullAllRendering()
+        {
+            int cams = 0, rends = 0, lights = 0, graphics = 0;
+
+            // 1) 相机：保留实例（ScreenSpaceCamera 的 UI 还要用 worldCamera），只清 cullingMask
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<Camera>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var cam = all[i];
+                    if (cam == null) continue;
+                    try
+                    {
+                        _savedCameras.Add(cam); _savedCameraIds.Add(cam.GetInstanceID());
+                        _savedCullMask.Add(cam.cullingMask);
+                        _savedClearFlags.Add(cam.clearFlags);
+                        _savedCamBg.Add(cam.backgroundColor);
+                        cam.cullingMask = 0;
+                        cam.clearFlags = CameraClearFlags.SolidColor;
+                        cam.backgroundColor = Color.black;
+                        cam.allowHDR = false;
+                        cam.allowMSAA = false;
+                        cams++;
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限/相机: " + e.Message); }
+
+            // 2) 所有 Renderer（Mesh/Skinned/Sprite/Particle/Line/Trail 都是 Renderer 子类）
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<Renderer>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var r = all[i];
+                    if (r == null) continue;
+                    try
+                    {
+                        if (!r.enabled) continue;
+                        r.enabled = false;
+                        _hiddenRenderers.Add(r); _hiddenRendererIds.Add(r.GetInstanceID());
+                        rends++;
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限/Renderer: " + e.Message); }
+
+            // 3) 灯光（黑屏下不再需要，省掉光照计算）
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<Light>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var li = all[i];
+                    if (li == null) continue;
+                    try
+                    {
+                        if (!li.enabled) continue;
+                        li.enabled = false;
+                        _disabledLights.Add(li);
+                        lights++;
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限/灯光: " + e.Message); }
+
+            // 4) UI：颜色刷黑（不是 cull！见方法注释）
+            try
+            {
+                var all = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Graphic>();
+                for (int i = 0; i < all.Length; i++)
+                {
+                    var g = all[i];
+                    if (g == null) continue;
+                    try
+                    {
+                        Color c = g.color;
+                        if (c.r == 0f && c.g == 0f && c.b == 0f) continue;   // 已经是黑的，不用记
+                        _blackenedGraphics.Add(g); _blackenedGraphicIds.Add(g.GetInstanceID());
+                        _blackenedColors.Add(c);
+                        g.color = new Color(0f, 0f, 0f, c.a);
+                        graphics++;
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限/UI: " + e.Message); }
+
+            A11yHost.Diag("LOWPERF 极限: 相机=" + cams + " renderer=" + rends
+                          + " 灯光=" + lights + " UI图元刷黑=" + graphics + "（点击仍然可用）");
+        }
+
+        /// <summary>
+        /// 极限档的增量补扫：剧情推进/切换场景会**新建** Renderer、UI 图元与相机，
+        /// 只做一次全量会把新出现的对象漏掉（实测 run127b：黑屏期间画面重新亮起、还原计数也对不上）。
+        /// 开档时全量，之后每轮补扫把新出现的对象也按住。
+        /// </summary>
+        private static void BlackoutNewObjects()
+        {
+            int addedR = 0, addedG = 0, addedC = 0;
+            try
+            {
+                var cam = Resources.FindObjectsOfTypeAll<Camera>();
+                for (int i = 0; i < cam.Length; i++)
+                {
+                    var c = cam[i];
+                    if (c == null) continue;
+                    if (!_savedCameraIds.Add(c.GetInstanceID())) continue;
+                    _savedCameras.Add(c); _savedCullMask.Add(c.cullingMask);
+                    _savedClearFlags.Add(c.clearFlags); _savedCamBg.Add(c.backgroundColor);
+                    c.cullingMask = 0;
+                    c.clearFlags = CameraClearFlags.SolidColor;
+                    c.backgroundColor = Color.black;
+                    addedC++;
+                }
+
+                var rend = Resources.FindObjectsOfTypeAll<Renderer>();
+                for (int i = 0; i < rend.Length; i++)
+                {
+                    var r = rend[i];
+                    if (r == null) continue;
+                    int rid = r.GetInstanceID();
+                    if (_hiddenRendererIds.Contains(rid)) continue;
+                    _hiddenRendererIds.Add(rid);
+                    // 只登记「我们真的关掉」的那些：FindObjectsOfTypeAll<Renderer> 还会返回
+                    // 大量未激活预制体里的 Renderer（实测约 2500 个），把它们记进还原名单会让
+                    // 「还原 N 个 Renderer」虚高、也白占内存。
+                    if (!r.enabled) continue;
+                    _hiddenRenderers.Add(r); r.enabled = false; addedR++;
+                }
+
+                var gs = Resources.FindObjectsOfTypeAll<UnityEngine.UI.Graphic>();
+                for (int i = 0; i < gs.Length; i++)
+                {
+                    var g = gs[i];
+                    if (g == null) continue;
+                    int gid = g.GetInstanceID();
+                    if (_blackenedGraphicIds.Contains(gid)) continue;
+                    _blackenedGraphicIds.Add(gid);
+                    Color oc = g.color;
+                    if (oc.r <= 0f && oc.g <= 0f && oc.b <= 0f) continue;   // 本来就是黑的，不用还原
+                    _blackenedGraphics.Add(g); _blackenedColors.Add(oc);
+                    g.color = Color.black;
+                    addedG++;
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限补扫: " + e.Message); }
+
+            if (addedC + addedR + addedG > 0)
+                A11yHost.Diag("LOWPERF 极限补扫: 新增相机=" + addedC + " renderer=" + addedR + " UI图元=" + addedG);
+        }
+
+        /// <summary>还原极限档改过的一切（顺序：UI 颜色 → Renderer → 灯光 → 相机）。</summary>
+        private static void RestoreBlackout()
+        {
+            if (_blackenedGraphics.Count > 0)
+            {
+                int n = 0;
+                for (int i = 0; i < _blackenedGraphics.Count; i++)
+                {
+                    try
+                    {
+                        var g = _blackenedGraphics[i];
+                        if (g != null) { g.color = _blackenedColors[i]; n++; }
+                    }
+                    catch { }
+                }
+                _blackenedGraphics.Clear();
+                _blackenedColors.Clear();
+                if (n > 0) A11yHost.Diag("LOWPERF 极限: 还原 " + n + " 个 UI 图元颜色");
+            }
+
+            if (_hiddenRenderers.Count > 0)
+            {
+                int n = 0;
+                for (int i = 0; i < _hiddenRenderers.Count; i++)
+                {
+                    try
+                    {
+                        var r = _hiddenRenderers[i];
+                        if (r != null) { r.enabled = true; n++; }
+                    }
+                    catch { }
+                }
+                _hiddenRenderers.Clear();
+                if (n > 0) A11yHost.Diag("LOWPERF 极限: 还原 " + n + " 个 Renderer");
+            }
+
+            if (_disabledLights.Count > 0)
+            {
+                int n = 0;
+                for (int i = 0; i < _disabledLights.Count; i++)
+                {
+                    try
+                    {
+                        var li = _disabledLights[i];
+                        if (li != null) { li.enabled = true; n++; }
+                    }
+                    catch { }
+                }
+                _disabledLights.Clear();
+                if (n > 0) A11yHost.Diag("LOWPERF 极限: 还原 " + n + " 个灯光");
+            }
+
+            if (_savedCameras.Count > 0)
+            {
+                int n = 0;
+                for (int i = 0; i < _savedCameras.Count; i++)
+                {
+                    try
+                    {
+                        var cam = _savedCameras[i];
+                        if (cam != null)
+                        {
+                            cam.cullingMask = _savedCullMask[i];
+                            cam.clearFlags = _savedClearFlags[i];
+                            cam.backgroundColor = _savedCamBg[i];
+                            n++;
+                        }
+                    }
+                    catch { }
+                }
+                _savedCameras.Clear();
+                _savedCullMask.Clear();
+                _savedClearFlags.Clear();
+                _savedCamBg.Clear();
+                if (n > 0) A11yHost.Diag("LOWPERF 极限: 还原 " + n + " 个相机");
+            }
+        }
+
         // ================================================================== TrueShadow
 
         /// <summary>
@@ -526,12 +820,14 @@ namespace ManosabaA11y
 
         private static void Restore()
         {
+            RestoreBlackout();
             RestoreUrp();
             RestoreTrueShadows();
             RestoreParticles();
             RestoreQuality();
             RestoreResolution();
             _appliedUrp = _appliedShadow = _appliedQuality = _appliedParticles = false;
+            _appliedBlackout = false;
         }
 
         // ================================================================== 低帧率提醒

@@ -720,3 +720,24 @@ L2 契约 / 配置项 / 测试套件 / 合规）。**只读审计 + 主代理统
 
 **验收**：`tests\reports\modes*-report.md` 的 `perf.lowmode`（四档阶梯：40s 保守 → 70s 普通 →
 100s 激进 → 130s 关闭，12 条断言含三条「已还原」），以及 `probe\run126-lowperf.ps1`。
+
+## 25. 第十七轮：低性能模式扩到五档 + 「极限」档只剩黑窗口（0.0.15）
+
+**玩家要求**：档位更多、名字更顺，另加一个「画面全丢、只剩黑窗口」的极限档。
+
+**一个反直觉的坑：不能靠关 Canvas / CanvasRenderer 来隐藏 UI。**
+UGUI 的 `GraphicRaycaster.Raycast` 只处理「已注册到 `GraphicRegistry` 且 `canvasRenderer.cull == false`」
+的图元。所以一旦 `Canvas.enabled = false`（→ OnDisable → 从 GraphicRegistry 移除）或
+`CanvasRenderer.cull = true`，**鼠标点击也会一起失效**，游戏彻底推不动（软锁）。
+最终做法：把每个 `UnityEngine.UI.Graphic` 的 `color` 刷成 `Color.black`——
+颜色不参与射线判定，画面全黑、输入还在。实测黑屏期间点 26 次，`Reader.say` 从 1 句涨到 13 句。
+
+**另一个坑：一次性全量清理会被「新建对象」打败。**
+剧情推进/切场景会新建 Renderer、UI 图元、相机；只在开档那一刻扫一遍，黑屏会慢慢「漏光」，
+还原计数也对不上（实测 182 个 Renderer 只还原回 25 个：其余对象已被销毁，而新出现的没记进名单）。
+修法：开档全量 + 每轮补扫（`BlackoutNewObjects`，按 6~8 秒），新对象既按住也能被正确还原。
+
+**工程纪律（第三次重复同一条结论）**：
+1. 任何「隐藏/停用」类优化，先问**它是不是游戏输入的依赖**（Canvas/CanvasRenderer 就是）；
+2. 任何「全局状态改造」必须**增量补扫 + 可还原**，并打印「按住多少 / 还原多少」便于对账；
+3. 档位提升要先量收益再宣传——本轮只证明「极限档仍然可玩、能还原」，帧率没有单独量。
