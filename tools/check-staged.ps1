@@ -36,7 +36,11 @@ Push-Location $root
 try {
     # core.quotepath=false：否则 git 会把中文文件名输出成 \345\215\270 这样的
     # 八进制转义，反斜杠在 Windows 路径里非法，GetExtension 会直接抛异常
-    $staged = @(git -c core.quotepath=false diff --cached --name-only)
+    # 只检查**新增/修改**的文件；删除条目（D）也要从 diff --cached 里出来，
+    # 但“删掉一份游戏原文”恰恰是我们想要的动作，不能算违规。
+    $staged = @(git -c core.quotepath=false diff --cached --name-status |
+                Where-Object { $_ -notmatch '^D' } |
+                ForEach-Object { ($_ -split "`t")[-1] })
     if ($staged.Count -eq 0) {
         Write-Host "暂存区为空，没有要检查的内容。" -ForegroundColor Yellow
         exit 0
