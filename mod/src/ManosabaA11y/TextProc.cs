@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -52,6 +52,10 @@ namespace ManosabaA11y
             new Regex(@"[█■□]+", RegexOptions.Compiled);
 
         /// <summary>连续空白。</summary>
+        // 破折号/省略号后面多出来的逗号
+        private static readonly Regex DashCommaRe =
+            new Regex(@"([—…])[ \t]*[，,][ \t]*", RegexOptions.Compiled);
+
         private static readonly Regex SpaceRe =
             new Regex(@"[ \t\u3000]{2,}", RegexOptions.Compiled);
 
@@ -110,8 +114,11 @@ namespace ManosabaA11y
             // 遮蔽名：`? ? ?` / `？ ？ ？` / `???` —— 念「问号问号问号」是噪音，按剧本语义念「未知」。
             string compact = Regex.Replace(s, @"[\s?？]", "");
             if (compact.Length == 0) return "未知";
-            string mapped = SpeakerNames.Resolve(s);
-            return string.IsNullOrEmpty(mapped) ? s : mapped;
+            string mapped;
+            if (SpeakerNames.TryMap(s, out mapped)) return mapped;
+            // 未命中表：中文名原样念，纯西文 id（如 `Creature<动态名>`）不念——
+            // 否则读屏里会出现一串英文字母，听众也猜不出是谁。
+            return ContainsCjk(s) ? s : "";
         }
 
         /// <summary>
@@ -160,13 +167,19 @@ namespace ManosabaA11y
             s = s.Replace('\n', '，').Replace('\t', ' ');
             s = s.Replace('\u3000', ' ');
             s = SpaceRe.Replace(s, " ");
+            // 本作剧本用「<br>\u3000」做缩进（3,342 处），把 U+3000 换成半角空格后
+            // 会在句中留下一个孤立空格被 TTS 念成停顿（实例：「…… 1，很开心」）。
+            s = RemoveCjkEdgeSpaces(s);
 
             // 10) 标点归一（<br> 造成的一串逗号、终止标点后的逗号）
             s = DupCommaRe.Replace(s, "，");
             s = CommaAfterStopRe.Replace(s, "$1");
+            // 破折号/省略号后不再补逗号（语料 6 处「——，」）
+            s = DashCommaRe.Replace(s, "$1");
             s = Regex.Replace(s, @"\s*([，。！？；：、])\s*", "$1");
 
-            s = s.Trim().Trim('，', '。', ' ');
+            // 只去尾部逗号与空白；句号保留（TTS 靠它收尾降调）
+            s = s.Trim().Trim('，', ' ');
             return s;
         }
 
@@ -226,6 +239,14 @@ namespace ManosabaA11y
                     case '；': case ';': case '：': case ':':
                     case '」': case '』': case '）': case ')': case '＞':
                         return "";
+                    // 左侧是粘着助词/连接词时也不能补逗号：语料里有 1,353 处
+                    // `<br>` 紧跟在「的/是/了/在/地/得…」后面（如「墙上的<br>全新」），
+                    // 无条件补逗号就会念成「墙上的，全新」。
+                    case '的': case '了': case '着': case '过': case '地': case '得':
+                    case '是': case '在': case '和': case '与': case '及': case '或':
+                    case '把': case '被': case '就': case '都': case '也': case '还':
+                    case '而': case '且': case '但': case '并':
+                        return "";
                 }
 
                 // 右侧是「的/了/着/过/地/得/吗/呢/吧/啊/呀/哦」这类粘着语素时也不能补逗号，
@@ -255,8 +276,63 @@ namespace ManosabaA11y
             string body = (m.Groups[2].Value ?? "").Trim();
             if (note.Length == 0) return body;
             if (IsKanaOnly(note)) return body;
+            // 拉丁法名/英文旁注（Balloon / SALAMANDER / pyrokinesis…）只念正文：
+            // 中文 TTS 念拼写又慢又听不懂，与 textassets\text-format.md 的结论一致。
+            if (IsLatinOnly(note)) return body;
             if (body.Length == 0) return note;
             return body + "（" + note + "）";
+        }
+
+        /// <summary>是不是只有西文字母/数字/空格/连字符（即拉丁法名、英文专用名）。</summary>
+        private static bool IsLatinOnly(string s)
+        {
+            bool any = false;
+            foreach (char c in s)
+            {
+                if (char.IsWhiteSpace(c)) continue;
+                bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+                          || c == '-' || c == '\'' || c == '&';
+                if (!ok) return false;
+                any = true;
+            }
+            return any;
+        }
+
+        /// <summary>删掉紧贴中文/全角标点的单个半角空格（剧本里 &lt;br&gt;\u3000 做缩进产生的）。</summary>
+        private static string RemoveCjkEdgeSpaces(string s)
+        {
+            if (s.IndexOf(' ') < 0) return s;
+            StringBuilder sb = new StringBuilder(s.Length);
+            for (int i = 0; i < s.Length; i++)
+            {
+                char c = s[i];
+                if (c == ' ')
+                {
+                    char prev = sb.Length > 0 ? sb[sb.Length - 1] : '\0';
+                    char next = i + 1 < s.Length ? s[i + 1] : '\0';
+                    if (IsCjkOrFullWidth(prev) || IsCjkOrFullWidth(next)) continue;
+                }
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
+        private static bool IsCjkOrFullWidth(char c)
+        {
+            if (c >= '\u4e00' && c <= '\u9fff') return true;
+            if (c >= '\u3000' && c <= '\u303f') return true;
+            if (c >= '\uff00' && c <= '\uffef') return true;
+            if (c >= '\u3040' && c <= '\u30ff') return true;
+            return false;
+        }
+
+        /// <summary>有中文（CJK）字符吗：用于判断一个未映射的说话人 id 该不该念。</summary>
+        public static bool ContainsCjk(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return false;
+            foreach (char c in s)
+                if (c >= '\u4e00' && c <= '\u9fff') return true;
+            return false;
         }
 
         /// <summary>旁注是不是纯日文假名（含长音符/中点）。</summary>

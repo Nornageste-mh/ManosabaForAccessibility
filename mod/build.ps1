@@ -224,7 +224,7 @@ if ($NoDeploy) {
 Step "6/6  组装安装包 package\"
 $pkg = Join-Path $mod "package"
 # 保留自产的说明文件，其余重建
-$keep = @("安装说明.md", "常见问题.md")
+$keep = @("安装说明.md", "常见问题.md", "更新日志.md")
 $saved = @{}
 foreach ($k in $keep) {
     $p = Join-Path $pkg $k
@@ -272,6 +272,21 @@ Copy-Item -LiteralPath $pluginDll -Destination $plugDir -Force
 Copy-Item -LiteralPath $nvdaDll.FullName -Destination $plugDir -Force
 # 同时放一份到包根：DllImport 会先查应用目录
 Copy-Item -LiteralPath $nvdaDll.FullName -Destination (Join-Path $pkg "nvdaControllerClient.dll") -Force
+
+# 本仓库的许可证与来源说明（MIT 要求随分发附许可文本，不能只放在仓库里）
+$repoRoot = Split-Path -Parent $mod
+foreach ($f in @("LICENSE", "NOTICE.md")) {
+    $src = Join-Path $repoRoot $f
+    if (Test-Path -LiteralPath $src) {
+        Copy-Item -LiteralPath $src -Destination (Join-Path $pkg $f) -Force
+    } else {
+        Write-Host "    警告：找不到 $f，包里将缺少它（发布前必须补上）" -ForegroundColor Yellow
+    }
+}
+# 本模组自己的更新日志（原来包根的 changelog.txt 是 BepInEx 上游的，不是我们的）
+$chg = Join-Path $repoRoot "CHANGELOG.md"
+if (Test-Path -LiteralPath $chg) { Copy-Item -LiteralPath $chg -Destination (Join-Path $pkg "更新日志.md") -Force }
+Ok "已附 LICENSE / NOTICE.md / 更新日志.md"
 
 # 第三方许可证与来源说明（随二进制分发的合规要求）
 $licDir = Join-Path $mod "licenses"

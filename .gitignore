@@ -1,4 +1,4 @@
-# 构建产物
+﻿# 构建产物
 bin/
 obj/
 dist/
@@ -66,3 +66,10 @@ probe/_stash_out/
 # 自动化测试产物（报告/截图/临时 json）
 tests/reports/
 tests/tests/
+
+# 游戏原始资源与反编译产物一律不入库（IP 红线：见 README「我们不做什么」）
+evidence/raw/
+re/raw/
+re/lead/
+re/lead2/
+*.bin

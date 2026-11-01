@@ -47,13 +47,16 @@ try {
         'extracted/',
         'decompiled/',
         'verify/',
+        'evidence/raw/',
+        're/raw/',
+        're/lead/',
         'textassets/',
         'bep_dl/',
         'nvda_dl/',
         'addressable_ids.txt'
     )
     # 禁止出现的文件扩展名
-    $forbiddenExt = @('.dll', '.zip', '.exe', '.pdb')
+    $forbiddenExt = @('.dll', '.zip', '.exe', '.pdb', '.bin', '.nson', '.bundle', '.assets')
 
     # 脚手架文件名（只匹配纯文件名，避免误伤正常文件）
     $scratchNames = @(

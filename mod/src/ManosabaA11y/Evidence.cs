@@ -434,6 +434,7 @@ namespace ManosabaA11y
             int firstOnPage = _page * PageSize;
             for (int i = 1; i <= PageSize && firstOnPage + i <= _items.Count; i++)
             {
+                if (!FocusGate.CanReadChoiceKeys()) continue;
                 if (!Tapped(KeyCode.Alpha0 + i) && !Tapped(KeyCode.Keypad0 + i)) continue;
                 Activate(firstOnPage + i);
                 return;
@@ -840,13 +841,13 @@ namespace ManosabaA11y
             if (idx < 0 || idx >= _items.Count) return;
             Item e = _items[idx];
             _selectedIndex = oneBased;
-            Repeat.Say(e.Name);
-            ClickButton(e.Btn != null ? e.Btn._button : null);
-            A11yHost.Diag("EVIDENCE 数字键 " + oneBased + " -> " + e.Name);
-            // 只选中，不替玩家出示（0.0.0.9 起）。理由：选哪件是玩家的决策，
-            // 「现在就提交」也是玩家的决策——自动弹确认框等于替玩家走了一步，
-            // 而且会消灭「选中后继续浏览其它证物」这个动作。改成数字键=选中、回车=出示。
-            Repeat.Say("已选中。按回车出示这件证据。");
+            // ★ 先点后念：原来是“先说已选中、再去点”，点击失败时读屏就撤了谎。
+            //   ClickButton 返回值代表注入点击是否真的发出（坐标越界、拿不到
+            //   RectTransform 都会返回 false）。
+            bool clicked = ClickButton(e.Btn != null ? e.Btn._button : null);
+            A11yHost.Diag("EVIDENCE 数字键 " + oneBased + " -> " + e.Name + " clicked=" + clicked);
+            Repeat.Say(clicked ? (e.Name + "。已选中。按回车出示这件证据。")
+                               : (e.Name + "。选中没成功，请再按一次。"));
             _clickPresentAt = 0f;
             _presentClicked = false;
         }
@@ -874,9 +875,9 @@ namespace ManosabaA11y
                     Selectable sel = inner;
                     if (sel == null) { A11yHost.Diag("EVIDENCE: PresentEvidenceButton 里找不到 Unity Button"); continue; }
                     if (!vis || !sel.interactable) continue;
-                    Repeat.Say("已出示证据。");
-                    ClickButton(sel);
-                    A11yHost.Diag("EVIDENCE 点了「出示证据」 name=" + b.name);
+                    bool ok = ClickButton(sel);
+                    A11yHost.Diag("EVIDENCE 点了「出示证据」 name=" + b.name + " ok=" + ok);
+                    Repeat.Say(ok ? "已出示证据。" : "出示没成功，请再按一次回车。");
                     return;
                 }
                 A11yHost.Diag("EVIDENCE: 找不到可点的「出示证据」按钮");
@@ -975,6 +976,7 @@ namespace ManosabaA11y
 
                     for (int k = 1; k <= lst.Count && k <= PageSize; k++)
                     {
+                        if (!FocusGate.CanReadChoiceKeys()) continue;
                         if (!Tapped(KeyCode.Alpha0 + k) && !Tapped(KeyCode.Keypad0 + k)) continue;
                         var rb = lst[k - 1];
                         A11yHost.Diag("EVIDENCE 对话框数字键 " + k);

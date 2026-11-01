@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -67,6 +67,9 @@ namespace ManosabaA11y
             SpeakerTests();
             VoiceTests();
             HotkeyTests();
+            // 2026-11-01 审计新增的两组：文本边界用例 + L2 接线/配置默认值
+            CheckText();
+            CheckWiring();
             Summary();
         }
 
@@ -167,6 +170,63 @@ namespace ManosabaA11y
             // 认不出来的键必须「返回 false 且有原因」，不能静默当成功
             ok = Hotkey.Parse("Ctrl+NotAKeyXyz", out sp, out why);
             Check("hotkey.坏键报错", !ok && !string.IsNullOrEmpty(why), "ok=" + ok + " why=" + why);
+        }
+
+        private static void CheckText()
+        {
+            // ---- 2026-11-01 审计回填：这六条在修复前是红的 ----
+            Check("textproc.br左侧助词不补逗号",
+                  !TextProc.Clean("挂在墙上的<br>全新的制服").Contains("的，"),
+                  TextProc.Clean("挂在墙上的<br>全新的制服"));
+            Check("textproc.br后全角缩进不留空格",
+                  !TextProc.Clean("墙上的<br>　全新").Contains(" "),
+                  TextProc.Clean("墙上的<br>　全新"));
+            Check("textproc.ruby拉丁旁注不念",
+                  TextProc.Clean("<ruby=\"Balloon\">气球</ruby>") == "气球",
+                  TextProc.Clean("<ruby=\"Balloon\">气球</ruby>"));
+            Check("textproc.全角空格不留半角空格",
+                  TextProc.Clean("甲　乙") == "甲乙",
+                  TextProc.Clean("甲　乙"));
+            Check("textproc.破折号后不叠逗号",
+                  !TextProc.Clean("甲——，乙").Contains("—，"),
+                  TextProc.Clean("甲——，乙"));
+            Check("speaker.未映射英文id不念",
+                  TextProc.Speaker("CreatureFreshName") == "",
+                  TextProc.Speaker("CreatureFreshName"));
+
+            // ---- 行 id 反推作者（审计 P1-2：1,988 个 @printDebate 行只能从 id 推）----
+            Check("speaker.printDebate行可反推",
+                  Reader.AuthorFromLineId("0101Trial01_Sherry001") == "Sherry",
+                  Reader.AuthorFromLineId("0101Trial01_Sherry001"));
+            Check("speaker.旁白id不产生作者",
+                  Reader.AuthorFromLineId("0101Adv01_Narrative001") == "",
+                  Reader.AuthorFromLineId("0101Adv01_Narrative001"));
+            Check("speaker.反推结果能查成中文名",
+                  TextProc.Speaker(Reader.AuthorFromLineId("0101Trial01_Sherry001")) == "橘雪莉",
+                  TextProc.Speaker(Reader.AuthorFromLineId("0101Trial01_Sherry001")));
+        }
+
+        private static void CheckWiring()
+        {
+            // ---- L2 契约接线（审计 E：少填一个钩子就是静默失效）----
+            string[] missing = null;
+            try { missing = A11yHost.Missing(); } catch (Exception) { }
+            string missText = missing == null ? "null" : string.Join(",", missing);
+            Check("wiring.契约必填项齐全", missing != null && missing.Length == 0, "missing=" + missText);
+            Check("wiring.groupPriority", A11yHost.GameGroupPriority != null);
+            Check("wiring.groupName", A11yHost.GameGroupName != null);
+            Check("wiring.labelOf", A11yHost.GameLabelOf != null);
+            Check("wiring.textIsNoise", A11yHost.GameTextIsNoise != null);
+            Check("wiring.muteSubmit", A11yHost.ShouldMuteUnitySubmit != null);
+            Check("wiring.blockAdvance", A11yHost.BlockGameAdvance != null);
+            Check("wiring.navToggle", A11yHost.NavTogglePressed != null);
+
+            // ---- 配置默认值必须合法（审计 F：沉默按键原默认 "0" 是不合法键名）----
+            Check("config.沉默按键留空或合法",
+                  string.IsNullOrEmpty(Plugin.CfgSilenceKey == null ? "" : Plugin.CfgSilenceKey.Value));
+            string quitNames = Plugin.CfgQuitNames == null ? "" : (Plugin.CfgQuitNames.Value ?? "");
+            Check("config.退出确认默认已取证对象名",
+                  quitNames.IndexOf("Button_Exit", StringComparison.OrdinalIgnoreCase) >= 0, quitNames);
         }
 
         private static void Summary()

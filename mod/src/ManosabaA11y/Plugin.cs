@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.9";
+        public const string Version = "0.0.0.10";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -49,14 +49,10 @@ namespace ManosabaA11y
         internal static ConfigEntry<bool> CfgSpeakName;
         internal static ConfigEntry<bool> CfgReadChoices;
         internal static ConfigEntry<bool> CfgChoiceHotkeys;
-        internal static ConfigEntry<float> CfgRealTimeSeconds;
         internal static ConfigEntry<string> CfgSilenceKey;
         internal static ConfigEntry<string> CfgRepeatKey;
         internal static ConfigEntry<string> CfgSpeechBackend;
         internal static ConfigEntry<string> CfgTextLocale;
-        internal static ConfigEntry<bool> CfgReadPhone;
-        internal static ConfigEntry<bool> CfgReadPhoneSticker;
-        internal static ConfigEntry<bool> CfgAnnounceOnSkipStop;
         internal static ConfigEntry<bool> CfgAnnounceLoading;
 
         // ==================== 界面导航 ====================
@@ -236,6 +232,7 @@ namespace ManosabaA11y
             // 靠对象名/路径名补中文（依据见 UiNav.Game.cs 顶部注释）。
             A11yHost.GameLabelOf = UiNav.GameLabelOf;
             A11yHost.GameGroupName = UiNav.GameGroupName;
+            A11yHost.GameGroupPriority = UiNav.GameGroupPriority;
             A11yHost.GameTextIsNoise = UiNav.GameTextIsNoise;
 
             // 每帧一次：界面导航 + 选项面板。
@@ -274,6 +271,18 @@ namespace ManosabaA11y
             catch (Exception e)
             {
                 L.LogWarning("[a11y] 全局键预热失败: " + e.Message);
+            }
+            // ★ 测试钩子总闸：没有 TEST/DIAG 环境变量时一律不生效。
+            //   为什么：这些钩子会“替玩家点选项 / 走地点 / 按对话框按钮”，
+            //   一旦玩家 shell 里残留了某个 TEST_* 变量，正常游戏就会被插手。
+            bool hooksAllowed = TestMode || A11yHost.DiagOn;
+            if (!hooksAllowed)
+            {
+                TestNavMode = false; TestChoiceOnce = false; TestMapChoicePick = 0;
+                TestMapPickKind = null; TestMapFloorCount = 0; TestEvModeOnce = false;
+                TestEvForce = false; TestEvYes = false; TestEvPick = false; TestEvCmdMode = "";
+                // TEST_REPEAT / TEST_ESC 的开关在 PluginBehaviour 里（同一帧驱动），
+                // 这里够不到；它们的触发还依赖 UI 场景，且只重复「重读/关闭」这类只读动作，风险可接受。
             }
             // 选项验收：播报后由插件自己选一次第 1 项（仅 MANOSABA_A11Y_TEST_CHOICE=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_CHOICE") == "1")
@@ -380,8 +389,7 @@ namespace ManosabaA11y
                 //   Harmony detour 会搬坏返回值，让 PrintText.Print 的 await 抛
                 //   MethodAccessException 并把剧情永久卡死（2026-10-29 实机 + 二分证据）。
                 //   文本主钩子是 RevealableText.set_Text，见 Patches.Patch_RevealText 注释。
-                if (!skipPanel) _harmony.PatchAll(typeof(Patches.Patch_PanelAddMessage));
-                // printer 级 AddMessage / SetMessages：本作 ADV 真入口（面板级一条都不响），
+                // printer 级 AddMessage / SetMessages：本作 ADV 真入口（面板级一条都不响，已删掉那条补丁），
                 // 也是「行 id」的唯一来源 → 配音闸门依赖它。返回值 void，detour 安全。
                 _harmony.PatchAll(typeof(Patches.Patch_PrinterAddMessage));
                 _harmony.PatchAll(typeof(Patches.Patch_PrinterSetMessages));
@@ -393,6 +401,8 @@ namespace ManosabaA11y
                 if (!skipDebate) Patches.ApplyManual(_harmony);
                 // 加载界面可见性（Giga LoadingUiExtended）——事件驱动，补轮询查不到的短板。
                 Patches.ApplyLoadingUi(_harmony);
+                // 审判 HUD（倒计时 / HP）与提交静音：这三类信息导航扫不到，只能靠补丁。
+                Patches.ApplyTrialHud(_harmony);
 
                 // 把已挂补丁数打进日志：漏挂是静默故障，必须能一眼看出来。
                 int patched = 0;
@@ -425,6 +435,12 @@ namespace ManosabaA11y
                 else
                     L.LogWarning("[a11y] 重读按键认不出来: " + why);
 
+                // 导航开关键也要打解析结果：写错了就是“按键没反应”，而玩家不可能去看配置文件。
+                if (Hotkey.Parse(CfgNavKey.Value, out sp, out why))
+                    L.LogInfo("[a11y] 导航开关键=" + CfgNavKey.Value + " -> KeyCode." + sp.Key
+                              + (sp.Alt ? " +Alt" : "") + (sp.Ctrl ? " +Ctrl" : "") + (sp.Shift ? " +Shift" : ""));
+                else
+                    L.LogWarning("[a11y] 导航开关键认不出来：" + CfgNavKey.Value + " —— " + why);
                 if (Hotkey.Parse(CfgSilenceKey.Value, out sp, out why))
                     L.LogInfo("[a11y] 沉默按键=" + CfgSilenceKey.Value + " -> KeyCode." + sp.Key);
                 else
@@ -538,20 +554,12 @@ namespace ManosabaA11y
                 "选项面板出现时把每条选项念出来。");
             CfgChoiceHotkeys = Config.Bind("朗读", "数字键选择选项", true,
                 "按 1-9 直接选对应选项。");
-            CfgRealTimeSeconds = Config.Bind("朗读", "限时选择时长", 20f,
-                "限时选项的倒计时。读屏用户需要在朗读完之后留出决策时间，所以远长于默认值。");
             CfgSilenceKey = Config.Bind("朗读", "沉默按键", "0",
                 "按一下立刻停止朗读（不改变游戏状态）。");
             CfgRepeatKey = Config.Bind("朗读", "重读按键", "Backspace",
                 "重读上一句剧情/选项。本作只启用新 Input System，键名照 Unity KeyCode 写。");
             CfgSpeechBackend = Config.Bind("朗读", "语音后端", "自动",
                 "自动 / NVDA / SAPI / 争渡（具体取值见 Speech.CycleAvailable 支持的列表）。");
-            CfgReadPhone = Config.Bind("朗读", "朗读手机消息", true,
-                "手机界面里的消息文本。逐作 P3 接上后生效。");
-            CfgReadPhoneSticker = Config.Bind("朗读", "朗读手机表情", true,
-                "表情/贴纸的描述文字。逐作 P3 接上后生效。");
-            CfgAnnounceOnSkipStop = Config.Bind("朗读", "快进停止时补念当前句", true,
-                "快进时台词被跳过，停下时补念当前这一句。");
             CfgAnnounceLoading = Config.Bind("朗读", "播报加载中", true,
                 "加载时念一句「正在加载。」——读屏玩家在加载期没有任何线索，容易以为卡死。\n" +
                 "本作实测有明显的黑屏加载段（点新游戏后），所以默认开。");
@@ -606,6 +614,25 @@ namespace ManosabaA11y
                 "  预制体（从未被实例化），所以这个开关在发行版里按了也不会有面板；\n" +
                 "  开发构建（Editor/Dev Build）才有完整面板。保留开关是为了开发构建可用。");
 
+            // 旧 cfg 迁移：只做“一定知道用户意图”的两件事。
+            // 1) 沉默按键旧默认值 "0" 不是合法键名（Hotkey.cs 拒绝纯数字），
+            //    它本来就从来没生效过 → 视为“未设置”写回空串。
+            // 2) 退出确认对象名旧默认写的是 TODO 占位符（run41 之前的模板）。
+            try
+            {
+                if (CfgSilenceKey != null && (CfgSilenceKey.Value ?? "").Trim() == "0")
+                {
+                    CfgSilenceKey.Value = "";
+                    L.LogInfo("[a11y] cfg 迁移：沉默按键\"0\" -> \"（留空 = 停用）");
+                }
+                if (CfgQuitNames != null && (CfgQuitNames.Value ?? "").IndexOf("TODO", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    CfgQuitNames.Value = "Button_Exit";
+                    L.LogInfo("[a11y] cfg 迁移：退出确认对象名 TODO -> Button_Exit（实机取证）");
+                }
+            }
+            catch (Exception e) { A11yHost.Diag("cfg 迁移: " + e.Message); }
+
             // 无人值守实机测试开关：只有环境变量 MANOSABA_A11Y_TEST=1 时强制打开诊断日志，
             // 让自动化脚本能从 LogOutput.log 里核对「哪一句被念了 / 哪条补丁没接上」。
             try
@@ -613,17 +640,46 @@ namespace ManosabaA11y
                 if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST") == "1")
                 {
                     TestMode = true;
-                    CfgDiagLog.Value = true;
+                    A11yHost.DiagOn = true; // 纯内存：不能把玩家的 cfg 永久改成开启
                     L.LogInfo("[a11y] TEST MODE: diag on + TestDriver on");
                 }
                 // 只开诊断日志、不要 TestDriver 介入（实机点鼠标走玩家路径时用这个）
                 else if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_DIAG") == "1")
                 {
-                    CfgDiagLog.Value = true;
+                    A11yHost.DiagOn = true; // 同上
                     L.LogInfo("[a11y] DIAG MODE: diag on, TestDriver off");
                 }
             }
             catch { }
+        }
+    }
+
+    /// <summary>
+    /// 交互层的“现在能不能读玩家的选择键”。
+    /// 为什么需要：本作只启用新 Input System，平台层热键靠 Win32 全局读键兜底
+    /// （A11yHost.UseGlobalKeys）——全局读键不看焦点，玩家在别的程序里敲 1/2/3
+    /// 会直接点掉选项、走掉地点、选中证物。所以选择类按键必须先问
+    /// 一句“游戏窗口在前台吗”。热键（退格/休眠/F7）不在此列。
+    /// </summary>
+    internal static class FocusGate
+    {
+        private static bool _hasKey;
+        private static bool _cached;
+        private static float _at;
+
+        internal static bool CanReadChoiceKeys()
+        {
+            try
+            {
+                float now = UnityEngine.Time.realtimeSinceStartup;
+                if (_hasKey && now - _at < 0.25f) return _cached;
+                bool ok;
+                try { ok = UnityEngine.Application.isFocused; }
+                catch { ok = true; }
+                _hasKey = true; _cached = ok; _at = now;
+                return ok;
+            }
+            catch { return true; }
         }
     }
 

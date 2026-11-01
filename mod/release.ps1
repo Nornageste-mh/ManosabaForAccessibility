@@ -63,7 +63,10 @@ $required = @(
     "BepInEx\plugins\manosaba_a11y\$pluginName.dll",
     "BepInEx\plugins\manosaba_a11y\nvdaControllerClient.dll",
     "nvdaControllerClient.dll",
-    "licenses\THIRD-PARTY-NOTICES.txt"
+    "licenses\THIRD-PARTY-NOTICES.txt",
+    "LICENSE",
+    "NOTICE.md",
+    "更新日志.md"
 )
 $miss = @()
 foreach ($r in $required) {
@@ -73,24 +76,28 @@ if ($miss.Count -gt 0) { Fail "安装包缺必需文件：`n  $($miss -join "`n 
 Ok "必需文件齐全（$($required.Count) 项）"
 
 $md = @(Get-ChildItem -LiteralPath $pkg -File -Filter "*.md")
-if ($md.Count -lt 2) { Fail "包根至少要有 2 个说明 *.md（安装说明.md、常见问题.md），实际 $($md.Count)" }
+# 光数量不够：以前只要求“≥ 2 个 md”，改个名字也能通过。现在要求名字必须对得上。
+$needMd = @("安装说明.md", "常见问题.md", "更新日志.md")
+$missMd = @($needMd | Where-Object { -not (Test-Path -LiteralPath (Join-Path $pkg $_)) })
+if ($missMd.Count -gt 0) { Fail "包根缺说明文档：$($missMd -join '、')" }
 Ok "说明文档：$($md.Name -join '、')"
 
-$forbidden = @(
-    "BepInEx\interop",
-    "BepInEx\unity-libs",
-    "BepInEx\config\$pluginGuid.cfg",
-    "BepInEx\plugins\ManosabaA11yProbe.dll",
-    "BepInEx\plugins\manosaba_a11y\ManosabaA11yProbe.dll"
-)
+# 发布红线改成“黑名单路径 + 黑名单扩展名”：只查几个精确路径做不住
+# （把 interop 目录改个名就能渗进包里）。
+$forbidden = @("BepInEx\interop", "BepInEx\unity-libs", "BepInEx\config\", "ManosabaProbe", "NaninovelReProbe")
+$forbiddenExt = @('.pdb', '.cs', '.ps1', '.py', '.bin', '.nson', '.log', '.cfg', '.bundle', '.assets')
 $bad = @()
 foreach ($f in $forbidden) {
     if (Test-Path -LiteralPath (Join-Path $pkg $f)) { $bad += $f }
 }
-if ($bad.Count -gt 0) {
-    Fail "安装包混入了不该分发的内容：`n  $($bad -join "`n  ")`n（interop 是机器相关的、config 是用户数据、probe 是开发工具）"
+foreach ($f in (Get-ChildItem -LiteralPath $pkg -Recurse -File)) {
+    $ext = [System.IO.Path]::GetExtension($f.Name).ToLower()
+    if ($forbiddenExt -contains $ext) { $bad += ($f.FullName.Substring($pkg.Length).TrimStart('\')) }
 }
-Ok "未混入 interop / unity-libs / config / probe"
+if ($bad.Count -gt 0) {
+    Fail "安装包混入了不该分发的内容：`n  $($bad -join "`n  ")`n（interop 是机器相关的、config 是用户数据、probe/源码/日志不进包）"
+}
+Ok "未混入 interop / unity-libs / config / probe / 源码 / 日志"
 
 # ============================================================
 Step "3/4  打 ZIP（makezip，正斜杠条目）"
@@ -124,7 +131,7 @@ Write-Host @"
     发布前自检：
       [ ] 已在干净的游戏目录上实测「解压 → 启动 → 能读能导航」
       [ ] 已实测「不装补丁 / 关掉补丁」游戏本身正常（回归，测试问卷第 8 节）
-      [ ] 测试问卷 docs/测试问卷.md 已填实机结果（未实测的写「尚未实机复测」）
+      [ ] 测试问卷（仓库根目录下的 测试问卷.md） 已填实机结果（未实测的写「尚未实机复测」）
       [ ] README 的「已知问题」「游戏原生占用的键」已更新
       [ ] licenses\THIRD-PARTY-NOTICES.txt 内容与本包实际随附的组件一致
 

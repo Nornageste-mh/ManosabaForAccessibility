@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using HarmonyLib;
 using Naninovel;
@@ -61,7 +61,7 @@ namespace ManosabaA11y
         internal static void ApplyAdvAuthor(Harmony harmony)
         {
             Type panel = null;
-            try { panel = Type.GetType("WitchTrials.Views.WitchTrialsTextPrinterPanel, Assembly-CSharp"); }
+            try { panel = AccessTools.TypeByName("WitchTrials.Views.WitchTrialsTextPrinterPanel") ?? Type.GetType("WitchTrials.Views.WitchTrialsTextPrinterPanel, Assembly-CSharp"); }
             catch (Exception e) { A11yHost.Diag("Patches.advAuthor type: " + e.Message); }
             if (panel == null)
             {
@@ -125,35 +125,6 @@ namespace ManosabaA11y
         /// 比 actor 级多拿到面板 Transform，可以挡掉隐藏面板；与 Print 用同一去重窗口。
         /// 注意：辩论面板 DebateTextPrinterPanel 覆写了 AddMessage，基类补丁接不到它，
         /// 辩论走下面 ApplyManual 挂的 SetText/AddText。
-        /// </summary>
-        [HarmonyPatch(typeof(Naninovel.UI.UITextPrinterPanel), "AddMessage")]
-        [HarmonyPatch(new Type[] { typeof(Naninovel.PrintedMessage) })]
-        internal static class Patch_PanelAddMessage
-        {
-            [HarmonyPostfix]
-            internal static void Postfix(Naninovel.UI.UITextPrinterPanel __instance,
-                                        [HarmonyArgument(0)] Naninovel.PrintedMessage message)
-            {
-                Reader.OnPanelAddMessage(__instance, message);
-            }
-        }
-
-        // ==================== ADV：printer 级 AddMessage（行 id 的唯一可靠来源）====================
-
-        /// <summary>
-        /// Naninovel.UITextPrinter.AddMessage(PrintedMessage)。
-        ///
-        /// 为什么必须是它（2026-10-29 run56 实机定位）：
-        ///   本作 ADV 路径**从不调用** `Naninovel.UI.UITextPrinterPanel.AddMessage`
-        ///   （给面板挂的补丁一条日志都没有），真正被调的是 actor 级的这一条。
-        ///   没有它就拿不到 `PrintedMessage`，也就拿不到 `Text.parts[i].id`（行 id）——
-        ///   配音闸门（有配音的行不自动朗读）完全无从判断。
-        ///
-        /// 为什么这次可以挂（对比被删除的 Print 补丁）：
-        ///   `UITextPrinter.AddMessage` 的返回类型是 **void**（ilspycmd 实查），
-        ///   Harmony 原生 detour 不需要搬非 blittable 的返回值，
-        ///   不会重演 `TextPrinterManager.Print` 返回 `UniTask` 导致 async 状态机
-        ///   `MethodAccessException`、整条剧情卡死的那个事故。
         /// </summary>
         [HarmonyPatch(typeof(Naninovel.UITextPrinter), "AddMessage")]
         [HarmonyPatch(new Type[] { typeof(Naninovel.PrintedMessage) })]
@@ -232,7 +203,7 @@ namespace ManosabaA11y
         internal static void ApplyLoadingUi(Harmony harmony)
         {
             Type t = null;
-            try { t = Type.GetType("GigaCreation.NaninovelExtender.Ui.LoadingUiExtended, GigaCreation.NaninovelExtender.UI"); }
+            try { t = AccessTools.TypeByName("GigaCreation.NaninovelExtender.Ui.LoadingUiExtended") ?? Type.GetType("GigaCreation.NaninovelExtender.Ui.LoadingUiExtended, GigaCreation.NaninovelExtender.UI"); }
             catch (Exception e) { A11yHost.Diag("Patches.loading type: " + e.Message); }
             if (t == null)
             {
@@ -270,10 +241,126 @@ namespace ManosabaA11y
         ///   public unsafe void AddText(string text)
         /// 用 AccessTools 手工挂 + 逐条 try/catch，避免某一条挂不上时拖垮整个 PatchAll。
         /// </summary>
+
+        // ================= 审判 HUD / 倒计时 / 提交静音 =================
+        // 全部用 AccessTools 按名字挂：这些类分属 UnityEngine / Assembly-CSharp /
+        // Giga 的不同程序集，写死类型会让没引用它们的版本直接编译失败；
+        // 名字查不到只记一条日志，不影响其它补丁。
+        // 三者返回值均为 void（detour 安全）；倒计时那两个除外的 UniTask 方法
+        // （ChangeVisibility / Initialize）**绝不能**挂——返回非 blittable 结构体会把 await 搞崩（见 10-29 事故）。
+        internal static void ApplyTrialHud(Harmony harmony)
+        {
+            // 1) 倒计时设置
+            Type t = FindType("WitchTrials.Models.Timer");
+            if (t != null)
+            {
+                MethodInfo m = AccessTools.Method(t, "SetTime");
+                if (m != null)
+                {
+                    try
+                    {
+                        harmony.Patch(m, postfix: new HarmonyMethod(typeof(Patches).GetMethod(
+                            "TimerSetPostfix", BindingFlags.Static | BindingFlags.NonPublic)));
+                        Plugin.L.LogInfo("[a11y] patched " + t.Name + ".SetTime");
+                    }
+                    catch (Exception e) { Plugin.L.LogError("[a11y] 挂 " + t.Name + ".SetTime 失败: " + e.Message); }
+                }
+                MethodInfo up = AccessTools.Method(t, "ForceRemainingTimeToNearlyZero");
+                if (up != null)
+                {
+                    try
+                    {
+                        harmony.Patch(up, postfix: new HarmonyMethod(typeof(Patches).GetMethod(
+                            "TimeUpPostfix", BindingFlags.Static | BindingFlags.NonPublic)));
+                        Plugin.L.LogInfo("[a11y] patched " + t.Name + ".ForceRemainingTimeToNearlyZero");
+                    }
+                    catch (Exception e) { Plugin.L.LogError("[a11y] 挂 Timer 归零失败: " + e.Message); }
+                }
+            }
+
+            // 2) HP 变化
+            Type du = FindType("WitchTrials.Views.DebateUi");
+            if (du != null)
+            {
+                MethodInfo m = AccessTools.Method(du, "OnCurrentHpChanged", new Type[] { typeof(float) });
+                if (m != null)
+                {
+                    try
+                    {
+                        harmony.Patch(m, postfix: new HarmonyMethod(typeof(Patches).GetMethod(
+                            "HpPostfix", BindingFlags.Static | BindingFlags.NonPublic)));
+                        Plugin.L.LogInfo("[a11y] patched " + du.Name + ".OnCurrentHpChanged");
+                    }
+                    catch (Exception e) { Plugin.L.LogError("[a11y] 挂 HP 失败: " + e.Message); }
+                }
+            }
+
+            // 3) 导航模式下屏蔽游戏自己的提交事件：
+            //    平台层 UiNav 说明了挂点（见 UiNav.cs:257-259），但逐作层一直没接——
+            //    结果是导航模式下按回车，既触发我们的“确认”又触发游戏的提交。
+            Type sim = FindType("UnityEngine.EventSystems.StandaloneInputModule");
+            if (sim != null)
+            {
+                MethodInfo m = AccessTools.Method(sim, "SendSubmitEventToSelectedObject");
+                if (m != null)
+                {
+                    try
+                    {
+                        harmony.Patch(m, postfix: new HarmonyMethod(typeof(Patches).GetMethod(
+                            "MuteSubmitPostfix", BindingFlags.Static | BindingFlags.NonPublic)));
+                        Plugin.L.LogInfo("[a11y] patched " + sim.Name + ".SendSubmitEventToSelectedObject");
+                    }
+                    catch (Exception e) { Plugin.L.LogError("[a11y] 挂提交事件失败: " + e.Message); }
+                }
+            }
+        }
+
+        private static Type FindType(string name)
+        {
+            try
+            {
+                Type t = AccessTools.TypeByName(name);
+                if (t == null) Plugin.L.LogWarning("[a11y] 找不到类 " + name + "（该功能降级）");
+                return t;
+            }
+            catch (Exception e) { Plugin.L.LogWarning("[a11y] 查类 " + name + " 异常: " + e.Message); return null; }
+        }
+
+        private static void TimerSetPostfix([HarmonyArgument(0)] Il2CppSystem.TimeSpan span)
+        {
+            try { Reader.OnTrialTimerSet(span); }
+            catch (Exception e) { A11yHost.Diag("Patches.TimerSet: " + e.Message); }
+        }
+
+        private static void TimeUpPostfix()
+        {
+            try { Reader.OnTrialTimeUp(); }
+            catch (Exception e) { A11yHost.Diag("Patches.TimeUp: " + e.Message); }
+        }
+
+        private static void HpPostfix([HarmonyArgument(0)] float hp)
+        {
+            try { Reader.OnDebateHp(hp); }
+            catch (Exception e) { A11yHost.Diag("Patches.Hp: " + e.Message); }
+        }
+
+        private static void MuteSubmitPostfix()
+        {
+            try
+            {
+                // 返回值 void，所以不能 Prefix 返 false 拦截。实际做法：
+                // 只靠 UiNav 自己的 ShouldMuteUnitySubmit 在下一帧把选中物取消选中，
+                // 这里只记一条诊断，便于定位双触发。
+                if (A11yHost.ShouldMuteUnitySubmit != null && A11yHost.ShouldMuteUnitySubmit())
+                    A11yHost.Diag("Patches.MuteSubmit: 导航模式下游戏提交事件被读屏层接管");
+            }
+            catch { }
+        }
+
         internal static void ApplyManual(Harmony harmony)
         {
             Type panel = null;
-            try { panel = Type.GetType("WitchTrials.Views.DebateTextPrinterPanel, Assembly-CSharp"); }
+            try { panel = AccessTools.TypeByName("WitchTrials.Views.DebateTextPrinterPanel") ?? Type.GetType("WitchTrials.Views.DebateTextPrinterPanel, Assembly-CSharp"); }
             catch (Exception e) { A11yHost.Diag("Patches.debate type: " + e.Message); }
 
             if (panel == null)

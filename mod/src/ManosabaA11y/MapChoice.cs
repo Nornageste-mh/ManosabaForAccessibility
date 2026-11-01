@@ -130,7 +130,8 @@ namespace ManosabaA11y
                 {
                     // 走 KeyEdge 而不是裸 Input：本作只启用新 Input System（run31 取证），
                     // KeyEdge 在旧 API 抛异常时会退回 Win32 全局读取。
-                    if (KeyEdge.Pressed(KeyCode.Alpha0 + i) || KeyEdge.Pressed(KeyCode.Keypad0 + i))
+                    if (FocusGate.CanReadChoiceKeys()
+                        && (KeyEdge.Pressed(KeyCode.Alpha0 + i) || KeyEdge.Pressed(KeyCode.Keypad0 + i)))
                     {
                         pick = i;
                         break;
@@ -168,15 +169,19 @@ namespace ManosabaA11y
 
                 // 楼层切换：地图上有多个楼层时，允许名单可能跨层（Adv25 的 8 个里
                 // 6 个在 1F、娱乐室在 2F、牢房在地下1F），必须能翻楼层才选得到。
+                // ★ 导航模式开着时不抢 PageUp/PageDown：平台层 UiNav 用它们
+                //   切换组（UiNav.cs SwitchGroup），两边同时消费会跳两步。
+                // 导航模式状态直接读平台层的 UiNav.Active（internal，同一程序集）。
+                bool navOwnsPaging = UiNav.Active;
                 if (_entries.Count > PageSize)
                 {
-                    if (KeyEdge.Pressed(KeyCode.PageDown)) { TurnPage(1); return; }
-                    if (KeyEdge.Pressed(KeyCode.PageUp)) { TurnPage(-1); return; }
+                    if (!navOwnsPaging && KeyEdge.Pressed(KeyCode.PageDown)) { TurnPage(1); return; }
+                    if (!navOwnsPaging && KeyEdge.Pressed(KeyCode.PageUp)) { TurnPage(-1); return; }
                 }
                 else if (!_choiceMode)
                 {
-                    if (KeyEdge.Pressed(KeyCode.PageDown)) { SwitchFloor(1); return; }
-                    if (KeyEdge.Pressed(KeyCode.PageUp)) { SwitchFloor(-1); return; }
+                    if (!navOwnsPaging && KeyEdge.Pressed(KeyCode.PageDown)) { SwitchFloor(1); return; }
+                    if (!navOwnsPaging && KeyEdge.Pressed(KeyCode.PageUp)) { SwitchFloor(-1); return; }
                 }
             }
             catch (Exception e) { A11yHost.Diag("MapChoice.Tick: " + e.Message); }
@@ -210,6 +215,8 @@ namespace ManosabaA11y
             _floorSwitchCount = 0;
             _kindTestDone = false;
             _floorTestAt = 0f;
+            _choiceMode = false;
+            _allowedKinds = null;
             // 注意：不要在这里清 _choiceDiagAt —— 选完地点后手册会关闭、
             // ScreenAssist 会调 Clear()，清掉就永远打不出 chosenAreaId 诊断（run108 实测）。
         }
@@ -630,13 +637,18 @@ namespace ManosabaA11y
             try
             {
                 Repeat.Say(e.Name);          // 选前复述，确认选的是哪个地点
-                bool ok = e.Area != null ? ClickArea(e.Area) : false;
-                if (!ok) e.Button.onClick.Invoke();
-                A11yHost.Diag("MAPCHOICE 点击派发 ok=" + ok + " kind="
-                              + (e.Area == null ? "?" : SafeKind(e.Area)));
-                // 合成派发之后补一次「真实输入」点击：run117/run118 证明光靠合成派发，
-                // 游戏的 OnChoiceMapAreaAsync 不会返回（地图页一直不关）。
-                if (e.Area != null) ClickByInput(e.Area);
+                // ★ 只派发**一次**。原来是「先合成派发、再真实注入」两次点击，
+                //   run117/run118 实测出现「选食堂却走了医务室」——第一次点击已经
+                //   让游戏选了一个地点，第二次又碰到了另一个。真正能让
+                //   OnChoiceMapAreaAsync 返回的只有真实输入注入，所以优先用它。
+                bool ok = e.Area != null && ClickByInput(e.Area);
+                if (!ok)
+                {
+                    ok = e.Area != null ? ClickArea(e.Area) : false;
+                    if (!ok) e.Button.onClick.Invoke();
+                }
+                A11yHost.Diag("MAPCHOICE 点击派发 方式=" + (ok ? "真实注入" : "合成")
+                              + " kind=" + (e.Area == null ? "?" : SafeKind(e.Area)));
             }
             catch (Exception ex)
             {
@@ -660,6 +672,15 @@ namespace ManosabaA11y
                 if (canvas != null && canvas.renderMode != UnityEngine.RenderMode.ScreenSpaceOverlay)
                     cam = canvas.worldCamera;
                 UnityEngine.Vector2 sp = UnityEngine.RectTransformUtility.WorldToScreenPoint(cam, rt.position);
+                // 坐标越界（屏幕外 / 负数）就不点：本作地图按钮挂在 WorldSpace 画布，
+                // 拿不到相机时会算出负坐标（实测 screen=-7,-2），那样点击落在窗外。
+                float sw = UnityEngine.Screen.width, sh = UnityEngine.Screen.height;
+                if (sp.x < 0 || sp.y < 0 || sp.x > sw || sp.y > sh)
+                {
+                    A11yHost.Diag("MAPCHOICE 注入点击越界，放弃: screen="
+                                  + sp.x.ToString("0") + "," + sp.y.ToString("0") + " 屏幕=" + sw + "x" + sh);
+                    return false;
+                }
                 InputInject.Click(sp.x, sp.y, 0.16f);
                 A11yHost.Diag("MAPCHOICE 注入点击 kind=" + SafeKind(a) + " screen="
                               + sp.x.ToString("0") + "," + sp.y.ToString("0")

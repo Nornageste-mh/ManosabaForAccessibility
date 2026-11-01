@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Naninovel;
@@ -470,6 +470,100 @@ namespace ManosabaA11y
         }
 
         /// <summary>统一朗读路径：清洗 → 去重闸门 → 说话人 → 配音闸门 → Repeat.Say。</summary>
+        // ================= 审判界面状态（倒计时 / HP） =================
+        // 为什么在这里：这两类信息在本作只存在于 HUD 组件的属性里，
+        // 导航扫描看不到（不是 Selectable），只能靠补丁取。全部做限频，
+        // 否则 6 FPS 下会把读屏洗毛。
+        private static int _lastAnnouncedTimerSec = -1;
+        private static int _lastAnnouncedHp = -1;
+        private static bool _timeUpAnnounced;
+        private static float _lastTrialAnnounceAt = -999f;
+
+        /// <summary>倒计时被设置（来自 WitchTrials.Models.Timer.SetTime）。</summary>
+        internal static void OnTrialTimerSet(Il2CppSystem.TimeSpan span)
+        {
+            try
+            {
+                double total = span.TotalSeconds;
+                if (total < 0 || total > 36000) return;
+                int sec = (int)System.Math.Ceiling(total);
+                // 只在跨过 5 分/两分/一分/30 秒/10 秒阈值时说一句
+                int[] marks = new int[] { 300, 120, 60, 30, 10 };
+                foreach (int m in marks)
+                {
+                    if (sec <= m && _lastAnnouncedTimerSec > m)
+                    {
+                        AnnounceTrial(m >= 60 ? ("剩余时间 " + (m / 60) + " 分钟。") : ("剩余时间 " + m + " 秒。"));
+                        break;
+                    }
+                }
+                _lastAnnouncedTimerSec = sec;
+                if (sec > 10) _timeUpAnnounced = false;
+            }
+            catch (Exception e) { A11yHost.Diag("Reader.TimerSet: " + e.Message); }
+        }
+
+        /// <summary>倒计时归零（来自 Timer.ForceRemainingTimeToNearlyZero）。</summary>
+        internal static void OnTrialTimeUp()
+        {
+            try
+            {
+                if (_timeUpAnnounced) return;
+                _timeUpAnnounced = true;
+                AnnounceTrial("时间到了。");
+            }
+            catch (Exception e) { A11yHost.Diag("Reader.TimeUp: " + e.Message); }
+        }
+
+        /// <summary>HP 变化（来自 DebateUi.OnCurrentHpChanged）。</summary>
+        internal static void OnDebateHp(float hp)
+        {
+            try
+            {
+                int v = (int)hp;
+                if (v == _lastAnnouncedHp) return;
+                bool first = _lastAnnouncedHp < 0;
+                _lastAnnouncedHp = v;
+                if (first) return;
+                AnnounceTrial("当前生命 " + v + "。");
+            }
+            catch (Exception e) { A11yHost.Diag("Reader.Hp: " + e.Message); }
+        }
+
+        private static void AnnounceTrial(string text)
+        {
+            float now = UnityEngine.Time.realtimeSinceStartup;
+            if (now - _lastTrialAnnounceAt < 1.2f) return;
+            _lastTrialAnnounceAt = now;
+            Repeat.Say(text, true);
+        }
+
+        /// <summary>
+        /// 行 id → 作者 id 的回退匹配（末尾 `_字母+三位数字`）。
+        /// 本作 1,988 个 `@printDebate` 行在本地化文档里没有作者注释，作者只在 id 里；
+        /// 在已知 24,492 条作者上回放一致率 99.84%。放在这里而不放 LineSpeakers，
+        /// 是因为后者是生成文件，重新生成会把手写代码覆盖掉。
+        /// </summary>
+        internal static string AuthorFromLineId(string lineId)
+        {
+            if (string.IsNullOrEmpty(lineId)) return "";
+            try
+            {
+                System.Text.RegularExpressions.Match m = LineAuthorRe.Match(lineId);
+                if (!m.Success) return "";
+                string id = m.Groups[1].Value;
+                // ★ 还要确认这个候选能查成中文名：否则 `..._Narrative001`
+                //   会被反推成作者 `Narrative`（旁白就被念成一个英文名）。
+                string mapName;
+                return SpeakerNames.TryMap(id, out mapName) ? id : "";
+            }
+            catch { return ""; }
+        }
+
+        private static readonly System.Text.RegularExpressions.Regex LineAuthorRe =
+            new System.Text.RegularExpressions.Regex(@"_([A-Za-z][A-Za-z0-9]*?)\d{3}$",
+                System.Text.RegularExpressions.RegexOptions.Compiled);
+
         private static void SpeakNow(string raw, string authorId, string authorLabel, string src, string lineKey = "")
         {
             if (string.IsNullOrEmpty(raw)) return;
@@ -500,6 +594,9 @@ namespace ManosabaA11y
                 if (string.IsNullOrEmpty(speaker))
                 {
                     string fromLine = LineSpeakers.AuthorOf(lineKey);
+                    // 表未命中（本作 1,988 个 @printDebate 行都没有作者注释）
+                    // 时从行 id 末尾反推（`0101Trial01_Sherry001` → `Sherry`）。
+                    if (string.IsNullOrEmpty(fromLine)) fromLine = AuthorFromLineId(lineKey);
                     if (!string.IsNullOrEmpty(fromLine))
                     {
                         speaker = TextProc.Speaker(fromLine);

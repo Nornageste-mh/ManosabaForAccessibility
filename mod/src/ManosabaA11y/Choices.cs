@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -40,7 +40,10 @@ namespace ManosabaA11y
         /// <summary>由 Harmony 在 AddChoiceButton 之后调用：只记下面板，不做朗读。</summary>
         internal static void OnButtonAdded(Naninovel.UI.ChoiceHandlerPanel panel)
         {
-            if (panel != null) _panel = panel;
+            // 为什么要 try/catch：这个回调挂在 AddChoiceButton 的 Postfix 上，
+            // 异常会沿游戏的 async 调用链外泄（2022-10-29 就是这样卡死剧情的）。
+            try { if (panel != null) _panel = panel; }
+            catch (Exception e) { A11yHost.Diag("Choices.OnButtonAdded: " + e.Message); }
         }
 
         private static Naninovel.UI.ChoiceHandlerPanel Panel()
@@ -239,7 +242,8 @@ namespace ManosabaA11y
                     // 走 KeyEdge 而不是裸 Input：本作只启用了新 Input System，
                     // UnityEngine.Input 读取会抛 InvalidOperationException（实机 run31 取证），
                     // KeyEdge 会在旧 API 不可用时退回 Win32 全局读取（A11yHost.UseGlobalKeys）。
-                    if (KeyEdge.Pressed(KeyCode.Alpha0 + i) || KeyEdge.Pressed(KeyCode.Keypad0 + i))
+                    if (FocusGate.CanReadChoiceKeys()
+                        && (KeyEdge.Pressed(KeyCode.Alpha0 + i) || KeyEdge.Pressed(KeyCode.Keypad0 + i)))
                     {
                         pick = i;
                         break;

@@ -272,6 +272,7 @@ function Wait-Log {
     param([string]$Pattern, [int]$TimeoutSec = 60, [int]$PollMs = 500)
     $sw = [Diagnostics.Stopwatch]::StartNew()
     while ($sw.Elapsed.TotalSeconds -lt $TimeoutSec) {
+    if ($script:CaseDeadline -and (Get-Date) -gt $script:CaseDeadline) { throw "CASE_TIMEOUT: 用例超过声明时长，主动中止" }
         $txt = Get-LogText
         if ($txt) {
             $m = [regex]::Match($txt, $Pattern, 'IgnoreCase,Multiline')
@@ -289,6 +290,7 @@ function Enter-Story {
     param($Game, [int]$MaxTries = 10, [int]$WaitSec = 25)
     $attempts = 0
     while ($attempts -lt $MaxTries) {
+    if ($script:CaseDeadline -and (Get-Date) -gt $script:CaseDeadline) { throw "CASE_TIMEOUT: 用例超过声明时长，主动中止" }
         $attempts++
         $null = Click-Rel $Game.Hwnd 0.220 0.832   # 标题「新游戏」（相对坐标，尺寸会变）
         $r = Wait-Log -Pattern 'Reader\.say\[|JUMP 已进正片|加载播报（' -TimeoutSec $WaitSec
@@ -309,6 +311,7 @@ function Advance-Until {
           [int]$ClickX = 960, [int]$ClickY = 540, [int]$ClickMs = 1800)
     $sw = [Diagnostics.Stopwatch]::StartNew()
     while ($sw.Elapsed.TotalSeconds -lt $TimeoutSec) {
+    if ($script:CaseDeadline -and (Get-Date) -gt $script:CaseDeadline) { throw "CASE_TIMEOUT: 用例超过声明时长，主动中止" }
         # ★ @() 包住：只有一个匹配时 PowerShell 会把单元素数组拆成字符串，
         #   于是 `$Matches[0]` 变成取第一个字符（曾导致证据行显示为 "C"）。
         $m = @(Get-LogMatches $Pattern)

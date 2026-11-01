@@ -31,9 +31,11 @@ $Version = (Select-String -Path (Join-Path $RepoDir 'mod\src\ManosabaA11y\Plugin
 
 function Clear-A11yEnv {
     foreach ($k in @('MANOSABA_A11Y_DIAG','MANOSABA_A11Y_KEYDIAG','MANOSABA_A11Y_SELFTEST','MANOSABA_A11Y_JUMP',
-                     'MANOSABA_A11Y_LOCALE','MANOSABA_A11Y_TEST','MANOSABA_A11Y_TEST_NAV','MANOSABA_A11Y_TEST_PLAY',
+                     'MANOSABA_A11Y_JUMP_LINE','MANOSABA_A11Y_LOCALE','MANOSABA_A11Y_TEST','MANOSABA_A11Y_TEST_NAV','MANOSABA_A11Y_TEST_PLAY',
                      'MANOSABA_A11Y_TEST_KEYS','MANOSABA_A11Y_TEST_REPEAT','MANOSABA_A11Y_TEST_ESC','MANOSABA_A11Y_PROBE_UI','MANOSABA_A11Y_DEBUGUI','MANOSABA_A11Y_INJECT',
-                     'MANOSABA_A11Y_NOPATCH')) {
+                     'MANOSABA_A11Y_TEST_CHOICE','MANOSABA_A11Y_TEST_MAPCHOICE','MANOSABA_A11Y_TEST_MAPFLOOR','MANOSABA_A11Y_TEST_MAPPICK_KIND',
+                     'MANOSABA_A11Y_TEST_EVMODE','MANOSABA_A11Y_TEST_EVCMD','MANOSABA_A11Y_TEST_EVFORCE','MANOSABA_A11Y_TEST_EVPICK','MANOSABA_A11Y_TEST_EVYES',
+                     'MANOSABA_A11Y_EVDIAG','MANOSABA_A11Y_MAPDIAG','MANOSABA_A11Y_NOPATCH')) {
         Remove-Item -Path "Env:$k" -ErrorAction SilentlyContinue
     }
 }
@@ -451,10 +453,14 @@ $Cases = @(
 # 运行器
 # ====================================================================================
 $selected = $Cases
-if ($Only.Count -gt 0) {
+# Skip = $true 的用例不进默认批次（显式 -Only 指定时仍然会跑，方便排查）。
+# ★ 旧写法把这行放在 `if ($Only.Count -gt 0)` 里面，而该条件又要求 $Only 为空
+#   —— 永远不成立，于是 Skip 完全失效：默认批次把 evidence.present / map.choice
+#   这种依赖真人点击的用例也拉起来跑了。
+if ($Only.Count -eq 0) {
+    $selected = @($Cases | Where-Object { -not ($_.ContainsKey('Skip') -and $_.Skip) })
+} else {
     $selected = @($Cases | Where-Object { $c = $_; @($Only | Where-Object { $c.Id -like "$_*" -or $c.Group -like "*$_*" }).Count -gt 0 })
-    # Skip = $true 的用例不进默认批次（显式 -Only 指定时仍然会跑，方便排查）。
-    if (-not $Only -or $Only.Length -eq 0) { $selected = @($selected | Where-Object { -not ($_.ContainsKey('Skip') -and $_.Skip) }) }
     if ($selected.Count -eq 0) { Write-Host "没有匹配的用例：$($Only -join ', ')"; exit 2 }
 }
 
@@ -466,6 +472,11 @@ foreach ($case in $selected) {
     $r = New-CaseResult $case.Id $case.Title $case.Group
     $r.Pass = $true
     $sw = [Diagnostics.Stopwatch]::StartNew()
+    # 用例厂时看门狗：旧版本的 $case.Timeout 从来没被读过，
+    # 一个卡住的用例会拖到自己的内部超时（实测 menu.title 305s > 声明 300s）。
+    $script:CaseDeadline = if ($case.ContainsKey('Timeout') -and $case.Timeout -gt 0) {
+        (Get-Date).AddSeconds([double]$case.Timeout * $TimeoutScale)
+    } else { (Get-Date).AddHours(1) }
     $game = $null
     $cfgSaved = $null
     Write-Host ("--- {0} [{1}] …" -f $case.Id, $case.Group) -ForegroundColor Yellow

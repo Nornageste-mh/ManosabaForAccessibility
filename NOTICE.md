@@ -1,4 +1,4 @@
-# 附加条款与免责声明 / Additional Terms and Disclaimer
+﻿# 附加条款与免责声明 / Additional Terms and Disclaimer
 
 > **适用关系**：本文件是对仓库根目录 [`LICENSE`](LICENSE)（MIT 许可）的补充说明
 > 与明确化，**不缩减** MIT 许可已授予的任何权利。若两者冲突，以 MIT 许可为准。
@@ -86,7 +86,7 @@ notices and license texts must be preserved.
 | BepInEx 6.x（`master` 分支） | LGPL-2.1 | BepInEx Team | **6.x 才是 LGPL-2.1**；文本见 `licenses/LGPL-2.1-BepInEx.txt`。逐作发布时按该作实际用的版本附对应文本 |
 | HarmonyX | MIT | BepInEx 项目 | 文本见 `licenses/MIT-HarmonyX.txt`（上游 Harmony 2 另有 `MIT-Harmony.txt`） |
 | UnityDoorstop | LGPL-2.1 | NeighTools（组织；上游 `LICENSE` 无版权行，权利人无法逐字核实） | 文本见 `licenses/LGPL-2.1-UnityDoorstop.txt` |
-| NVDA Controller Client | LGPL-2.1 | NV Access | 本仓库不随附；由使用方自行取得 |
+| NVDA Controller Client | LGPL-2.1 | NV Access | **随包附带** `nvdaControllerClient.dll`（包根与 `BepInEx\plugins\manosaba_a11y\` 各一份），许可证全文见 `licenses\LGPL-2.1-NVDA-ControllerClient.txt` |
 | Tolk（可选） | LGPL-3.0 | 上游 `dkager/tolk`（Davy Kager 等）；`ndarilek/tolk` 是持续维护的 fork | 上游 `LICENSE.txt` 为 LGPL-3.0；官方有 CI 构建的 `tolk.zip`（无版本 tag）。本仓库不随附；若随包分发 Tolk 本体，须按 LGPL-3.0 附许可证全文、来源与修改说明。其官方 `tolk.zip` 里另带 NVDA Controller Client（LGPL-2.1，须一并保留包内的 `LICENSE-NVDA.txt`）与 `SAAPI64.dll` / `dolapi32.dll` 等第三方专有组件（包内无许可文本，随包前须自行确认，建议改为让玩家自备） |
 | 争渡读屏 ZDSRAPI（可选） | **专有软件**（非开源） | 争渡读屏（ZDSR）的作者 / 发行方 | 本仓库**不随附**其 DLL；发布包若放兜底副本，须自行取得授权并自负责任；本项目未取得其书面许可 |
 
@@ -97,7 +97,7 @@ notices and license texts must be preserved.
 Il2CppInterop（LGPL-3.0）、Cpp2IL、AsmResolver、AssetRipper.*、Capstone.NET、Capstone
 （BSD-3-Clause）、Disarm、Iced、SemanticVersioning、uTinyRipper、Dobby（Apache-2.0）、
 .NET runtime 等）。这些工具只在本机制作补丁时使用，**本仓库不随附它们的二进制**；
-逐文件对应关系见 [`docs/licenses.md`](docs/licenses.md)。
+逐文件对应关系见 `licenses\THIRD-PARTY-NOTICES.txt`（包内同名文件）。
 
 6. 关于反编译与资源解包 / On Decompilation and Asset Extraction
 --------------------------------------------------------------
