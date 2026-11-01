@@ -11,20 +11,19 @@
 1. 署名 / Attribution
 ---------------------
 
-我们**请求**（而非强制）你在复制、修改或分发本软件时以显著方式标注：
+凡复制、修改、分发本软件，或以本软件为基础创作衍生作品，均须以显著方式标注：
 
-  (a) 原始出处：https://github.com/Nornageste-mh/Framework.git，以及作者 Nornageste-mh；
-  (b) 若发生修改，注明「已修改」及修改要点，不要让他人误以为修改版
+  (a) 原始出处：https://github.com/Nornageste-mh/ManosabaForAccessibility.git，以及作者 Nornageste-mh；
+  (b) 若发生修改，须注明「已修改」及修改要点，不得让他人误以为修改版
       出自原作者或获得原作者背书。
 
-以上是**请求，不是附加条件**：MIT 许可并不要求署名，任何人都可以按 MIT 的条款使用、
-修改与再分发本软件 —— 本条不得被解释为对 MIT 已授予权利的限制。
+标注位置可为 README、项目文档、关于界面、发行说明或源码头部之一，
+且须随分发物一同提供。
 
-We *request* (but do not require) that you credit the origin when you copy,
-modify, or redistribute this software: this repository's URL and the author
-Nornageste-mh. If you changed anything, please say so. This is a request, not a
-condition: the MIT license does not require attribution, and nothing here
-restricts the rights it grants.
+Any copy, modification, distribution, or derivative work must prominently
+credit the origin: this repository's URL and the author Nornageste-mh. If you
+changed anything, state that it was modified. Do not imply that a modified
+version was produced or endorsed by the original author.
 
 2. 非官方声明 / Unofficial Project
 ----------------------------------
