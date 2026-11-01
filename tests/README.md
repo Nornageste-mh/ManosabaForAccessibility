@@ -8,8 +8,8 @@
 
 | 层 | 位置 | 跑法 | 覆盖什么 | 耗时 |
 | --- | --- | --- | --- | --- |
-| **单元自测** | `mod\src\ManosabaA11y\SelfTest.cs` | 进程内，`MANOSABA_A11Y_SELFTEST=1` | 纯逻辑：文本清洗规则、行 id 提取、说话人表、配音表、快捷键解析。26 条断言 | ~14 秒 |
-| **集成场景** | `tests\Suite.ps1` + `tests\lib\Harness.ps1` | 每个用例独立启动一次游戏，真点击进正片 → 跳转到目标剧本 → 断言日志证据 | 标题导航 / 对话 / 说话人 / 配音闸门 / 退格重读 / 选项 / 辩论 / 加载 / 语言 | 每个 60–180 秒 |
+| **单元自测** | `mod\src\ManosabaA11y\SelfTest.cs` | 进程内，`MANOSABA_A11Y_SELFTEST=1` | 纯逻辑：文本清洗规则、行 id 提取、说话人表、配音表、快捷键解析。54 条断言 | ~14 秒 |
+| **集成场景** | `tests\Suite.ps1` + `tests\lib\Harness.ps1` | 每个用例独立启动一次游戏，真点击进正片 → 跳转到目标剧本 → 断言日志证据 | 标题导航 / 对话 / 说话人 / 配音闸门 / 退格重读 / 选项 / 辩论 / 加载 / 语言 / 整页界面 / 低性能模式 | 每个 60–180 秒 |
 
 为什么单元层放在插件里而不是单独的测试工程：本作是 **IL2CPP**，`TextProc`、`SpeakerNames`、`VoiceLineIds` 依赖运行时 interop，进程外引用不到。放在插件里跑 = 「用真实运行时 + 真实游戏数据」跑逻辑，比另建 net6.0 工程更可信。
 
@@ -17,7 +17,7 @@
 
 | Id | 分组 | 覆盖 | 关键断言 |
 | --- | --- | --- | --- |
-| `unit.selftest` | 单元 | TextProc / SpeakerNames / VoiceLineIds / LineSpeakers / Hotkey | 26 条全 PASS，`fail=0` |
+| `unit.selftest` | 单元 | TextProc / SpeakerNames / VoiceLineIds / LineSpeakers / Hotkey | 54 条全 PASS，`fail=0` |
 | `menu.title` | 界面/标题 | 标题菜单导航 | `Alt+Shift+F1` 能进/出导航；组名「标题画面」；共 5 项；按钮有中文名；不念 `Ver.` |
 | `story.adv` | 剧情/ADV | 普通对话逐句朗读 | ≥5 句 `Reader.say[reveal]`；带 `id=0101Adv01_*`；朗读文本无残留标签 |
 | `story.speaker` | 剧情/ADV | 说话人 | `HOOK print author id=[Ema]` 类证据；出现「角色名：台词」或配音行「只报名字」；`重读: 角色名：台词` |
@@ -30,6 +30,7 @@
 | `book.assist` | 界面/整页 | 魔女手册整页界面 | 读取存档槽 1 → 点书本 → `ScreenAssist: 播报 魔女手册，<页签>页签。内容：…`；`TEST_ESC` 钩子触发 `ScreenAssist: Esc 关闭 魔女手册` |
 | `evidence.present` | 审判/出示证据 | 否（默认跳过） | 跳行直达 `@choiceEvidence`：证物名枚举 → 播报 → 选卡 → 出示 → 确认框 → 剧本越过该行 |
 | `map.choice` | 界面/地图 | 地图页选择地点（默认批次跳过） | `MAPCHOICE 播报 \d+ 个地点` 且含 `在2F：`；`chosenAreaId=[String:RecreationRoom]`；台词念到「娱乐室」 |
+| `perf.lowmode` | 模块/性能 | 低性能模式 | `TEST_LOWPERF=1` 40s 开、75s 关；`LOWPERF URP: renderScale=0.80`；`关闭 579 个柔边阴影组件`；关闭后 `已还原画质设置` + `还原 579 个`；无开启/关闭失败 |
 
 > 整页界面用例用「读取存档」而不是「新游戏」：存档槽 1 直接落在第 1 章 Adv18，手册里已有内容，
 > 打开就能取证（用户提示的办法）；新游戏要推进到有线索的位置太慢。

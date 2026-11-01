@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,7 +35,7 @@ namespace ManosabaA11y
         /// 版本策略（0.0.0.1 起）：**克制**。只有「玩家能感知到的功能」或
         /// 「实机事故修复」才 +1 最后一段；文档、打包、内部重构不动版本号。
         /// </summary>
-        public const string Version = "0.0.0.12";
+        public const string Version = "0.0.0.13";
 
         public const string DisplayName = "魔法少女ノ魔女裁判 A11y Reader";
 
@@ -80,6 +80,16 @@ namespace ManosabaA11y
         /// ★ 调试功能，会扩大可达范围：正式发布默认关闭，只有玩家自己打开才响应组合键。
         /// </summary>
         internal static ConfigEntry<bool> CfgAllowScriptJump;
+
+        internal static bool TestLowPerf;
+        internal static int _testLowPerfStage;   // MANOSABA_A11Y_TEST_LOWPERF=1：自动开关一次，供自动化取证
+        // 低性能模式（0.0.0.13）：默认关闭；开关组合键运行中可切；四档各自可以单独关。
+        internal static ConfigEntry<bool> CfgLowPerf;
+        internal static ConfigEntry<string> CfgLowPerfToggleKey;
+        internal static ConfigEntry<bool> CfgLowPerfDegradeUrp;
+        internal static ConfigEntry<bool> CfgLowPerfNoShadow;
+        internal static ConfigEntry<bool> CfgLowPerfLowerResolution;
+        internal static ConfigEntry<bool> CfgLowPerfHint;
 
         /// <summary>性能取证日志（仅 MANOSABA_A11Y_PERFDIAG=1 或配置打开）：不做任何优化，只测量。</summary>
         internal static bool CfgPerfDiag;
@@ -360,6 +370,9 @@ namespace ManosabaA11y
                 TestScriptJump = true;
                 L.LogInfo("[a11y] TEST SCRIPTJUMP: 45s 后自动打开跳转菜单并跳转（自动化用）");
             }
+            // 低性能模式取证（仅 MANOSABA_A11Y_TEST_LOWPERF=1）：40s 自动开启、75s 自动关闭。
+            TestLowPerf = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_LOWPERF") == "1";
+            if (TestLowPerf) L.LogInfo("[a11y] TEST LOWPERF MODE: 40s 开启、75s 关闭低性能模式");
 
             string evCmd = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVCMD");
             if (evCmd == "1" || evCmd == "2")
@@ -652,6 +665,30 @@ namespace ManosabaA11y
                 "★ 跳转能力来自 Naninovel 的 ScriptPlayerExtensions.LoadAndPlayAtLine，\n" +
                 "  0.0.0.9 起已在实机验证过（当时用环境变量 MANOSABA_A11Y_JUMP_LINE 直达 Trial04 第 327 行）。");
 
+            CfgLowPerf = Config.Bind("性能", "低性能模式", false,
+                "默认关闭。开启后：降低插件自身的每帧开销（无视觉代价）+ 降低画面设置。\n" +
+                "★ 实测（0.0.0.12 的性能探针，详见 docs/framework-notes.md §22）：\n" +
+                "  · 插件自己原来每帧要花 10~13ms，限频后 2.5~5ms，这部分是纯收益；\n" +
+                "  · 画面降级（URP 画质/柔边阴影/分辨率）在测试机上**没有测出帧率提升**——\n" +
+                "    那台机器是主线程瓶颈，不是显卡瓶颈。所以画面三档做成了可以单独关掉。\n" +
+                "★ 什么时候值得开：显存/内存小、显卡弱、或者画面卡顿明显时。");
+            CfgLowPerfToggleKey = Config.Bind("性能", "低性能模式开关键", "Alt+Shift+F2",
+                "运行中开关「低性能模式」的组合键。改成空串 = 只能用配置项开启。\n" +
+                "★ 和本作自带按键不冲突（游戏用的是回车/空格/左键/Esc/Ctrl）。");
+            CfgLowPerfDegradeUrp = Config.Bind("性能", "降低 URP 画质", true,
+                "低性能模式开启时生效：渲染缩放 0.8、关 MSAA、关主光与软阴影、关额外灯光。\n" +
+                "★ 画面会变糊、立体感变弱，但能省显卡。关闭模式时会还原原始设置。");
+            CfgLowPerfNoShadow = Config.Bind("性能", "关闭柔边阴影（TrueShadow）", true,
+                "低性能模式开启时生效：把本作 800 多个柔边阴影组件全部临时关掉。\n" +
+                "★ 文字与立绘的阴影会消失、对比度会变，看不清时请关掉这一项。");
+            CfgLowPerfLowerResolution = Config.Bind("性能", "降低渲染分辨率", false,
+                "低性能模式开启时生效：把窗口分辨率降到 75%（例如 1920x1080 → 1440x810）。\n" +
+                "★ 默认关闭：这一档最容易被看出来（窗口变小/画面变糊），而且它会改变窗口大小，\n" +
+                "  读屏用户如果依赖固定窗口位置，请不要开。");
+            CfgLowPerfHint = Config.Bind("性能", "低帧率时提示开启", true,
+                "长时间低于 15 帧时，念一句「按 Alt+Shift+F2 可以开启低性能模式」。\n" +
+                "★ 只提醒、绝不自动切换：开不开由玩家决定（自动改画面属于替玩家做决策）。");
+
             // 旧 cfg 迁移：只做“一定知道用户意图”的两件事。
             // 1) 沉默按键旧默认值 "0" 不是合法键名（Hotkey.cs 拒绝纯数字），
             //    它本来就从来没生效过 → 视为“未设置”写回空串。
@@ -742,6 +779,7 @@ namespace ManosabaA11y
     {
         private bool _speechInited;
         private int _ticks;
+        private bool _lowPerfApplied;
 
         public void Update()
         {
@@ -770,6 +808,14 @@ namespace ManosabaA11y
                     // （同时装 NVDA 与争渡的机器，自动档会挑 NVDA）。
                     try { Repeat.Say("魔法少女ノ魔女裁判 无障碍补丁已加载。语音后端 " + Speech.BackendName); } catch { }
                 }
+
+            // 低性能模式：配置里开启了就在开局应用一次（默认关闭）。
+            // 画面类设置（URP/TrueShadow/分辨率）在这里落地；之后每 3 秒补扫新出现的柔边阴影。
+            if (!_lowPerfApplied)
+            {
+                _lowPerfApplied = true;
+                try { LowPerf.ApplyFromConfig(); } catch (Exception e) { A11yHost.Diag("LowPerf: " + e.Message); }
+            }
             }
 
             // 自动化测试：纯逻辑单元自测（MANOSABA_A11Y_SELFTEST=1）。
@@ -837,6 +883,10 @@ namespace ManosabaA11y
             PerfProbe.BeginCost("screen");
             try { ScreenAssist.Update(); }
             catch (Exception e) { A11yHost.Diag("ScreenAssist: " + e.Message); }
+
+            // 低性能模式（0.0.0.13，默认关闭）：组合键开关、补扫柔边阴影、低帧率只提醒。
+            try { LowPerf.Update(); } catch (Exception e) { A11yHost.Diag("LowPerf: " + e.Message); }
+            try { TestLowPerfTick(); } catch (Exception e) { A11yHost.Diag("LowPerf.Test: " + e.Message); }
             PerfProbe.EndCost("screen");
 
             // 性能取证探针（仅 MANOSABA_A11Y_PERFDIAG=1）：只测量不改设置
@@ -932,6 +982,29 @@ namespace ManosabaA11y
         private static bool _testEvModeDone;
 
         private static float _nextEvProbeAt;
+
+        /// <summary>
+        /// 自动化取证：40 秒开启低性能模式、75 秒关闭（MANOSABA_A11Y_TEST_LOWPERF=1）。
+        /// 为什么需要：本机自动化环境的键盘注入进不了游戏（keybd_event/SendInput 都被挡），
+        /// 组合键的真实链路只能靠单元断言（Hotkey.Parse）覆盖，实机行为用这个钩子取证。
+        /// </summary>
+        private static void TestLowPerfTick()
+        {
+            if (!Plugin.TestLowPerf) return;
+            float now = Time.realtimeSinceStartup;
+            if (Plugin._testLowPerfStage == 0 && now >= 40f)
+            {
+                Plugin._testLowPerfStage = 1;
+                Plugin.L.LogInfo("[a11y] TEST LOWPERF: 开启 (t=" + now.ToString("F1") + ")");
+                LowPerf.Enable("自动化测试");
+            }
+            else if (Plugin._testLowPerfStage == 1 && now >= 75f)
+            {
+                Plugin._testLowPerfStage = 2;
+                Plugin.L.LogInfo("[a11y] TEST LOWPERF: 关闭 (t=" + now.ToString("F1") + ")");
+                LowPerf.Disable("自动化测试");
+            }
+        }
 
         private static void TestKeyInjectTick()
         {
@@ -1161,6 +1234,9 @@ namespace ManosabaA11y
 
         public void OnDestroy()
         {
+            // 卸载时把低性能模式改过的画面设置还原，别把玩家的画质留在降级状态。
+            try { LowPerf.Shutdown(); } catch { }
+
             try { Speech.Shutdown(); } catch { }
             try { A11yHost.Clear(); } catch { }
         }

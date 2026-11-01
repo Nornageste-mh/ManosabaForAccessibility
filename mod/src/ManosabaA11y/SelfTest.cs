@@ -71,6 +71,7 @@ namespace ManosabaA11y
             CheckText();
             CheckWiring();
             CheckScriptIndex();
+            CheckLowPerf();
             Summary();
         }
 
@@ -80,6 +81,27 @@ namespace ManosabaA11y
         /// 它由 tools/gen_script_index.py 从 textassets 索引生成，**不含任何台词原文**。
         /// 这里只断言“表本身是好的”（数量/无重复/含已知条目），不依赖游戏运行时。
         /// </summary>
+        private static void CheckLowPerf()
+        {
+            Check("lowperf.默认关闭",
+                Plugin.CfgLowPerf != null && !Plugin.CfgLowPerf.Value && !LowPerf.Active,
+                "CfgLowPerf=" + (Plugin.CfgLowPerf != null ? Plugin.CfgLowPerf.Value.ToString() : "null")
+                + " Active=" + LowPerf.Active);
+
+            bool parsed = false, ok = false;
+            try
+            {
+                Hotkey.Spec spec;
+                string why;
+                parsed = Hotkey.Parse(Plugin.CfgLowPerfToggleKey.Value, out spec, out why);
+                ok = parsed && spec.Key == KeyCode.F2 && spec.Alt && spec.Shift;
+            }
+            catch (Exception e) { ok = false; A11yHost.Diag("SelfTest lowperf: " + e.Message); }
+            Check("lowperf.开关键可解析",
+                ok,
+                Plugin.CfgLowPerfToggleKey.Value + " parsed=" + parsed);
+        }
+
         private static void CheckScriptIndex()
         {
             Check("scriptindex.数量不少于 400", ScriptIndex.Count >= 400, "Count=" + ScriptIndex.Count);
