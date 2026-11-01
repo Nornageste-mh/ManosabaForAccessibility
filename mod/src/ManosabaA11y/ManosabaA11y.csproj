@@ -24,7 +24,7 @@
   <PropertyGroup>
     <AssemblyName>ManosabaA11y</AssemblyName>
     <RootNamespace>ManosabaA11y</RootNamespace>
-    <Version>0.0.0.15</Version>
+    <Version>0.0.0.16</Version>
     <LangVersion>9.0</LangVersion>
     <Nullable>disable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
@@ -152,6 +152,11 @@
     <!-- GigaCreation.NaninovelExtender.UI：WitchBookScreen 的基类 NaninovelScreen 在这里。
          不引用它会报 CS0012「类型 NaninovelScreen 在未引用的程序集中定义」（读
          WitchBookScreen.PresentationMode 时） -->
+    <!-- 极限档要停 UI/立绘的 Animator（省掉每帧动画求值） -->
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(InteropDir)\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
       <HintPath>$(InteropDir)\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>false</Private>

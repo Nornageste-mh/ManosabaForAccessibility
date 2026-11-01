@@ -101,9 +101,11 @@ namespace ManosabaA11y
         private static bool _savedRealtimeReflection;
         private static AnisotropicFiltering _savedAniso;
         private static int _savedVSync;
-        private static int _savedTargetFrameRate;
+        private static int _savedTargetFrameRate = -1;
 
         private static bool _savedResolution;
+        private static int _nativeWidth, _nativeHeight;
+        private static float _appliedResolutionScale = 1f;
         private static int _savedWidth, _savedHeight;
         private static FullScreenMode _savedMode;
 
@@ -284,8 +286,34 @@ namespace ManosabaA11y
                 _appliedBlackout = true;
             }
 
-            // ---- 窗口分辨率：不属于档位，只有玩家自己开了这个开关才跟着生效 ----
-            if (Allowed(Plugin.CfgLowPerfLowerResolution)) LowerResolution();
+            // ---- 窗口分辨率：跟着档位一起降（玩家可以单独关掉这一项） ----
+            // 0.0.16 起按用户要求把「降窗口分辨率」算进档位：越往上窗口越小、越省。
+            if (Allowed(Plugin.CfgLowPerfLowerResolution))
+            {
+                float resScale = ResolutionScaleFor(mode);
+                if (resScale < 0.999f) SetResolutionScale(resScale);
+            }
+
+            // ---- 极限档专属：真的极限（有代价，玩家已确认接受） ----
+            if (level >= 4)
+            {
+                ApplyExtremeExtras();
+            }
+        }
+
+        /// <summary>
+        /// 各档位对应的窗口分辨率比例（1.0 = 不动窗口）。抽成纯函数是为了能被单元断言覆盖：
+        /// 「档位越高窗口越小」这件事不该只靠实机看起来对不对。
+        /// </summary>
+        internal static float ResolutionScaleFor(Mode mode)
+        {
+            switch (mode)
+            {
+                case Mode.Balanced: return 0.85f;
+                case Mode.Strong: return 0.70f;
+                case Mode.Extreme: return 0.50f;
+                default: return 1.0f;
+            }
         }
 
         private static bool Allowed(ConfigEntry<bool> c)
@@ -384,7 +412,7 @@ namespace ManosabaA11y
                     _savedRealtimeReflection = QualitySettings.realtimeReflectionProbes;
                     _savedAniso = QualitySettings.anisotropicFiltering;
                     _savedVSync = QualitySettings.vSyncCount;
-                    _savedTargetFrameRate = Application.targetFrameRate;
+                    if (_savedTargetFrameRate < 0) _savedTargetFrameRate = Application.targetFrameRate;
                     _savedQuality = true;
                 }
                 catch (Exception e) { A11yHost.Diag("LOWPERF: 保存质量设置失败 " + e.Message); }
@@ -490,6 +518,147 @@ namespace ManosabaA11y
         }
 
         // ================================================================== 极限档：丢掉所有画面
+
+        // ---- 极限档专属：真的极限（用户明确说「有代价本来就是正常的」） ----
+        private static bool _appliedExtreme;
+        private static readonly List<UnityEngine.Rendering.Volume> _disabledVolumes =
+            new List<UnityEngine.Rendering.Volume>();
+        private static readonly List<Animator> _disabledAnimators = new List<Animator>();
+        private static readonly HashSet<int> _disabledAnimatorIds = new HashSet<int>();
+        private static bool _savedLodLevel, _savedSkinWeights, _savedMaxLod;
+        private static int _savedMaxLodLevel = -1;
+        private static int _savedSkinWeightsValue = -1;
+
+        /// <summary>
+        /// 极限档的「再往下压」：这一档追求的是最高帧数，代价（画质/动画）玩家已确认接受。
+        ///   · 强制最低 LOD、单骨骼蒙皮（省 CPU/GPU 的蒙皮与网格切换）
+        ///   · 关掉所有 URP Volume（后处理/调色/泛光这一整类的每帧开销）
+        ///   · 每台相机的后处理/阴影/抗锯齿全关
+        ///   · 停掉所有 Animator（立绘抖动的状态机每帧求值也占 CPU）
+        ///   · 锁 30 帧 + 关 VSync（把省下来的算力留给输入响应）
+        /// </summary>
+        private static void ApplyExtremeExtras()
+        {
+            if (_appliedExtreme) return;
+            _appliedExtreme = true;
+            int volumes = 0, anims = 0, cams = 0;
+            try
+            {
+                // 质量：最低 LOD、单骨骼
+                try
+                {
+                    if (!_savedLodLevel)
+                    {
+                        _savedMaxLodLevel = QualitySettings.maximumLODLevel;
+                        _savedSkinWeightsValue = (int)QualitySettings.skinWeights;
+                        _savedLodLevel = true;
+                    }
+                    QualitySettings.maximumLODLevel = 1;
+                    QualitySettings.skinWeights = SkinWeights.OneBone;
+                }
+                catch (Exception e) { A11yHost.Diag("LOWPERF 极限/质量: " + e.Message); }
+
+                // URP Volume（后处理整条链）
+                try
+                {
+                    var vols = Resources.FindObjectsOfTypeAll<UnityEngine.Rendering.Volume>();
+                    for (int i = 0; i < vols.Length; i++)
+                    {
+                        var v = vols[i];
+                        if (v == null || !v.enabled) continue;
+                        v.enabled = false;
+                        _disabledVolumes.Add(v);
+                        volumes++;
+                    }
+                }
+                catch (Exception e) { A11yHost.Diag("LOWPERF 极限/Volume: " + e.Message); }
+
+                // 相机：关后处理/阴影/抗锯齿
+                var camsAll = Resources.FindObjectsOfTypeAll<Camera>();
+                for (int i = 0; i < camsAll.Length; i++)
+                {
+                    var c = camsAll[i];
+                    if (c == null) continue;
+                    try
+                    {
+                        var data = c.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+                        if (data != null)
+                        {
+                            data.renderPostProcessing = false;
+                            data.renderShadows = false;
+                            data.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.None;
+                            data.dithering = false;
+                            cams++;
+                        }
+                    }
+                    catch { }
+                }
+
+                // Animator
+                try
+                {
+                    var animsAll = Resources.FindObjectsOfTypeAll<Animator>();
+                    for (int i = 0; i < animsAll.Length; i++)
+                    {
+                        var a = animsAll[i];
+                        if (a == null) continue;
+                        int id = a.GetInstanceID();
+                        if (!_disabledAnimatorIds.Add(id)) continue;
+                        if (!a.enabled) continue;
+                        a.enabled = false;
+                        _disabledAnimators.Add(a);
+                        anims++;
+                    }
+                }
+                catch (Exception e) { A11yHost.Diag("LOWPERF 极限/Animator: " + e.Message); }
+
+                // 帧率上限
+                try
+                {
+                    if (_savedTargetFrameRate < 0) _savedTargetFrameRate = Application.targetFrameRate;
+                    QualitySettings.vSyncCount = 0;
+                    Application.targetFrameRate = 30;
+                }
+                catch (Exception e) { A11yHost.Diag("LOWPERF 极限/帧率: " + e.Message); }
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限: " + e.Message); }
+
+            A11yHost.Diag("LOWPERF 极限加强: Volume=" + volumes + " Animator=" + anims + " 相机后处理=" + cams
+                          + " LOD=1 单骨骼 目标帧率=30");
+        }
+
+        private static void RestoreExtremeExtras()
+        {
+            if (!_appliedExtreme) return;
+            int volumes = 0, anims = 0;
+            for (int i = 0; i < _disabledVolumes.Count; i++)
+            {
+                try { var v = _disabledVolumes[i]; if (v != null) { v.enabled = true; volumes++; } } catch { }
+            }
+            _disabledVolumes.Clear();
+
+            for (int i = 0; i < _disabledAnimators.Count; i++)
+            {
+                try { var a = _disabledAnimators[i]; if (a != null) { a.enabled = true; anims++; } } catch { }
+            }
+            _disabledAnimators.Clear();
+            _disabledAnimatorIds.Clear();
+
+            try
+            {
+                if (_savedLodLevel)
+                {
+                    QualitySettings.maximumLODLevel = _savedMaxLodLevel;
+                    try { QualitySettings.skinWeights = (SkinWeights)_savedSkinWeightsValue; } catch { }
+                }
+                if (_savedTargetFrameRate >= 0) Application.targetFrameRate = _savedTargetFrameRate;
+            }
+            catch (Exception e) { A11yHost.Diag("LOWPERF 极限还原: " + e.Message); }
+
+            _appliedExtreme = false;
+            if (volumes + anims > 0)
+                A11yHost.Diag("LOWPERF 极限加强: 还原 Volume=" + volumes + " Animator=" + anims);
+        }
 
         /// <summary>
         /// 极限档：把画面整个扔掉，只剩一个黑窗口。三件事：
@@ -786,22 +955,31 @@ namespace ManosabaA11y
         // ================================================================== 窗口分辨率
 
         /// <summary>
-        /// 降低窗口分辨率（默认关闭！）。它会改变窗口大小/清晰度，是最"看得出来"的一档，
-        /// 所以配置里默认 false，只有玩家自己打开才会生效。
+        /// 按比例降窗口分辨率（0.0.16 起属于档位：均衡 0.85 / 强力 0.7 / 极限 0.5）。
+        /// 一律以**原生分辨率**为基准算，所以反复切档不会越缩越小；原值只在第一次记下来，还原用。
         /// </summary>
-        private static void LowerResolution()
+        private static void SetResolutionScale(float scale)
         {
             try
             {
-                _savedWidth = Screen.width;
-                _savedHeight = Screen.height;
-                _savedMode = Screen.fullScreenMode;
-                _savedResolution = true;
-                int w = Mathf.Max(960, Mathf.RoundToInt(_savedWidth * 0.75f));
-                int h = Mathf.Max(540, Mathf.RoundToInt(_savedHeight * 0.75f));
+                if (!_savedResolution)
+                {
+                    _savedWidth = Screen.width;
+                    _savedHeight = Screen.height;
+                    _savedMode = Screen.fullScreenMode;
+                    _nativeWidth = _savedWidth;
+                    _nativeHeight = _savedHeight;
+                    _savedResolution = true;
+                }
+                int baseW = _nativeWidth > 0 ? _nativeWidth : _savedWidth;
+                int baseH = _nativeHeight > 0 ? _nativeHeight : _savedHeight;
+                int w = Mathf.Max(640, Mathf.RoundToInt(baseW * scale));
+                int h = Mathf.Max(360, Mathf.RoundToInt(baseH * scale));
+                if (w == Screen.width && h == Screen.height) { _appliedResolutionScale = scale; return; }
                 Screen.SetResolution(w, h, _savedMode);
-                A11yHost.Diag("LOWPERF 分辨率: " + _savedWidth + "x" + _savedHeight + " -> " + w + "x" + h
-                              + " mode=" + _savedMode);
+                _appliedResolutionScale = scale;
+                A11yHost.Diag("LOWPERF 分辨率: 原生 " + baseW + "x" + baseH + " × " + scale.ToString("F2")
+                              + " -> " + w + "x" + h + " mode=" + _savedMode);
             }
             catch (Exception e) { A11yHost.Diag("LOWPERF 分辨率: " + e.Message); }
         }
@@ -820,6 +998,7 @@ namespace ManosabaA11y
 
         private static void Restore()
         {
+            RestoreExtremeExtras();
             RestoreBlackout();
             RestoreUrp();
             RestoreTrueShadows();

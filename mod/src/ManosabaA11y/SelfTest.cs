@@ -100,6 +100,16 @@ namespace ManosabaA11y
             Check("lowperf.档位解析-关闭", LowPerf.TryParseMode("off", out m5) && m5 == LowPerf.Mode.Off, "off");
             Check("lowperf.旧档名仍认", LowPerf.TryParseMode("激进", out mOld) && mOld == LowPerf.Mode.Strong, "激进->强力");
             Check("lowperf.档位解析-坏值不崩", !LowPerf.TryParseMode("乱写", out mBad), "乱写");
+            // 0.0.16：降窗口分辨率进档位了，「档位越高窗口越小」必须是可验证的映射
+            Check("lowperf.分辨率-关闭不动窗口", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Off) - 1f) < 0.001f, "1.00");
+            Check("lowperf.分辨率-轻度不动窗口", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Light) - 1f) < 0.001f, "1.00");
+            Check("lowperf.分辨率-均衡0.85", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Balanced) - 0.85f) < 0.001f, "0.85");
+            Check("lowperf.分辨率-强力0.70", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong) - 0.70f) < 0.001f, "0.70");
+            Check("lowperf.分辨率-极限0.50", Math.Abs(LowPerf.ResolutionScaleFor(LowPerf.Mode.Extreme) - 0.50f) < 0.001f, "0.50");
+            Check("lowperf.分辨率随档位单调下降",
+                LowPerf.ResolutionScaleFor(LowPerf.Mode.Balanced) > LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong)
+                && LowPerf.ResolutionScaleFor(LowPerf.Mode.Strong) > LowPerf.ResolutionScaleFor(LowPerf.Mode.Extreme),
+                "均衡 > 强力 > 极限");
 
             bool parsed = false, ok = false;
             try

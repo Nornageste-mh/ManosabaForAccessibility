@@ -290,16 +290,24 @@ $Cases = @(
             Add-Check $Result '切到均衡档（轻度 -> 均衡）' $s2.Ok $s2.Line
             $q = @(Get-LogMatches 'LOWPERF 质量: level=\d+')
             Add-Check $Result '均衡档：质量/纹理降级已生效' ($q.Count -ge 1) ("命中 " + $q.Count)
+            $r85 = @(Get-LogMatches 'LOWPERF 分辨率: 原生 \d+x\d+ × 0\.85')
+            Add-Check $Result '均衡档：窗口分辨率降到 0.85×' ($r85.Count -ge 1) ("命中 " + $r85.Count)
 
             $s3 = Wait-Log -Pattern 'LOWPERF 档位: 均衡 -> 强力' -TimeoutSec 90
             Add-Check $Result '切到强力档（均衡 -> 强力）' $s3.Ok $s3.Line
             $agr = @(Get-LogMatches 'LOWPERF 激进: vSync=\d targetFps=\d')
             Add-Check $Result '强力档：VSync/帧率上限已调整' ($agr.Count -ge 1) ("命中 " + $agr.Count)
+            $r70 = @(Get-LogMatches 'LOWPERF 分辨率: 原生 \d+x\d+ × 0\.70')
+            Add-Check $Result '强力档：窗口分辨率降到 0.70×' ($r70.Count -ge 1) ("命中 " + $r70.Count)
 
             $s4 = Wait-Log -Pattern 'LOWPERF 档位: 强力 -> 极限' -TimeoutSec 90
             Add-Check $Result '切到极限档（强力 -> 极限）' $s4.Ok $s4.Line
             $blk = @(Get-LogMatches 'LOWPERF 极限: 相机=\d+ renderer=\d+')
             Add-Check $Result '极限档：画面已丢弃（相机/Renderer）' ($blk.Count -ge 1) ("命中 " + $blk.Count)
+            $r50 = @(Get-LogMatches 'LOWPERF 分辨率: 原生 \d+x\d+ × 0\.50')
+            Add-Check $Result '极限档：窗口分辨率降到 0.50×' ($r50.Count -ge 1) ("命中 " + $r50.Count)
+            $plus = @(Get-LogMatches 'LOWPERF 极限加强: Volume=\d+ Animator=\d+ 相机后处理=\d+')
+            Add-Check $Result '极限档：LOD/单骨骼/Volume/Animator 追加手段已生效' ($plus.Count -ge 1) ("命中 " + $plus.Count)
 
             $s5 = Wait-Log -Pattern 'LOWPERF 档位: 极限 -> 关闭' -TimeoutSec 90
             Add-Check $Result '回到关闭档（极限 -> 关闭）' $s5.Ok $s5.Line
@@ -309,6 +317,8 @@ $Cases = @(
             Add-Check $Result '关闭后质量设置已还原' ($qback.Count -ge 1) ("命中 " + $qback.Count)
             $rback = @(Get-LogMatches 'LOWPERF 极限: 还原 \d+ 个相机')
             Add-Check $Result '关闭后极限档已还原' ($rback.Count -ge 1) ("命中 " + $rback.Count)
+            $resback = @(Get-LogMatches 'LOWPERF 分辨率: 还原 \d+x\d+')
+            Add-Check $Result '关闭后窗口分辨率已还原' ($resback.Count -ge 1) ("命中 " + $resback.Count)
 
             $err = @(Get-LogMatches 'LOWPERF 换档失败|LOWPERF 已开启失败')
             Add-Check $Result '没有换档失败（反向）' ($err.Count -eq 0) ("命中 " + $err.Count)
