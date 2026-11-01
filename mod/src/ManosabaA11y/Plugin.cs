@@ -81,6 +81,12 @@ namespace ManosabaA11y
         /// </summary>
         internal static ConfigEntry<bool> CfgAllowScriptJump;
 
+        /// <summary>性能取证日志（仅 MANOSABA_A11Y_PERFDIAG=1 或配置打开）：不做任何优化，只测量。</summary>
+        internal static bool CfgPerfDiag;
+
+        /// <summary>性能实验（仅 MANOSABA_A11Y_PERFTEST=1）：依次施加候选优化并看帧率变化。只用于取证。</summary>
+        internal static bool CfgPerfTest;
+
         private Harmony _harmony;
 
         /// <summary>
@@ -334,6 +340,19 @@ namespace ManosabaA11y
         TestEvYes = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVYES") == "1";
             TestEvPick = Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_EVPICK") == "1";
             if (TestEvForce || TestEvPick) { CfgEvDiag = true; L.LogInfo("[a11y] TEST EVFORCE=" + TestEvForce + " EVPICK=" + TestEvPick); }
+
+            // 性能取证（仅 MANOSABA_A11Y_PERFDIAG=1）：量帧率、渲染设置、场景昂贵对象与自己的开销。
+            // 只测量、不改任何设置 —— 「低性能模式」要不要做、做什么，先看这份数据。
+            if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_PERFDIAG") == "1")
+            {
+                CfgPerfDiag = true;
+                A11yHost.Diag("PERFDIAG=1（只测量，不改任何设置）");
+                if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_PERFTEST") == "1")
+                {
+                    CfgPerfTest = true;
+                    A11yHost.Diag("PERFTEST=1（会改动画面设置做对照实验，仅取证用）");
+                }
+            }
 
             // 自动化：从插件内部驱动「剧情跳转」菜单（仅 MANOSABA_A11Y_TEST_SCRIPTJUMP=1）
             if (Environment.GetEnvironmentVariable("MANOSABA_A11Y_TEST_SCRIPTJUMP") == "1")
@@ -795,22 +814,36 @@ namespace ManosabaA11y
             try { ScriptJump.TestTick(); }
             catch (Exception e) { A11yHost.Diag("ScriptJump.Test: " + e.Message); }
 
+            PerfProbe.BeginCost("uinav");
             try { if (A11yHost.TickUiNav != null) A11yHost.TickUiNav(); }
             catch (Exception e) { A11yHost.Diag("Tick: " + e.Message); }
+            PerfProbe.EndCost("uinav");
 
             // 剧情文本朗读队列（消息级钩子只登记，这里到点统一念，避免一句念两遍）
+            PerfProbe.BeginCost("reader");
             try { Reader.Tick(); }
             catch (Exception e) { A11yHost.Diag("Reader.Tick: " + e.Message); }
+            PerfProbe.EndCost("reader");
 
             // 加载播报（本作点「新游戏」后有明显的黑屏加载段）
+            PerfProbe.BeginCost("ev");
             try { Evidence.Tick(); } catch (Exception e) { A11yHost.Diag("Evidence: " + e.Message); }
+            PerfProbe.EndCost("ev");
             try { LoadingWatch.Update(); }
             catch (Exception e) { A11yHost.Diag("LoadingWatch: " + e.Message); }
 
             // 整页界面辅助（魔女手册 / 对话记录）：平台导航扫不到关闭按钮与地图地点，
             // 这里自动播报页面内容 + Esc 直接调 CloseButton（详见 ScreenAssist.cs 注释）。
+            PerfProbe.BeginCost("screen");
             try { ScreenAssist.Update(); }
             catch (Exception e) { A11yHost.Diag("ScreenAssist: " + e.Message); }
+            PerfProbe.EndCost("screen");
+
+            // 性能取证探针（仅 MANOSABA_A11Y_PERFDIAG=1）：只测量不改设置
+            try { PerfProbe.Tick(); }
+            catch (Exception e) { A11yHost.Diag("PerfProbe: " + e.Message); }
+            try { PerfProbe.TestTick(); }
+            catch (Exception e) { A11yHost.Diag("PerfProbe.Test: " + e.Message); }
 
             // 界面取证探针（仅 MANOSABA_A11Y_PROBE_UI=1）：转储控件对象名，供别名表取证
             try { UiProbe.Update(); }

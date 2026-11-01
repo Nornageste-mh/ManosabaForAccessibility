@@ -29,7 +29,13 @@ namespace ManosabaA11y
     {
         private const float ScanInterval = 0.5f;
 
+        // 性能（0.0.0.12 实测）：每次扫描要 find 全场景 Transform，花 3~10ms。
+        // 找不到界面时（=绝大多数剧情时间）没必要 0.5 秒扫一次，放慢到 1.5 秒；
+        // 一旦找到界面立刻回到 0.5 秒，保证界面里的响应速度。
+        private const float ScanIntervalIdle = 1.5f;
+
         private static float _nextScanAt;
+        private static bool _foundLastScan;
         private static Transform _active;
         private static string _activeTitle;
         private static string _lastKey;
@@ -55,9 +61,10 @@ namespace ManosabaA11y
                 if (_active != null) HandleCloseKey(_active, _activeTitle);
 
                 if (Time.unscaledTime < _nextScanAt) return;
-                _nextScanAt = Time.unscaledTime + ScanInterval;
+                _nextScanAt = Time.unscaledTime + (_foundLastScan ? ScanInterval : ScanIntervalIdle);
 
                 Transform found = FindVisibleScreen(out string title);
+                _foundLastScan = found != null;
                 if (found == null)
                 {
                     _active = null;

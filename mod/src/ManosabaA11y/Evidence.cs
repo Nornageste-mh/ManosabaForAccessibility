@@ -26,6 +26,10 @@ namespace ManosabaA11y
 
         private static WitchTrials.Models.WitchTrialsNaninovelManager _mgr;
         private static bool _warnedMgr;
+
+        // 门控缓存（性能：见 Tick 里的注释）
+        private static float _nextGateAt;
+        private static bool _gateCached;
         private static float _nextFind;
         private static float _nextDump;
         private static int _scannedScript = int.MinValue;
@@ -67,7 +71,16 @@ namespace ManosabaA11y
                 // 仍然是 **false**（ev1 实测，手册确实被限制成只剩证物页、PresentEvidenceButton 已亮），
                 // 所以不能只信它。改用「手册可见 + 允许类别被限定（RestrictionCategories 非空）」判定，
                 // 这两个条件在普通阅读态都不成立（dump 里 catN=-1）。
-                if (Plugin.TestEvForce || IsMode || BookIsEvidenceMode()) UpdateChoice();
+                // ★ 性能：BookIsEvidenceMode() 内部是 Resources.FindObjectsOfTypeAll<WitchBookUi>()，
+                //   实测放在每帧路径上要 5.7ms（这台机器一帧才 80~370ms，等于吃掉 5%~7%）。
+                //   界面显隐不可能一帧内变化到需要每帧知道，限频到 0.4 秒完全够，且不影响按键响应
+                //   （按键判定在 UpdateChoice 里，仍每帧跑）。
+                if (!IsMode && Plugin.TestEvForce == false && now >= _nextGateAt)
+                {
+                    _nextGateAt = now + 0.4f;
+                    _gateCached = BookIsEvidenceMode();
+                }
+                if (Plugin.TestEvForce || IsMode || _gateCached) UpdateChoice();
                 else ResetChoice();
             }
             catch (Exception e) { A11yHost.Diag("EVIDENCE 交互: " + e.Message); }

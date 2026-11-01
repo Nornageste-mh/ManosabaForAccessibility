@@ -152,6 +152,22 @@
     <!-- GigaCreation.NaninovelExtender.UI：WitchBookScreen 的基类 NaninovelScreen 在这里。
          不引用它会报 CS0012「类型 NaninovelScreen 在未引用的程序集中定义」（读
          WitchBookScreen.PresentationMode 时） -->
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>$(InteropDir)\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="LeTai.TrueShadow">
+      <HintPath>$(InteropDir)\LeTai.TrueShadow.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+      <HintPath>$(InteropDir)\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>$(InteropDir)\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="GigaCreation.NaninovelExtender.UI">
       <HintPath>$(InteropDir)\GigaCreation.NaninovelExtender.UI.dll</HintPath>
       <Private>false</Private>
